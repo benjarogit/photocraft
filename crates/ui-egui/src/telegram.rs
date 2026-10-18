@@ -175,6 +175,38 @@ pub fn poll(app: &mut PhotocraftApp, ctx: &egui::Context) {
                 }
                 return;
             }
+            if let Some(json) = body.strip_prefix("CHATS\t") {
+                if let Some(dialog) = app.ui.dialogs.iter_mut().find(|dialog| owns(&dialog.fields)) {
+                    match serde_json::from_str::<Value>(json) {
+                        Ok(chats) => {
+                            dialog.fields.insert("found".into(), chats);
+                            dialog.fields.remove("findError");
+                            app.ui.status = "Found chats.".to_string();
+                            app.ui.status_error = false;
+                        }
+                        Err(_) => {
+                            dialog.fields.insert("findError".into(), json!("Telegram did not return chats."));
+                        }
+                    }
+                }
+                return;
+            }
+            if let Some(json) = body.strip_prefix("INBOX\t") {
+                if let Some(dialog) = app.ui.dialogs.iter_mut().find(|dialog| owns(&dialog.fields)) {
+                    match serde_json::from_str::<Value>(json) {
+                        Ok(files) => {
+                            dialog.fields.insert("inbox".into(), files);
+                            dialog.fields.remove("findError");
+                            app.ui.status = "Loaded files.".to_string();
+                            app.ui.status_error = false;
+                        }
+                        Err(_) => {
+                            dialog.fields.insert("findError".into(), json!("Telegram did not return files."));
+                        }
+                    }
+                }
+                return;
+            }
             let report = send_report(&body);
             let url = report.urls.first().cloned();
             let links = if report.urls.is_empty() {
@@ -284,14 +316,10 @@ pub fn body(app: &mut PhotocraftApp, ui: &mut egui::Ui, f: &mut serde_json::Map<
     ui.label(egui::RichText::new(tl!("The bot token is kept in the system keychain, not in PhotoCraft's settings file.")).color(t.text_dim));
     ui.add_space(4.0);
     if crate::widgets::secondary_button(ui, tl!("Find chats for this token"), 220.0).clicked() {
-        match fetch_chats(app, &token) {
-            Ok(chats) => {
-                f.insert("found".into(), json!(chats));
-                f.remove("findError");
-            }
-            Err(error) => {
-                f.insert("findError".into(), json!(error));
-            }
+        if let Err(error) = start_find_chats(app, &token) {
+            f.insert("findError".into(), json!(error));
+        } else {
+            f.remove("findError");
         }
     }
     if let Some(error) = f.get("findError").and_then(Value::as_str) {
@@ -319,14 +347,10 @@ pub fn body(app: &mut PhotocraftApp, ui: &mut egui::Ui, f: &mut serde_json::Map<
     ui.label(egui::RichText::new(tl!("Files sent from PhotoCraft, and the ten newest files sent to this bot. Click one to open it in PhotoCraft.")).color(t.text_dim));
     ui.add_space(4.0);
     if crate::widgets::secondary_button(ui, tl!("Get files"), 160.0).clicked() {
-        match fetch_inbox(app, &token) {
-            Ok(files) => {
-                f.insert("inbox".into(), json!(files));
-                f.remove("findError");
-            }
-            Err(error) => {
-                f.insert("findError".into(), json!(error));
-            }
+        if let Err(error) = start_fetch_inbox(app, &token) {
+            f.insert("findError".into(), json!(error));
+        } else {
+            f.remove("findError");
         }
     }
     if let Some(files) = f.get("inbox").and_then(Value::as_array).cloned() {
@@ -560,25 +584,21 @@ fn export_temp(app: &mut PhotocraftApp, extension: &str) -> Result<String, Strin
     Ok(path_str)
 }
 
-fn fetch_inbox(app: &PhotocraftApp, token: &str) -> Result<Vec<Value>, String> {
-    validate_token(token)?;
-    let Some(get) = app.services.telegram_get.as_ref() else {
-        return Err("Telegram sending needs the desktop app.".to_string());
-    };
-    let url = format!("https://api.telegram.org/bot{token}/getUpdates");
-    let body = get(&url).map_err(|error| redact(&error, token))?;
-    let mut rows = app.telegram.sent_files.clone();
-    for row in files_from_updates(&body) {
+fn inbox_rows(sent_files: &[Value], body: &str) -> Vec<Value> {
+    let mut rows = sent_files.to_vec();
+    let mut added = 0;
+    for row in files_from_updates(body) {
         let id = row.get("id").and_then(Value::as_str).unwrap_or("");
         if id.is_empty() || rows.iter().any(|have| have.get("id").and_then(Value::as_str) == Some(id)) {
             continue;
         }
         rows.push(row);
-        if rows.len() == 10 {
+        added += 1;
+        if added == 10 {
             break;
         }
     }
-    Ok(rows)
+    rows
 }
 
 fn start_download(app: &mut PhotocraftApp, token: &str, file_id: &str, name: &str) -> Result<(), String> {
@@ -590,7 +610,7 @@ fn start_download(app: &mut PhotocraftApp, token: &str, file_id: &str, name: &st
     };
     let token = token.to_string();
     let file_id = file_id.to_string();
-    let name = name.to_string();
+    let name = file_name(name);
     let (tx, rx) = std::sync::mpsc::channel();
     let token_for_job = token.clone();
     let name_for_status = name.clone();
@@ -622,14 +642,72 @@ fn start_download(app: &mut PhotocraftApp, token: &str, file_id: &str, name: &st
     Ok(())
 }
 
-fn fetch_chats(app: &PhotocraftApp, token: &str) -> Result<Vec<Value>, String> {
+fn start_find_chats(app: &mut PhotocraftApp, token: &str) -> Result<(), String> {
+    if app.telegram_job.is_some() {
+        return Err("A Telegram send is already running.".to_string());
+    }
     validate_token(token)?;
-    let Some(get) = app.services.telegram_get.as_ref() else {
+    let Some(get) = app.services.telegram_get.clone() else {
         return Err("Telegram sending needs the desktop app.".to_string());
     };
-    let url = format!("https://api.telegram.org/bot{token}/getUpdates");
-    let body = get(&url).map_err(|error| redact(&error, token))?;
-    Ok(chats_from_updates(&body))
+    let token = token.to_string();
+    let (tx, rx) = std::sync::mpsc::channel();
+    let token_for_job = token.clone();
+    #[cfg(target_arch = "wasm32")]
+    {
+        let _ = (get, token, tx);
+        return Err("Telegram sending needs the desktop app.".to_string());
+    }
+    #[cfg(not(target_arch = "wasm32"))]
+    std::thread::Builder::new()
+        .name("pc-tg-chats".into())
+        .spawn(move || {
+            let url = format!("https://api.telegram.org/bot{token}/getUpdates");
+            let result = get(&url)
+                .map_err(|error| redact(&error, &token))
+                .map(|body| format!("CHATS\t{}", serde_json::to_string(&chats_from_updates(&body)).unwrap_or_else(|_| "[]".into())));
+            let _ = tx.send(result);
+        })
+        .map_err(|error| error.to_string())?;
+    app.ui.status = "Looking for chats…".to_string();
+    app.ui.status_error = false;
+    app.telegram_job = Some(Job { rx, path: String::new(), temporary: false, preview: None, name: String::new(), token: token_for_job });
+    Ok(())
+}
+
+fn start_fetch_inbox(app: &mut PhotocraftApp, token: &str) -> Result<(), String> {
+    if app.telegram_job.is_some() {
+        return Err("A Telegram send is already running.".to_string());
+    }
+    validate_token(token)?;
+    let Some(get) = app.services.telegram_get.clone() else {
+        return Err("Telegram sending needs the desktop app.".to_string());
+    };
+    let token = token.to_string();
+    let sent = app.telegram.sent_files.clone();
+    let (tx, rx) = std::sync::mpsc::channel();
+    let token_for_job = token.clone();
+    #[cfg(target_arch = "wasm32")]
+    {
+        let _ = (get, token, sent, tx);
+        return Err("Telegram sending needs the desktop app.".to_string());
+    }
+    #[cfg(not(target_arch = "wasm32"))]
+    std::thread::Builder::new()
+        .name("pc-tg-inbox".into())
+        .spawn(move || {
+            let url = format!("https://api.telegram.org/bot{token}/getUpdates");
+            let result = get(&url).map_err(|error| redact(&error, &token)).map(|body| {
+                let rows = inbox_rows(&sent, &body);
+                format!("INBOX\t{}", serde_json::to_string(&rows).unwrap_or_else(|_| "[]".into()))
+            });
+            let _ = tx.send(result);
+        })
+        .map_err(|error| error.to_string())?;
+    app.ui.status = "Loading files…".to_string();
+    app.ui.status_error = false;
+    app.telegram_job = Some(Job { rx, path: String::new(), temporary: false, preview: None, name: String::new(), token: token_for_job });
+    Ok(())
 }
 
 /// Chats that have talked to the bot, newest last, one row per id.
@@ -797,8 +875,8 @@ fn file_secs(path: &str) -> u64 {
 
 fn file_name(path: &str) -> String {
     let raw = std::path::Path::new(path).file_name().and_then(|n| n.to_str()).unwrap_or("file");
-    let name: String = raw.chars().filter(|c| !matches!(c, '"' | '\\' | '\n' | '\r')).take(180).collect();
-    if name.is_empty() { "file".to_string() } else { name }
+    let name: String = raw.chars().filter(|c| !matches!(c, '"' | '\\' | '/' | '\n' | '\r')).take(180).collect();
+    if name.is_empty() || name == "." || name == ".." { "file".to_string() } else { name }
 }
 
 const CAPTION_LIMIT: usize = 1024;
@@ -1051,7 +1129,7 @@ pub fn files_from_updates(text: &str) -> Vec<Value> {
             if file_id.is_empty() || size > 20 * 1024 * 1024 {
                 continue;
             }
-            let name = document.get("file_name").and_then(Value::as_str).unwrap_or("file");
+            let name = file_name(document.get("file_name").and_then(Value::as_str).unwrap_or("file"));
             out.push(json!({"id": file_id, "name": name, "label": format!("{name} ({message_id})")}));
         } else if let Some(photos) = message.get("photo").and_then(Value::as_array) {
             let photo = photos.iter().max_by_key(|p| p.get("file_size").and_then(Value::as_u64).unwrap_or(0));
@@ -1233,6 +1311,22 @@ mod tests {
         let files = files_from_updates(&text);
         assert_eq!(files.len(), 10);
         assert_eq!(files[0].get("name").and_then(|v| v.as_str()), Some("f11.psd"));
+    }
+
+    #[test]
+    fn inbox_rows_keep_sent_files_and_ten_from_the_bot() {
+        let sent = vec![json!({"id": "sent1", "name": "a.psd"}), json!({"id": "sent2", "name": "b.psd"})];
+        let mut messages = Vec::new();
+        for n in 0..12 {
+            messages.push(format!(r#"{{"message":{{"message_id":{n},"document":{{"file_id":"id{n}","file_name":"../../f{n}.psd","file_size":10}}}}}}"#));
+        }
+        let text = format!(r#"{{"ok":true,"result":[{}]}}"#, messages.join(","));
+        let rows = inbox_rows(&sent, &text);
+        assert_eq!(rows.len(), 12);
+        assert_eq!(rows[0].get("id").and_then(Value::as_str), Some("sent1"));
+        assert_eq!(rows[2].get("name").and_then(Value::as_str), Some("f11.psd"));
+        assert_eq!(file_name("../../evil.psd"), "evil.psd");
+        assert_eq!(file_name(".."), "file");
     }
 
     #[test]

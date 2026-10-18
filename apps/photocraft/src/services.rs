@@ -586,6 +586,8 @@ const TELEGRAM_KEYCHAIN_USER: &str = "telegram-bot-token";
 /// Chat ids and switches on disk. The bot token stays in the system keychain.
 fn save_telegram_file(text: &str) -> Result<(), String> {
     let (rest, token) = photocraft_ui_egui::telegram::without_token(text)?;
+    // Keychain first: rewriting the file without the token must not leave the token nowhere.
+    store_telegram_token(&token)?;
     let path = config_dir().ok_or_else(|| "no config directory".to_string())?.join("telegram.json");
     write_atomic(&path, rest.as_bytes())?;
     #[cfg(unix)]
@@ -593,14 +595,18 @@ fn save_telegram_file(text: &str) -> Result<(), String> {
         use std::os::unix::fs::PermissionsExt;
         let _ = std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o600));
     }
-    store_telegram_token(&token)
+    Ok(())
 }
 
 fn load_telegram_file() -> Option<String> {
     let path = config_dir()?.join("telegram.json");
     let text = std::fs::read_to_string(&path).ok()?;
     let (_, embedded) = photocraft_ui_egui::telegram::without_token(&text).ok()?;
-    let stored = load_telegram_token().unwrap_or_default();
+    let stored = match load_telegram_token() {
+        Ok(token) => token,
+        // A keychain read error is not "no token": keep any embedded copy and do not migrate.
+        Err(_) => return Some(photocraft_ui_egui::telegram::with_token(&text, &embedded)),
+    };
     let token = if stored.is_empty() { embedded.clone() } else { stored };
     if !embedded.is_empty() {
         let _ = save_telegram_file(&photocraft_ui_egui::telegram::with_token(&text, &token));
