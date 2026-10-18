@@ -4338,3 +4338,8 @@ shape	Appearance	Izgled
 # File › Send to Telegram: result status
 	Sent {name}. {url}	Poslato: {name}. {url}
 	Could not pin the message. The file was still sent.	Nije moguće zakačiti poruku. Datoteka je ipak poslata.
+
+	Decrease Brush Size	Smanji veličinu četkice
+	Increase Brush Size	Povećaj veličinu četkice
+	Decrease Brush Hardness	Smanji tvrdoću četkice
+	Increase Brush Hardness	Povećaj tvrdoću četkice
