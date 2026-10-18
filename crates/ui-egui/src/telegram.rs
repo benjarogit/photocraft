@@ -816,15 +816,16 @@ fn remember_sent_files(app: &mut PhotocraftApp, fresh: &[Value]) {
         return;
     }
     let mut kept = fresh.to_vec();
+    kept.truncate(10);
     for old in app.telegram.sent_files.drain(..) {
+        if kept.len() >= 10 {
+            break;
+        }
         let id = old.get("id").and_then(Value::as_str).unwrap_or("");
         if id.is_empty() || kept.iter().any(|row| row.get("id").and_then(Value::as_str) == Some(id)) {
             continue;
         }
         kept.push(old);
-        if kept.len() == 10 {
-            break;
-        }
     }
     app.telegram.sent_files = kept;
     let text = settings_json(&app.telegram);
@@ -1021,12 +1022,11 @@ fn send_to_chats(
     let mut files = Vec::new();
     let mut pin_failed = false;
     for chat in chats {
+        // Always sendDocument (or a document album). sendPhoto re-encodes as JPEG,
+        // drops transparency, and rejects files over 10 MB while MAX_BYTES allows 50 MB.
         let (method, content_type, body) = if let Some((preview_name, preview_bytes, _)) = preview {
             let (content_type, body) = media_group(chat, caption, &[(name, bytes), (preview_name.as_str(), preview_bytes.as_slice())]);
             ("sendMediaGroup", content_type, body)
-        } else if is_image_name(name) {
-            let (content_type, body) = photo(chat, caption, name, bytes);
-            ("sendPhoto", content_type, body)
         } else {
             let (content_type, body) = multipart(chat, caption, name, bytes, None);
             ("sendDocument", content_type, body)
@@ -1061,11 +1061,6 @@ fn send_to_chats(
     Ok(json!({"urls": links, "files": files, "pinFailed": pin_failed}).to_string())
 }
 
-fn is_image_name(name: &str) -> bool {
-    let ext = std::path::Path::new(name).extension().and_then(|ext| ext.to_str()).unwrap_or("").to_ascii_lowercase();
-    matches!(ext.as_str(), "png" | "jpg" | "jpeg" | "gif" | "webp")
-}
-
 /// Album of two documents. Telegram will not mix a document with a photo.
 pub fn media_group(chat_id: &str, caption: &str, files: &[(&str, &[u8])]) -> (String, Vec<u8>) {
     let boundary = format!("PcTelegramAlbum{}", files.iter().map(|(_, bytes)| bytes.len()).sum::<usize>());
@@ -1097,21 +1092,6 @@ pub fn media_group(chat_id: &str, caption: &str, files: &[(&str, &[u8])]) -> (St
         body.extend_from_slice(b"\r\n");
     }
     body.extend_from_slice(format!("--{boundary}--\r\n").as_bytes());
-    (format!("multipart/form-data; boundary={boundary}"), body)
-}
-
-pub fn photo(chat_id: &str, caption: &str, filename: &str, bytes: &[u8]) -> (String, Vec<u8>) {
-    let boundary = format!("PcTelegramPhoto{}", bytes.len());
-    let mut body = Vec::new();
-    part(&mut body, &boundary, "chat_id", chat_id);
-    part(&mut body, &boundary, "caption", caption);
-    part(&mut body, &boundary, "parse_mode", "Markdown");
-    body.extend_from_slice(
-        format!("--{boundary}\r\nContent-Disposition: form-data; name=\"photo\"; filename=\"{filename}\"\r\nContent-Type: application/octet-stream\r\n\r\n")
-            .as_bytes(),
-    );
-    body.extend_from_slice(bytes);
-    body.extend_from_slice(format!("\r\n--{boundary}--\r\n").as_bytes());
     (format!("multipart/form-data; boundary={boundary}"), body)
 }
 
@@ -1287,18 +1267,28 @@ mod tests {
     }
 
     #[test]
-    fn album_sends_two_documents_and_a_photo_is_a_photo() {
+    fn album_sends_two_documents() {
         let (_, body) = media_group("99", "cap", &[("a.psd", b"PSD"), ("a.png", b"PNG")]);
         let text = String::from_utf8_lossy(&body);
         assert!(text.contains("sendMediaGroup") || text.contains("attach://f0"));
         assert!(text.contains("attach://f1"));
         assert!(text.contains("\"type\":\"document\""));
         assert!(!text.contains("reply_parameters"));
-        let (_, photo_body) = photo("99", "cap", "a.png", b"PNG");
-        let photo_text = String::from_utf8_lossy(&photo_body);
-        assert!(photo_text.contains("name=\"photo\""));
-        assert!(!photo_text.contains("name=\"document\""));
         assert_eq!(first_message_id(r#"{"ok":true,"result":[{"message_id":7}]}"#), Some(7));
+    }
+
+    #[test]
+    fn remember_sent_files_caps_at_ten_even_when_fresh_is_larger() {
+        let mut app = PhotocraftApp::new(
+            photocraft_engine::Session::new(),
+            crate::Services { save_telegram: Some(Box::new(|_| Ok(()))), ..Default::default() },
+        );
+        app.telegram.sent_files = vec![json!({"id": "old", "name": "old.psd"})];
+        let fresh: Vec<Value> = (0..12).map(|n| json!({"id": format!("n{n}"), "name": format!("f{n}.psd")})).collect();
+        remember_sent_files(&mut app, &fresh);
+        assert_eq!(app.telegram.sent_files.len(), 10);
+        assert_eq!(app.telegram.sent_files[0].get("id").and_then(Value::as_str), Some("n0"));
+        assert!(app.telegram.sent_files.iter().all(|row| row.get("id").and_then(Value::as_str) != Some("old")));
     }
 
     #[test]
@@ -1394,6 +1384,8 @@ mod tests {
         assert!(!app.ui.status.contains(&token()), "{}", app.ui.status);
         let dumped = seen.lock().unwrap_or_else(std::sync::PoisonError::into_inner).clone();
         assert!(dumped.contains("PNGDATA"), "{dumped}");
+        assert!(dumped.contains("sendDocument"), "{dumped}");
+        assert!(!dumped.contains("sendPhoto"), "{dumped}");
         assert!(dumped.contains("name=\"chat_id\""));
         let _ = std::fs::remove_dir_all(&dir);
     }
