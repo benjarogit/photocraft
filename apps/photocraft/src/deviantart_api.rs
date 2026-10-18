@@ -85,6 +85,7 @@ pub fn call(refresh_token: &str, client_id: &str, request: &str) -> Result<Strin
         "download" => {
             let id = value.get("deviationId").and_then(|v| v.as_str()).unwrap_or("");
             let (name, bytes) = download_deviation(refresh_token, client_id, id)?;
+            let name = safe_download_name(&name);
             let path = std::env::temp_dir().join(format!("photocraft-deviantart-in-{}-{name}", std::process::id()));
             std::fs::write(&path, &bytes).map_err(|error| error.to_string())?;
             Ok(format!("OPEN\t{}", path.display()))
@@ -109,6 +110,21 @@ fn string_list(value: Option<&serde_json::Value>) -> Vec<String> {
 
 fn file_name_of(path: &str) -> String {
     std::path::Path::new(path).file_name().and_then(|n| n.to_str()).unwrap_or("avatar.png").to_string()
+}
+
+/// Basename only, ASCII-safe, so a Hostile DeviantArt filename cannot leave temp_dir.
+fn safe_download_name(name: &str) -> String {
+    let normalized = name.replace('\\', "/");
+    let base = std::path::Path::new(&normalized)
+        .file_name()
+        .and_then(|n| n.to_str())
+        .unwrap_or("deviantart");
+    let cleaned: String = base.chars().filter(|c| c.is_ascii_alphanumeric() || matches!(c, '.' | '-' | '_')).collect();
+    if cleaned.is_empty() || cleaned == "." || cleaned == ".." {
+        "deviantart".to_string()
+    } else {
+        cleaned
+    }
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -463,7 +479,12 @@ fn wait_for_oauth_code(listener: &TcpListener, expected_state: &str, deadline: I
         if remaining.is_zero() {
             return Err("timeout".to_string());
         }
-        let mut stream = accept_for(listener, remaining.min(Duration::from_secs(5)))?;
+        // accept_for can time out every few seconds; that is not the overall deadline.
+        let mut stream = match accept_for(listener, remaining.min(Duration::from_secs(5))) {
+            Ok(stream) => stream,
+            Err(error) if error == "timeout" => continue,
+            Err(error) => return Err(error),
+        };
         let head = match read_head(&mut stream) {
             Ok(head) => head,
             Err(_) => {
@@ -647,5 +668,14 @@ mod tests {
         assert_eq!(query_value(&query, "state").as_deref(), Some("ss"));
         assert_eq!(request_path(head).as_deref(), Some("/callback"));
         assert_eq!(request_path("GET / HTTP/1.1\r\n\r\n").as_deref(), Some("/"));
+    }
+
+    #[test]
+    fn download_names_stay_inside_temp() {
+        assert_eq!(safe_download_name("../../evil.png"), "evil.png");
+        assert_eq!(safe_download_name(r"..\..\evil.png"), "evil.png");
+        assert_eq!(safe_download_name("my \"best\".png"), "mybest.png");
+        assert_eq!(safe_download_name(".."), "deviantart");
+        assert_eq!(safe_download_name(""), "deviantart");
     }
 }

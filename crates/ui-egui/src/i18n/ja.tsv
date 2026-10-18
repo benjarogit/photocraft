@@ -3902,6 +3902,7 @@ curves	Smooth	スムーズ
 	Submitted {name} to Sta.sh. It stays private until you publish it.	{name} は Sta.sh にあります。公開するまで非公開です。
 	Open the Sta.sh page	Sta.sh のページを開く
 	DeviantArt was disconnected.	DeviantArt を切断しました。
+	The DeviantArt login expired. Connect again.	DeviantArt のログインの有効期限が切れました。もう一度接続してください。
 	Open the Telegram message	Telegram のメッセージを開く
 	The ten newest files sent to this bot. Click one to open it in PhotoCraft.	このボットに送られた新しい順10件。クリックすると PhotoCraft で開きます。
 	Your published works. Click one to open it in PhotoCraft. Sta.sh drafts are not in this list.	公開済みの作品です。クリックすると PhotoCraft で開きます。Sta.sh の下書きはこの一覧にありません。

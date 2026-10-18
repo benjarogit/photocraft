@@ -361,9 +361,11 @@ pub fn body(app: &mut PhotocraftApp, ui: &mut egui::Ui, f: &mut serde_json::Map<
                     app.ui.status_error = true;
                 }
             }
-            if crate::widgets::secondary_button(ui, tl!("Disconnect DeviantArt"), 170.0).clicked() {
-                disconnect(app);
-            }
+            ui.add_enabled_ui(app.deviantart_job.is_none(), |ui| {
+                if crate::widgets::secondary_button(ui, tl!("Disconnect DeviantArt"), 170.0).clicked() {
+                    disconnect(app);
+                }
+            });
         });
     } else if crate::widgets::secondary_button(ui, tl!("Connect DeviantArt"), 220.0).clicked() {
         app.deviantart.client_id = client_id;
@@ -738,12 +740,6 @@ pub fn gallery_rows(text: &str) -> Vec<Value> {
 }
 
 fn start_call(app: &mut PhotocraftApp, request: &str) -> Result<(), String> {
-    if app.deviantart_job.is_some() {
-        return Err(tl!("A DeviantArt submit is already running.").to_string());
-    }
-    let Some(call) = app.services.deviantart_call.clone() else {
-        return Err(tl!("DeviantArt submitting needs the desktop app.").to_string());
-    };
     let parsed: Value = serde_json::from_str(request).unwrap_or_else(|_| json!({}));
     let op = parsed.get("op").and_then(Value::as_str).unwrap_or("");
     let (kind, path, temporary) = match op {
@@ -757,6 +753,19 @@ fn start_call(app: &mut PhotocraftApp, request: &str) -> Result<(), String> {
         }
         _ => (JobKind::Submit, String::new(), false),
     };
+    let discard_temp = |path: &str| {
+        if temporary {
+            let _ = std::fs::remove_file(path);
+        }
+    };
+    if app.deviantart_job.is_some() {
+        discard_temp(&path);
+        return Err(tl!("A DeviantArt submit is already running.").to_string());
+    }
+    let Some(call) = app.services.deviantart_call.clone() else {
+        discard_temp(&path);
+        return Err(tl!("DeviantArt submitting needs the desktop app.").to_string());
+    };
     let refresh = app.deviantart.refresh_token.clone();
     let client_id = app.deviantart.client_id.clone();
     let request = request.to_string();
@@ -764,9 +773,7 @@ fn start_call(app: &mut PhotocraftApp, request: &str) -> Result<(), String> {
     #[cfg(target_arch = "wasm32")]
     {
         let _ = (call, refresh, client_id, request, tx);
-        if temporary {
-            let _ = std::fs::remove_file(&path);
-        }
+        discard_temp(&path);
         return Err(tl!("DeviantArt submitting needs the desktop app.").to_string());
     }
     #[cfg(not(target_arch = "wasm32"))]
@@ -776,9 +783,7 @@ fn start_call(app: &mut PhotocraftApp, request: &str) -> Result<(), String> {
             let _ = tx.send(call(&refresh, &client_id, &request));
         })
         .map_err(|error| {
-            if temporary {
-                let _ = std::fs::remove_file(&path);
-            }
+            discard_temp(&path);
             error.to_string()
         })?;
     app.deviantart_job = Some(Job { rx, kind, path, temporary, name: "DeviantArt".into() });
@@ -927,6 +932,10 @@ pub fn item_id(body: &str) -> Option<i64> {
 /// DeviantArt rotates the refresh token on every use. The keychain has the new one; the
 /// dialog still holds the one it sent. Copy the keychain value before the next save.
 fn remember_rotated_login(app: &mut PhotocraftApp) {
+    // Disconnected (or never connected): do not bring a login back from the keychain.
+    if app.deviantart.refresh_token.is_empty() {
+        return;
+    }
     let Some(text) = app.services.load_deviantart.as_mut().and_then(|load| load()) else { return };
     let token = settings_from_json(&text).refresh_token;
     if !token.is_empty() {
@@ -971,7 +980,7 @@ fn disconnect(app: &mut PhotocraftApp) {
 
 fn localize_error(error: &str) -> String {
     if login_was_rejected(error) {
-        return "The DeviantArt login expired. Connect again.".to_string();
+        return tl!("The DeviantArt login expired. Connect again.").to_string();
     }
     let source = match error {
         "timeout" => "Waiting for DeviantArt timed out.",
@@ -987,6 +996,7 @@ fn localize_error(error: &str) -> String {
 
 pub fn multipart(title: &str, comments: &str, tags: &[String], filename: &str, bytes: &[u8]) -> (String, Vec<u8>) {
     let boundary = format!("PcDeviantArt{}", bytes.len());
+    let filename: String = filename.chars().map(|c| if matches!(c, '"' | '\r' | '\n' | '\\') { '_' } else { c }).collect();
     let mut body = Vec::new();
     part(&mut body, &boundary, "title", title);
     part(&mut body, &boundary, "artist_comments", comments);
@@ -1048,6 +1058,10 @@ mod tests {
         assert_eq!(item_id(r#"{"status":"success","itemid":42}"#), Some(42));
         assert_eq!(stash_url(2730074306229899).as_deref(), Some("https://www.deviantart.com/stash/0qvqatlhzez"));
         assert_eq!(stash_url(0), None);
+        let (_, quoted) = multipart("Hill", "notes", &[], "my \"best\" sketch.png", b"x");
+        let quoted = String::from_utf8_lossy(&quoted);
+        assert!(quoted.contains("filename=\"my _best_ sketch.png\""));
+        assert!(!quoted.contains("filename=\"my \"best\""));
     }
 
     #[test]
