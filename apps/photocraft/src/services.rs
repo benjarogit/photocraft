@@ -589,19 +589,18 @@ const DEVIANTART_KEYCHAIN_USER: &str = "deviantart-refresh-token";
 /// back over the one DeviantArt just issued.
 fn save_deviantart_file(text: &str) -> Result<(), String> {
     let (rest, token) = photocraft_ui_egui::deviantart::without_token(text)?;
+    // Keychain first: never rewrite the file without the token until storage succeeded.
+    if token.is_empty() {
+        crate::deviantart_api::clear_login();
+    } else if crate::deviantart_api::current_refresh().is_empty() {
+        crate::deviantart_api::adopt_login(&token)?;
+    }
     let path = config_dir().ok_or_else(|| "no config directory".to_string())?.join("deviantart.json");
     write_atomic(&path, rest.as_bytes())?;
     #[cfg(unix)]
     {
         use std::os::unix::fs::PermissionsExt;
         let _ = std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o600));
-    }
-    if token.is_empty() {
-        crate::deviantart_api::clear_login();
-        return Ok(());
-    }
-    if crate::deviantart_api::current_refresh().is_empty() {
-        crate::deviantart_api::adopt_login(&token);
     }
     Ok(())
 }
@@ -610,7 +609,11 @@ fn load_deviantart_file() -> Option<String> {
     let path = config_dir()?.join("deviantart.json");
     let text = std::fs::read_to_string(&path).ok()?;
     let (_, embedded) = photocraft_ui_egui::deviantart::without_token(&text).ok()?;
-    let stored = load_deviantart_token().unwrap_or_default();
+    let stored = match load_deviantart_token() {
+        Ok(token) => token,
+        // A keychain read error is not "no token": keep any embedded copy and do not migrate.
+        Err(_) => return Some(photocraft_ui_egui::deviantart::with_token(&text, &embedded)),
+    };
     let token = if stored.is_empty() { embedded.clone() } else { stored };
     if !embedded.is_empty() {
         let _ = save_deviantart_file(&photocraft_ui_egui::deviantart::with_token(&text, &token));

@@ -4054,3 +4054,8 @@ curves	Smooth	Vloeiend maken
 	GPU Memory (MB, 0 = Automatic)	GPU-geheugen (MB, 0 = Automatisch)
 	{name} was changed by another app after it was opened or saved here.	{name} is door een andere app gewijzigd nadat het hier is geopend of bewaard.
 	Replace it with this document, or cancel and use File › Save As to keep both.	Vervang het door dit document, of annuleer en gebruik Bestand › Opslaan als om beide te houden.
+
+# File › Submit to DeviantArt: result messages
+	Published on DeviantArt.	Gepubliceerd op DeviantArt.
+	Updated the title and tags on DeviantArt.	Titel en tags op DeviantArt bijgewerkt.
+	Set the DeviantArt profile picture.	DeviantArt-profielfoto ingesteld.

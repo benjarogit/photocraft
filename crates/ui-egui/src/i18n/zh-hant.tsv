@@ -2900,3 +2900,8 @@ curves	Smooth	平滑
 	Replace	取代
 	{name} was changed by another app after it was opened or saved here.	{name} 在此處開啟或儲存後已被其他 App 更改。
 	Replace it with this document, or cancel and use File › Save As to keep both.	以此文件取代它，或取消並使用「檔案 › 另存新檔」以保留兩者。
+
+# File › Submit to DeviantArt: result messages
+	Published on DeviantArt.	已在 DeviantArt 上發佈。
+	Updated the title and tags on DeviantArt.	已更新 DeviantArt 上的標題和標籤。
+	Set the DeviantArt profile picture.	已設定 DeviantArt 大頭貼。

@@ -4256,3 +4256,8 @@ navigator	Zoom	Zoom
 	GPU Memory (MB, 0 = Automatic)	Memoria de GPU (MB, 0 = Automático)
 	{name} was changed by another app after it was opened or saved here.	Otra aplicación cambió {name} después de abrirlo o guardarlo aquí.
 	Replace it with this document, or cancel and use File › Save As to keep both.	Reemplázalo con este documento, o cancela y usa Archivo › Guardar como para conservar ambos.
+
+# File › Submit to DeviantArt: result messages
+	Published on DeviantArt.	Publicado en DeviantArt.
+	Updated the title and tags on DeviantArt.	Se actualizaron el título y las etiquetas en DeviantArt.
+	Set the DeviantArt profile picture.	Se estableció la foto de perfil de DeviantArt.

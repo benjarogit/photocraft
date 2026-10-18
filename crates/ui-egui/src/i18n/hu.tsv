@@ -4213,3 +4213,8 @@ cameraRaw	Yellow	Sárga
 	GPU Memory (MB, 0 = Automatic)	GPU-memória (MB, 0 = Automatikus)
 	{name} was changed by another app after it was opened or saved here.	A(z) {name} fájlt egy másik alkalmazás módosította, miután itt megnyitották vagy mentették.
 	Replace it with this document, or cancel and use File › Save As to keep both.	Cserélje le erre a dokumentumra, vagy válassza a Mégse gombot, és a Fájl › Mentés másként paranccsal tartsa meg mindkettőt.
+
+# File › Submit to DeviantArt: result messages
+	Published on DeviantArt.	Közzétéve a DeviantArton.
+	Updated the title and tags on DeviantArt.	A DeviantArt cím és címkék frissítve.
+	Set the DeviantArt profile picture.	DeviantArt profilkép beállítva.

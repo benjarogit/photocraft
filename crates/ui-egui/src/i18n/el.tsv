@@ -3994,3 +3994,8 @@ curves	Smooth	Εξομάλυνση
 	GPU Memory (MB, 0 = Automatic)	Μνήμη GPU (MB, 0 = Αυτόματο)
 	{name} was changed by another app after it was opened or saved here.	Το {name} άλλαξε από άλλη εφαρμογή αφού ανοίχτηκε ή αποθηκεύτηκε εδώ.
 	Replace it with this document, or cancel and use File › Save As to keep both.	Αντικαταστήστε το με αυτό το έγγραφο ή ακυρώστε και χρησιμοποιήστε Αρχείο › Αποθήκευση ως για να κρατήσετε και τα δύο.
+
+# File › Submit to DeviantArt: result messages
+	Published on DeviantArt.	Δημοσιεύτηκε στο DeviantArt.
+	Updated the title and tags on DeviantArt.	Ενημερώθηκαν ο τίτλος και οι ετικέτες στο DeviantArt.
+	Set the DeviantArt profile picture.	Ορίστηκε η εικόνα προφίλ DeviantArt.

@@ -34,18 +34,7 @@ pub fn connect(client_id: &str) -> Result<String, String> {
         encode(REDIRECT_URI)
     );
     open::that(&url).map_err(|error| redact(&error.to_string()))?;
-    let mut stream = accept_for(&listener, Duration::from_secs(180))?;
-    let head = read_head(&mut stream)?;
-    let _ = write_done(&mut stream);
-    let query = request_query(&head).ok_or_else(|| "no-code".to_string())?;
-    if query_value(&query, "error").is_some() {
-        return Err("denied".to_string());
-    }
-    let got_state = query_value(&query, "state").unwrap_or_default();
-    if got_state != state {
-        return Err("state".to_string());
-    }
-    let code = query_value(&query, "code").ok_or_else(|| "no-code".to_string())?;
+    let code = wait_for_oauth_code(&listener, &state, Instant::now() + Duration::from_secs(180))?;
     let body = format!(
         "grant_type=authorization_code&client_id={client_id}&code={}&redirect_uri={}&code_verifier={}",
         encode(&code),
@@ -55,7 +44,7 @@ pub fn connect(client_id: &str) -> Result<String, String> {
     let text = post_form(TOKEN, &body)?;
     let refresh = refresh_of(&text).ok_or_else(|| "no-code".to_string())?;
     // This login replaces whatever the last upload rotated to.
-    adopt_login(&refresh);
+    adopt_login(&refresh)?;
     Ok(refresh)
 }
 
@@ -312,13 +301,13 @@ fn login_mut() -> std::sync::MutexGuard<'static, Login> {
 }
 
 /// Browser login succeeded. Drop the previous access token so the next call uses this refresh token.
-pub fn adopt_login(token: &str) {
+pub fn adopt_login(token: &str) -> Result<(), String> {
     let mut session = login_mut();
     session.refresh = token.to_string();
     session.access.clear();
     session.until = Instant::now();
     drop(session);
-    let _ = crate::services::store_deviantart_token(token);
+    crate::services::store_deviantart_token(token)
 }
 
 /// The user disconnected, or DeviantArt rejected the refresh token.
@@ -467,6 +456,46 @@ fn accept_for(listener: &TcpListener, limit: Duration) -> Result<TcpStream, Stri
     }
 }
 
+/// Keep accepting until `/callback` with the expected state arrives, or the deadline passes.
+fn wait_for_oauth_code(listener: &TcpListener, expected_state: &str, deadline: Instant) -> Result<String, String> {
+    loop {
+        let remaining = deadline.saturating_duration_since(Instant::now());
+        if remaining.is_zero() {
+            return Err("timeout".to_string());
+        }
+        let mut stream = accept_for(listener, remaining.min(Duration::from_secs(5)))?;
+        let head = match read_head(&mut stream) {
+            Ok(head) => head,
+            Err(_) => {
+                let _ = write_page(&mut stream, false);
+                continue;
+            }
+        };
+        if request_path(&head).as_deref() != Some("/callback") {
+            let _ = write_page(&mut stream, false);
+            continue;
+        }
+        let Some(query) = request_query(&head) else {
+            let _ = write_page(&mut stream, false);
+            continue;
+        };
+        if query_value(&query, "error").is_some() {
+            let _ = write_page(&mut stream, false);
+            return Err("denied".to_string());
+        }
+        if query_value(&query, "state").unwrap_or_default() != expected_state {
+            let _ = write_page(&mut stream, false);
+            continue;
+        }
+        let Some(code) = query_value(&query, "code").filter(|code| !code.is_empty()) else {
+            let _ = write_page(&mut stream, false);
+            continue;
+        };
+        let _ = write_page(&mut stream, true);
+        return Ok(code);
+    }
+}
+
 fn read_head(stream: &mut TcpStream) -> Result<String, String> {
     let mut buf = Vec::new();
     let mut byte = [0u8; 1];
@@ -488,11 +517,21 @@ fn read_head(stream: &mut TcpStream) -> Result<String, String> {
     String::from_utf8(buf).map_err(|_| "no-code".to_string())
 }
 
-fn write_done(stream: &mut TcpStream) -> Result<(), String> {
-    let body = "PhotoCraft ist verbunden. Du kannst dieses Fenster schließen.\nPhotoCraft is connected. You can close this window.";
+fn write_page(stream: &mut TcpStream, ok: bool) -> Result<(), String> {
+    let body = if ok {
+        "PhotoCraft ist verbunden. Du kannst dieses Fenster schließen.\nPhotoCraft is connected. You can close this window."
+    } else {
+        "PhotoCraft konnte nicht verbinden. Du kannst dieses Fenster schließen.\nPhotoCraft could not connect. You can close this window."
+    };
     let head = format!("HTTP/1.1 200 OK\r\nContent-Type: text/plain; charset=utf-8\r\nContent-Length: {}\r\nConnection: close\r\n\r\n", body.len());
     stream.write_all(head.as_bytes()).map_err(|error| error.to_string())?;
     stream.write_all(body.as_bytes()).map_err(|error| error.to_string())
+}
+
+fn request_path(head: &str) -> Option<String> {
+    let line = head.lines().next()?;
+    let path = line.split_whitespace().nth(1)?;
+    Some(path.split('?').next().unwrap_or(path).to_string())
 }
 
 fn request_query(head: &str) -> Option<String> {
@@ -606,5 +645,7 @@ mod tests {
         let query = request_query(head).unwrap();
         assert_eq!(query_value(&query, "code").as_deref(), Some("abc/1"));
         assert_eq!(query_value(&query, "state").as_deref(), Some("ss"));
+        assert_eq!(request_path(head).as_deref(), Some("/callback"));
+        assert_eq!(request_path("GET / HTTP/1.1\r\n\r\n").as_deref(), Some("/"));
     }
 }

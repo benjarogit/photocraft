@@ -4024,3 +4024,8 @@ cameraData	Lens	Lens
 	GPU Memory (MB, 0 = Automatic)	GPU Belleği (MB, 0 = Otomatik)
 	{name} was changed by another app after it was opened or saved here.	{name}, burada açıldıktan veya kaydedildikten sonra başka bir uygulama tarafından değiştirildi.
 	Replace it with this document, or cancel and use File › Save As to keep both.	Bu belgeyle değiştirin ya da iptal edip ikisini de korumak için Dosya › Farklı Kaydet'i kullanın.
+
+# File › Submit to DeviantArt: result messages
+	Published on DeviantArt.	DeviantArt'ta yayımlandı.
+	Updated the title and tags on DeviantArt.	DeviantArt başlığı ve etiketleri güncellendi.
+	Set the DeviantArt profile picture.	DeviantArt profil resmi ayarlandı.

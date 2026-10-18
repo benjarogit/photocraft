@@ -3289,3 +3289,8 @@ curves	Smooth	Haluskan
 	Replace	Ganti
 	{name} was changed by another app after it was opened or saved here.	{name} diubah oleh aplikasi lain setelah dibuka atau disimpan di sini.
 	Replace it with this document, or cancel and use File › Save As to keep both.	Ganti dengan dokumen ini, atau batalkan dan gunakan Berkas › Simpan Sebagai untuk menyimpan keduanya.
+
+# File › Submit to DeviantArt: result messages
+	Published on DeviantArt.	Diterbitkan di DeviantArt.
+	Updated the title and tags on DeviantArt.	Judul dan tag di DeviantArt diperbarui.
+	Set the DeviantArt profile picture.	Foto profil DeviantArt diatur.

@@ -3994,3 +3994,8 @@ curves	Smooth	Згладити
 	Replace	Замінити
 	{name} was changed by another app after it was opened or saved here.	Файл {name} змінила інша програма після того, як його тут відкрили або зберегли.
 	Replace it with this document, or cancel and use File › Save As to keep both.	Замініть його цим документом або скасуйте й скористайтеся Файл › Зберегти як, щоб зберегти обидва.
+
+# File › Submit to DeviantArt: result messages
+	Published on DeviantArt.	Опубліковано на DeviantArt.
+	Updated the title and tags on DeviantArt.	Назву й теги на DeviantArt оновлено.
+	Set the DeviantArt profile picture.	Аватар DeviantArt встановлено.

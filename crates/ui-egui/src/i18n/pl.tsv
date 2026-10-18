@@ -3893,3 +3893,8 @@ curves	Smooth	Wygładź
 	Replace	Zastąp
 	{name} was changed by another app after it was opened or saved here.	Plik {name} został zmieniony przez inną aplikację po otwarciu lub zapisaniu go tutaj.
 	Replace it with this document, or cancel and use File › Save As to keep both.	Zastąp go tym dokumentem albo anuluj i użyj Plik › Zapisz jako, aby zachować oba.
+
+# File › Submit to DeviantArt: result messages
+	Published on DeviantArt.	Opublikowano na DeviantArt.
+	Updated the title and tags on DeviantArt.	Zaktualizowano tytuł i tagi na DeviantArt.
+	Set the DeviantArt profile picture.	Ustawiono zdjęcie profilowe DeviantArt.

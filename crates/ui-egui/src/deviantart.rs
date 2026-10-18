@@ -230,6 +230,58 @@ pub fn poll(app: &mut PhotocraftApp, ctx: &egui::Context) {
             app.ui.status_error = false;
             show_result(app, message, url);
         }
+        (JobKind::Publish, Some(Ok(_))) => {
+            remember_rotated_login(app);
+            let message = tl!("Published on DeviantArt.").to_string();
+            app.ui.status = message.clone();
+            app.ui.status_error = false;
+            show_result(app, message, None);
+        }
+        (JobKind::Edit, Some(Ok(_))) => {
+            remember_rotated_login(app);
+            let message = tl!("Updated the title and tags on DeviantArt.").to_string();
+            app.ui.status = message.clone();
+            app.ui.status_error = false;
+            show_result(app, message, None);
+        }
+        (JobKind::Avatar, Some(Ok(_))) => {
+            remember_rotated_login(app);
+            let message = tl!("Set the DeviantArt profile picture.").to_string();
+            app.ui.status = message.clone();
+            app.ui.status_error = false;
+            show_result(app, message, None);
+        }
+        (JobKind::Gallery, Some(Ok(body))) => {
+            remember_rotated_login(app);
+            if let Some(dialog) = app.ui.dialogs.iter_mut().find(|dialog| owns(&dialog.fields)) {
+                let rows = gallery_rows(&body);
+                if rows.is_empty() {
+                    dialog.fields.insert("galleryNote".into(), json!(tl!("No published works in the gallery.").to_string()));
+                } else {
+                    dialog.fields.remove("galleryNote");
+                }
+                dialog.fields.insert("gallery".into(), json!(rows));
+                dialog.fields.remove("filesError");
+            }
+            app.ui.status_error = false;
+        }
+        (JobKind::Gallery, Some(Err(error))) => {
+            if login_was_rejected(&error) {
+                app.deviantart.refresh_token.clear();
+                let _ = save_settings(app);
+            } else {
+                remember_rotated_login(app);
+            }
+            let message = localize_error(&error);
+            if let Some(dialog) = app.ui.dialogs.iter_mut().find(|dialog| owns(&dialog.fields)) {
+                dialog.fields.insert("filesError".into(), json!(message.clone()));
+            }
+            app.ui.status = message;
+            app.ui.status_error = true;
+        }
+        (JobKind::Download, Some(Err(error))) | (JobKind::Publish, Some(Err(error))) | (JobKind::Edit, Some(Err(error))) | (JobKind::Avatar, Some(Err(error))) => {
+            report_deviantart_error(app, &error, true);
+        }
         (_, Some(Err(error))) => {
             report_deviantart_error(app, &error, !matches!(job.kind, JobKind::Connect));
         }
@@ -495,6 +547,11 @@ fn save_settings(app: &mut PhotocraftApp) -> Result<(), String> {
 enum JobKind {
     Connect,
     Submit,
+    Publish,
+    Edit,
+    Avatar,
+    Gallery,
+    Download,
 }
 
 pub(crate) struct Job {
@@ -548,9 +605,17 @@ fn start_submit(app: &mut PhotocraftApp, path: String, temporary: bool) -> Resul
         }
         return Err(tl!("DeviantArt submitting needs the desktop app.").to_string());
     };
-    let (name, bytes) = read_file(&path)?;
+    let (name, bytes) = match read_file(&path) {
+        Ok(read) => read,
+        Err(error) => {
+            if temporary {
+                let _ = std::fs::remove_file(&path);
+            }
+            return Err(error);
+        }
+    };
     let title = if app.deviantart.title.is_empty() { stem(&name) } else { app.deviantart.title.clone() };
-    let comments = comments(&path, &name, bytes.len() as u64);
+    let comments = comments(&name, bytes.len() as u64);
     let tags = clean_tags(&app.deviantart.tags);
     let token = app.deviantart.refresh_token.clone();
     let client_id = app.deviantart.client_id.clone();
@@ -636,9 +701,9 @@ fn stem(name: &str) -> String {
     if stem.is_empty() { "PhotoCraft".to_string() } else { stem }
 }
 
-fn comments(path: &str, name: &str, bytes: u64) -> String {
-    let format = std::path::Path::new(path).extension().and_then(|ext| ext.to_str()).unwrap_or("").to_ascii_uppercase();
-    format!("File: {name}\nFormat: {format}\nSize: {}\nPath: {path}", crate::sizing::human_bytes(bytes as f64))
+fn comments(name: &str, bytes: u64) -> String {
+    let format = std::path::Path::new(name).extension().and_then(|ext| ext.to_str()).unwrap_or("").to_ascii_uppercase();
+    format!("File: {name}\nFormat: {format}\nSize: {}", crate::sizing::human_bytes(bytes as f64))
 }
 
 /// DeviantArt tags allow letters, digits and underscores.
@@ -672,19 +737,25 @@ pub fn gallery_rows(text: &str) -> Vec<Value> {
     out
 }
 
-fn call_now(app: &PhotocraftApp, request: &str) -> Result<String, String> {
-    let Some(call) = app.services.deviantart_call.as_ref() else {
-        return Err(tl!("DeviantArt submitting needs the desktop app.").to_string());
-    };
-    call(&app.deviantart.refresh_token, &app.deviantart.client_id, request)
-}
-
 fn start_call(app: &mut PhotocraftApp, request: &str) -> Result<(), String> {
     if app.deviantart_job.is_some() {
         return Err(tl!("A DeviantArt submit is already running.").to_string());
     }
     let Some(call) = app.services.deviantart_call.clone() else {
         return Err(tl!("DeviantArt submitting needs the desktop app.").to_string());
+    };
+    let parsed: Value = serde_json::from_str(request).unwrap_or_else(|_| json!({}));
+    let op = parsed.get("op").and_then(Value::as_str).unwrap_or("");
+    let (kind, path, temporary) = match op {
+        "publish" => (JobKind::Publish, String::new(), false),
+        "edit" => (JobKind::Edit, String::new(), false),
+        "gallery" => (JobKind::Gallery, String::new(), false),
+        "download" => (JobKind::Download, String::new(), false),
+        "avatar" => {
+            let path = parsed.get("path").and_then(Value::as_str).unwrap_or("").to_string();
+            (JobKind::Avatar, path, true)
+        }
+        _ => (JobKind::Submit, String::new(), false),
     };
     let refresh = app.deviantart.refresh_token.clone();
     let client_id = app.deviantart.client_id.clone();
@@ -693,6 +764,9 @@ fn start_call(app: &mut PhotocraftApp, request: &str) -> Result<(), String> {
     #[cfg(target_arch = "wasm32")]
     {
         let _ = (call, refresh, client_id, request, tx);
+        if temporary {
+            let _ = std::fs::remove_file(&path);
+        }
         return Err(tl!("DeviantArt submitting needs the desktop app.").to_string());
     }
     #[cfg(not(target_arch = "wasm32"))]
@@ -701,8 +775,13 @@ fn start_call(app: &mut PhotocraftApp, request: &str) -> Result<(), String> {
         .spawn(move || {
             let _ = tx.send(call(&refresh, &client_id, &request));
         })
-        .map_err(|error| error.to_string())?;
-    app.deviantart_job = Some(Job { rx, kind: JobKind::Submit, path: String::new(), temporary: false, name: "DeviantArt".into() });
+        .map_err(|error| {
+            if temporary {
+                let _ = std::fs::remove_file(&path);
+            }
+            error.to_string()
+        })?;
+    app.deviantart_job = Some(Job { rx, kind, path, temporary, name: "DeviantArt".into() });
     Ok(())
 }
 
@@ -742,23 +821,14 @@ fn gallery_section(app: &mut PhotocraftApp, ui: &mut egui::Ui, f: &mut serde_jso
     }
     if crate::widgets::secondary_button(ui, tl!("Get files"), 160.0).clicked() {
         f.remove("filesError");
+        f.remove("galleryNote");
         let stash = stash_rows_from(&app.deviantart);
         if stash.is_empty() {
             f.insert("filesError".into(), json!(tl!("No Sta.sh files yet.").to_string()));
         }
         f.insert("stash".into(), json!(stash));
-        match call_now(app, r#"{"op":"gallery"}"#) {
-            Ok(text) => {
-                remember_rotated_login(app);
-                let rows = gallery_rows(&text);
-                if rows.is_empty() && f.get("filesError").is_none() {
-                    f.insert("galleryNote".into(), json!(tl!("No published works in the gallery.").to_string()));
-                }
-                f.insert("gallery".into(), json!(rows));
-            }
-            Err(error) => {
-                f.insert("filesError".into(), json!(localize_error(&error)));
-            }
+        if let Err(error) = start_call(app, r#"{"op":"gallery"}"#) {
+            f.insert("filesError".into(), json!(error));
         }
     }
     if let Some(error) = f.get("filesError").and_then(Value::as_str) {
@@ -978,5 +1048,14 @@ mod tests {
         assert_eq!(item_id(r#"{"status":"success","itemid":42}"#), Some(42));
         assert_eq!(stash_url(2730074306229899).as_deref(), Some("https://www.deviantart.com/stash/0qvqatlhzez"));
         assert_eq!(stash_url(0), None);
+    }
+
+    #[test]
+    fn artist_comments_omit_the_local_path() {
+        let text = comments("hill.png", 1200);
+        assert!(text.contains("hill.png"));
+        assert!(text.contains("PNG"));
+        assert!(!text.contains('/'));
+        assert!(!text.contains("home"));
     }
 }

@@ -3302,3 +3302,8 @@ curves	Smooth	Lisser
 	Replace	Remplacer
 	{name} was changed by another app after it was opened or saved here.	{name} a été modifié par une autre application après avoir été ouvert ou enregistré ici.
 	Replace it with this document, or cancel and use File › Save As to keep both.	Remplacez-le par ce document, ou annulez et utilisez Fichier › Enregistrer sous pour garder les deux.
+
+# File › Submit to DeviantArt: result messages
+	Published on DeviantArt.	Publié sur DeviantArt.
+	Updated the title and tags on DeviantArt.	Titre et balises mis à jour sur DeviantArt.
+	Set the DeviantArt profile picture.	Photo de profil DeviantArt définie.
