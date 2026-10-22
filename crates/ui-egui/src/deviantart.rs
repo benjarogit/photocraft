@@ -8,7 +8,9 @@ use serde_json::{Value, json};
 use crate::PhotocraftApp;
 
 /// Sta.sh accepts smaller files than Telegram. Larger ones fail with a validation error.
+#[cfg(not(target_arch = "wasm32"))]
 const MAX_BYTES: u64 = 30 * 1024 * 1024;
+
 const BASE_SCOPES: &str = "stash";
 
 /// Loopback the user must whitelist on their DeviantArt app. A fixed port so the redirect URI
@@ -301,9 +303,7 @@ pub fn body(app: &mut PhotocraftApp, ui: &mut egui::Ui, f: &mut serde_json::Map<
         }
     });
     ui.label(egui::RichText::new(tl!("PNG is what DeviantArt shows. A PSD is only stored as a file in Sta.sh.")).color(t.text_dim));
-    ui.label(
-        egui::RichText::new(tl!("OK uploads to Sta.sh. Nothing is public until you publish.")).color(t.text_dim),
-    );
+    ui.label(egui::RichText::new(tl!("OK uploads to Sta.sh. Nothing is public until you publish.")).color(t.text_dim));
     ui.add_space(8.0);
     crate::widgets::section_label(ui, "Submit automatically");
     ui.add_space(4.0);
@@ -362,6 +362,7 @@ fn save_settings(app: &mut PhotocraftApp) -> Result<(), String> {
 }
 
 #[derive(Clone, Copy)]
+#[cfg_attr(target_arch = "wasm32", allow(dead_code))] // Desktop-only workers cannot be constructed in the web build.
 enum JobKind {
     Connect,
     Submit,
@@ -387,24 +388,26 @@ fn start_connect(app: &mut PhotocraftApp) -> Result<(), String> {
         return Err(tl!("DeviantArt submitting needs the desktop app.").to_string());
     };
     let scopes = BASE_SCOPES.to_string();
-    let scopes_for_job = scopes.clone();
-    let (tx, rx) = std::sync::mpsc::channel();
+    let _scopes_for_job = scopes.clone();
+    let (tx, _rx) = std::sync::mpsc::channel::<Result<String, String>>();
     #[cfg(target_arch = "wasm32")]
     {
         let _ = (connect, client_id, tx);
-        return Err(tl!("DeviantArt submitting needs the desktop app.").to_string());
+        Err(tl!("DeviantArt submitting needs the desktop app.").to_string())
     }
     #[cfg(not(target_arch = "wasm32"))]
-    std::thread::Builder::new()
-        .name("pc-da-login".into())
-        .spawn(move || {
-            let _ = tx.send(connect(&client_id, &scopes));
-        })
-        .map_err(|error| error.to_string())?;
-    app.ui.status = tl!("Waiting for DeviantArt…").to_string();
-    app.ui.status_error = false;
-    app.deviantart_job = Some(Job { rx, kind: JobKind::Connect, path: String::new(), temporary: false, name: scopes_for_job });
-    Ok(())
+    {
+        std::thread::Builder::new()
+            .name("pc-da-login".into())
+            .spawn(move || {
+                let _ = tx.send(connect(&client_id, &scopes));
+            })
+            .map_err(|error| error.to_string())?;
+        app.ui.status = tl!("Waiting for DeviantArt…").to_string();
+        app.ui.status_error = false;
+        app.deviantart_job = Some(Job { rx: _rx, kind: JobKind::Connect, path: String::new(), temporary: false, name: _scopes_for_job });
+        Ok(())
+    }
 }
 
 fn start_submit(app: &mut PhotocraftApp, path: String, temporary: bool) -> Result<(), String> {
@@ -434,25 +437,27 @@ fn start_submit(app: &mut PhotocraftApp, path: String, temporary: bool) -> Resul
     let tags = clean_tags(&app.deviantart.tags);
     let token = app.deviantart.refresh_token.clone();
     let client_id = app.deviantart.client_id.clone();
-    let (tx, rx) = std::sync::mpsc::channel();
+    let (tx, _rx) = std::sync::mpsc::channel::<Result<String, String>>();
     let file_name = name.clone();
     #[cfg(target_arch = "wasm32")]
     {
         let _ = (submit, token, client_id, title, comments, tags, file_name, bytes, tx);
-        return Err(tl!("DeviantArt submitting needs the desktop app.").to_string());
+        Err(tl!("DeviantArt submitting needs the desktop app.").to_string())
     }
     #[cfg(not(target_arch = "wasm32"))]
-    std::thread::Builder::new()
-        .name("pc-da-submit".into())
-        .spawn(move || {
-            let result = submit(&token, &client_id, &title, &comments, &tags, &file_name, &bytes);
-            let _ = tx.send(result);
-        })
-        .map_err(|error| error.to_string())?;
-    app.ui.status = crate::i18n::fmt(tl!("Submitting {name} to DeviantArt…"), &[("name", &name)]);
-    app.ui.status_error = false;
-    app.deviantart_job = Some(Job { rx, kind: JobKind::Submit, path, temporary, name });
-    Ok(())
+    {
+        std::thread::Builder::new()
+            .name("pc-da-submit".into())
+            .spawn(move || {
+                let result = submit(&token, &client_id, &title, &comments, &tags, &file_name, &bytes);
+                let _ = tx.send(result);
+            })
+            .map_err(|error| error.to_string())?;
+        app.ui.status = crate::i18n::fmt(tl!("Submitting {name} to DeviantArt…"), &[("name", &name)]);
+        app.ui.status_error = false;
+        app.deviantart_job = Some(Job { rx: _rx, kind: JobKind::Submit, path, temporary, name });
+        Ok(())
+    }
 }
 
 fn resolve_payload(app: &mut PhotocraftApp, format: &str, pending: Option<String>) -> Result<(String, bool), String> {
@@ -485,8 +490,8 @@ fn export_temp(app: &mut PhotocraftApp, extension: &str) -> Result<String, Strin
         let path = temp_dir.path().join(format!("{stem}.{extension}"));
         let path_str = path.display().to_string();
         let settings = crate::ExportSettings { xmp_all: false, tiff_layers: false, ..crate::ExportSettings::default() };
-        let (bytes, _) = export(&doc, &path_str, &settings)
-            .map_err(|error| crate::i18n::fmt(tl!("Could not prepare a file to send: {error}"), &[("error", &error)]))?;
+        let (bytes, _) =
+            export(&doc, &path_str, &settings).map_err(|error| crate::i18n::fmt(tl!("Could not prepare a file to send: {error}"), &[("error", &error)]))?;
         if bytes.len() as u64 > MAX_BYTES {
             return Err(tl!("That file is larger than DeviantArt accepts (30 MB).").to_string());
         }
@@ -499,9 +504,9 @@ fn export_temp(app: &mut PhotocraftApp, extension: &str) -> Result<String, Strin
 fn remove_temp_path(path: &str) {
     let path = std::path::Path::new(path);
     let _ = std::fs::remove_file(path);
-    if let Some(parent) = path.parent().filter(|parent| {
-        parent.file_name().and_then(|name| name.to_str()).is_some_and(|name| name.starts_with("photocraft-deviantart-"))
-    }) {
+    if let Some(parent) =
+        path.parent().filter(|parent| parent.file_name().and_then(|name| name.to_str()).is_some_and(|name| name.starts_with("photocraft-deviantart-")))
+    {
         let _ = std::fs::remove_dir(parent);
     }
 }
@@ -526,14 +531,15 @@ fn read_file(path: &str) -> Result<(String, Vec<u8>), String> {
     }
 }
 
-fn file_name(path: &str) -> String {
-    std::path::Path::new(path).file_name().and_then(|n| n.to_str()).unwrap_or("file").to_string()
-}
-
 fn stem(name: &str) -> String {
     let stem = std::path::Path::new(name).file_stem().and_then(|n| n.to_str()).unwrap_or(name);
     let stem: String = stem.chars().take(50).collect();
     if stem.is_empty() { "PhotoCraft".to_string() } else { stem }
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+fn file_name(path: &str) -> String {
+    std::path::Path::new(path).file_name().and_then(|name| name.to_str()).unwrap_or("file").to_string()
 }
 
 fn comments(name: &str, bytes: u64) -> String {
@@ -634,10 +640,7 @@ fn remember_rotated_login(app: &mut PhotocraftApp) {
 
 fn login_was_rejected(error: &str) -> bool {
     let lower = error.to_ascii_lowercase();
-    lower.contains("invalid_grant")
-        || lower.contains("invalid_token")
-        || lower.contains("refresh token")
-        || lower.contains("refresh_token")
+    lower.contains("invalid_grant") || lower.contains("invalid_token") || lower.contains("refresh token") || lower.contains("refresh_token")
 }
 
 fn report_deviantart_error(app: &mut PhotocraftApp, error: &str, adopt_rotation: bool) {

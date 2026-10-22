@@ -34,7 +34,8 @@ pub fn connect(client_id: &str, scopes: &str) -> Result<String, String> {
     let challenge = code_challenge(&verifier);
     let listener = TcpListener::bind("127.0.0.1:43821").map_err(|error| {
         if error.kind() == std::io::ErrorKind::AddrInUse {
-            "Another PhotoCraft login is already using the DeviantArt callback port. Finish that login or close the other app instance, then try again.".to_string()
+            "Another PhotoCraft login is already using the DeviantArt callback port. Finish that login or close the other app instance, then try again."
+                .to_string()
         } else {
             "Could not open the DeviantArt callback listener.".to_string()
         }
@@ -64,7 +65,12 @@ pub fn connect(client_id: &str, scopes: &str) -> Result<String, String> {
 pub fn submit(refresh_token: &str, client_id: &str, title: &str, comments: &str, tags: &[String], filename: &str, bytes: &[u8]) -> Result<String, String> {
     let access = bearer(client_id, refresh_token)?;
     let (content_type, body) = photocraft_ui_egui::deviantart::multipart(title, comments, tags, filename, bytes);
-    let response = agent(Duration::from_secs(60)).post(SUBMIT).set("User-Agent", USER_AGENT).set("Authorization", &format!("Bearer {access}")).set("Content-Type", &content_type).send_bytes(&body);
+    let response = agent(Duration::from_secs(60))
+        .post(SUBMIT)
+        .set("User-Agent", USER_AGENT)
+        .set("Authorization", &format!("Bearer {access}"))
+        .set("Content-Type", &content_type)
+        .send_bytes(&body);
     interpret(response, &access)
 }
 
@@ -230,7 +236,8 @@ fn post_form(url: &str, body: &str) -> Result<String, String> {
     if url != TOKEN {
         return Err("DeviantArt address was rejected".to_string());
     }
-    let response = agent(Duration::from_secs(30)).post(url).set("User-Agent", USER_AGENT).set("Content-Type", "application/x-www-form-urlencoded").send_string(body);
+    let response =
+        agent(Duration::from_secs(30)).post(url).set("User-Agent", USER_AGENT).set("Content-Type", "application/x-www-form-urlencoded").send_string(body);
     interpret(response, body)
 }
 
@@ -485,5 +492,4 @@ mod tests {
         assert_eq!(request_path(head).as_deref(), Some("/callback"));
         assert_eq!(request_path("GET / HTTP/1.1\r\n\r\n").as_deref(), Some("/"));
     }
-
 }
