@@ -209,11 +209,7 @@ pub fn poll(app: &mut PhotocraftApp, ctx: &egui::Context) {
             }
             let report = send_report(&body);
             let url = report.urls.first().cloned();
-            let links = if report.urls.is_empty() {
-                tl!("Telegram did not return a link for this chat.").to_string()
-            } else {
-                report.urls.join("\n")
-            };
+            let links = if report.urls.is_empty() { tl!("Telegram did not return a link for this chat.").to_string() } else { report.urls.join("\n") };
             let mut status = crate::i18n::fmt(tl!("Sent {name}. {url}"), &[("name", &job.name), ("url", &links)]);
             if report.pin_failed {
                 let note = tl!("Could not pin the message. The file was still sent.").to_string();
@@ -346,7 +342,10 @@ pub fn body(app: &mut PhotocraftApp, ui: &mut egui::Ui, f: &mut serde_json::Map<
         }
     }
     ui.add_space(4.0);
-    ui.label(egui::RichText::new(tl!("Files sent from PhotoCraft, and the ten newest files sent to this bot. Click one to open it in PhotoCraft.")).color(t.text_dim));
+    ui.label(
+        egui::RichText::new(tl!("Files sent from PhotoCraft, and the ten newest files sent to this bot. Click one to open it in PhotoCraft."))
+            .color(t.text_dim),
+    );
     ui.add_space(4.0);
     if crate::widgets::secondary_button(ui, tl!("Get files"), 160.0).clicked() {
         if let Err(error) = start_fetch_inbox(app, &token) {
@@ -527,32 +526,34 @@ fn start_send(app: &mut PhotocraftApp, path: String, temporary: bool, chats: Vec
     let caption = caption(&path, &name, bytes.len() as u64, file_secs(&path));
     let token = app.telegram.bot_token.clone();
     let pin = app.telegram.pin_message;
-    let (tx, rx) = std::sync::mpsc::channel();
-    let report_token = token.clone();
+    let (tx, _rx) = std::sync::mpsc::channel::<Result<String, String>>();
+    let _report_token = token.clone();
     #[cfg(target_arch = "wasm32")]
     {
-        let _ = (send, bytes, caption, chats, report_token, tx, preview_file, pin);
+        let _ = (send, bytes, caption, chats, _report_token, tx, preview_file, pin);
         forget_unsent(temporary, &path, &preview);
-        return Err("Telegram sending needs the desktop app.".to_string());
+        Err("Telegram sending needs the desktop app.".to_string())
     }
     #[cfg(not(target_arch = "wasm32"))]
-    std::thread::Builder::new()
-        .name("pc-telegram".into())
-        .spawn({
-            let name = name.clone();
-            move || {
-                let result = send_to_chats(&send, &report_token, &chats, &caption, &name, &bytes, preview_file.as_ref(), pin);
-                let _ = tx.send(result);
-            }
-        })
-        .map_err(|error| {
-            forget_unsent(temporary, &path, &preview);
-            error.to_string()
-        })?;
-    app.ui.status = format!("Sending {name} to Telegram…");
-    app.ui.status_error = false;
-    app.telegram_job = Some(Job { rx, path, temporary, preview, name, token });
-    Ok(())
+    {
+        std::thread::Builder::new()
+            .name("pc-telegram".into())
+            .spawn({
+                let name = name.clone();
+                move || {
+                    let result = send_to_chats(&send, &_report_token, &chats, &caption, &name, &bytes, preview_file.as_ref(), pin);
+                    let _ = tx.send(result);
+                }
+            })
+            .map_err(|error| {
+                forget_unsent(temporary, &path, &preview);
+                error.to_string()
+            })?;
+        app.ui.status = format!("Sending {name} to Telegram…");
+        app.ui.status_error = false;
+        app.telegram_job = Some(Job { rx: _rx, path, temporary, preview, name, token });
+        Ok(())
+    }
 }
 
 fn resolve_payload(app: &mut PhotocraftApp, format: &str, pending: Option<String>) -> Result<(String, bool), String> {
@@ -599,13 +600,14 @@ fn export_temp(app: &mut PhotocraftApp, extension: &str) -> Result<String, Strin
 fn remove_temp_path(path: &str) {
     let path = std::path::Path::new(path);
     let _ = std::fs::remove_file(path);
-    if let Some(parent) = path.parent().filter(|parent| {
-        parent.file_name().and_then(|name| name.to_str()).is_some_and(|name| name.starts_with("photocraft-telegram-"))
-    }) {
+    if let Some(parent) =
+        path.parent().filter(|parent| parent.file_name().and_then(|name| name.to_str()).is_some_and(|name| name.starts_with("photocraft-telegram-")))
+    {
         let _ = std::fs::remove_dir(parent);
     }
 }
 
+#[cfg(not(target_arch = "wasm32"))]
 fn inbox_rows(sent_files: &[Value], body: &str) -> Vec<Value> {
     let mut rows = sent_files.to_vec();
     let mut added = 0;
@@ -633,37 +635,37 @@ fn start_download(app: &mut PhotocraftApp, token: &str, file_id: &str, name: &st
     let token = token.to_string();
     let file_id = file_id.to_string();
     let name = file_name(name);
-    let (tx, rx) = std::sync::mpsc::channel();
-    let token_for_job = token.clone();
-    let name_for_status = name.clone();
+    let (tx, _rx) = std::sync::mpsc::channel::<Result<String, String>>();
+    let _token_for_job = token.clone();
+    let _name_for_status = name.clone();
     #[cfg(target_arch = "wasm32")]
     {
         let _ = (download, token, file_id, name, tx);
-        return Err("Telegram sending needs the desktop app.".to_string());
+        Err("Telegram sending needs the desktop app.".to_string())
     }
     #[cfg(not(target_arch = "wasm32"))]
-    std::thread::Builder::new()
-        .name("pc-tg-get".into())
-        .spawn(move || {
-            let result = match download(&token, &file_id) {
-                Ok(bytes) => {
-                    (|| {
+    {
+        std::thread::Builder::new()
+            .name("pc-tg-get".into())
+            .spawn(move || {
+                let result = match download(&token, &file_id) {
+                    Ok(bytes) => (|| {
                         let temp_dir = tempfile::Builder::new().prefix("photocraft-telegram-in-").tempdir().map_err(|error| error.to_string())?;
                         let path = temp_dir.path().join(&name);
                         std::fs::write(&path, &bytes).map_err(|error| error.to_string())?;
                         let _ = temp_dir.keep();
                         Ok(format!("OPEN\t{}", path.display()))
-                    })()
-                }
-                Err(error) => Err(redact(&error, &token)),
-            };
-            let _ = tx.send(result);
-        })
-        .map_err(|error| error.to_string())?;
-    app.ui.status = format!("Opening {name_for_status}…");
-    app.ui.status_error = false;
-    app.telegram_job = Some(Job { rx, path: String::new(), temporary: false, preview: None, name: name_for_status, token: token_for_job });
-    Ok(())
+                    })(),
+                    Err(error) => Err(redact(&error, &token)),
+                };
+                let _ = tx.send(result);
+            })
+            .map_err(|error| error.to_string())?;
+        app.ui.status = format!("Opening {_name_for_status}…");
+        app.ui.status_error = false;
+        app.telegram_job = Some(Job { rx: _rx, path: String::new(), temporary: false, preview: None, name: _name_for_status, token: _token_for_job });
+        Ok(())
+    }
 }
 
 fn start_find_chats(app: &mut PhotocraftApp, token: &str) -> Result<(), String> {
@@ -675,28 +677,30 @@ fn start_find_chats(app: &mut PhotocraftApp, token: &str) -> Result<(), String> 
         return Err("Telegram sending needs the desktop app.".to_string());
     };
     let token = token.to_string();
-    let (tx, rx) = std::sync::mpsc::channel();
-    let token_for_job = token.clone();
+    let (tx, _rx) = std::sync::mpsc::channel::<Result<String, String>>();
+    let _token_for_job = token.clone();
     #[cfg(target_arch = "wasm32")]
     {
         let _ = (get, token, tx);
-        return Err("Telegram sending needs the desktop app.".to_string());
+        Err("Telegram sending needs the desktop app.".to_string())
     }
     #[cfg(not(target_arch = "wasm32"))]
-    std::thread::Builder::new()
-        .name("pc-tg-chats".into())
-        .spawn(move || {
-            let url = format!("https://api.telegram.org/bot{token}/getUpdates");
-            let result = get(&url)
-                .map_err(|error| redact(&error, &token))
-                .map(|body| format!("CHATS\t{}", serde_json::to_string(&chats_from_updates(&body)).unwrap_or_else(|_| "[]".into())));
-            let _ = tx.send(result);
-        })
-        .map_err(|error| error.to_string())?;
-    app.ui.status = "Looking for chats…".to_string();
-    app.ui.status_error = false;
-    app.telegram_job = Some(Job { rx, path: String::new(), temporary: false, preview: None, name: String::new(), token: token_for_job });
-    Ok(())
+    {
+        std::thread::Builder::new()
+            .name("pc-tg-chats".into())
+            .spawn(move || {
+                let url = format!("https://api.telegram.org/bot{token}/getUpdates");
+                let result = get(&url)
+                    .map_err(|error| redact(&error, &token))
+                    .map(|body| format!("CHATS\t{}", serde_json::to_string(&chats_from_updates(&body)).unwrap_or_else(|_| "[]".into())));
+                let _ = tx.send(result);
+            })
+            .map_err(|error| error.to_string())?;
+        app.ui.status = "Looking for chats…".to_string();
+        app.ui.status_error = false;
+        app.telegram_job = Some(Job { rx: _rx, path: String::new(), temporary: false, preview: None, name: String::new(), token: _token_for_job });
+        Ok(())
+    }
 }
 
 fn start_fetch_inbox(app: &mut PhotocraftApp, token: &str) -> Result<(), String> {
@@ -709,29 +713,31 @@ fn start_fetch_inbox(app: &mut PhotocraftApp, token: &str) -> Result<(), String>
     };
     let token = token.to_string();
     let sent = app.telegram.sent_files.clone();
-    let (tx, rx) = std::sync::mpsc::channel();
-    let token_for_job = token.clone();
+    let (tx, _rx) = std::sync::mpsc::channel::<Result<String, String>>();
+    let _token_for_job = token.clone();
     #[cfg(target_arch = "wasm32")]
     {
         let _ = (get, token, sent, tx);
-        return Err("Telegram sending needs the desktop app.".to_string());
+        Err("Telegram sending needs the desktop app.".to_string())
     }
     #[cfg(not(target_arch = "wasm32"))]
-    std::thread::Builder::new()
-        .name("pc-tg-inbox".into())
-        .spawn(move || {
-            let url = format!("https://api.telegram.org/bot{token}/getUpdates");
-            let result = get(&url).map_err(|error| redact(&error, &token)).map(|body| {
-                let rows = inbox_rows(&sent, &body);
-                format!("INBOX\t{}", serde_json::to_string(&rows).unwrap_or_else(|_| "[]".into()))
-            });
-            let _ = tx.send(result);
-        })
-        .map_err(|error| error.to_string())?;
-    app.ui.status = "Loading files…".to_string();
-    app.ui.status_error = false;
-    app.telegram_job = Some(Job { rx, path: String::new(), temporary: false, preview: None, name: String::new(), token: token_for_job });
-    Ok(())
+    {
+        std::thread::Builder::new()
+            .name("pc-tg-inbox".into())
+            .spawn(move || {
+                let url = format!("https://api.telegram.org/bot{token}/getUpdates");
+                let result = get(&url).map_err(|error| redact(&error, &token)).map(|body| {
+                    let rows = inbox_rows(&sent, &body);
+                    format!("INBOX\t{}", serde_json::to_string(&rows).unwrap_or_else(|_| "[]".into()))
+                });
+                let _ = tx.send(result);
+            })
+            .map_err(|error| error.to_string())?;
+        app.ui.status = "Loading files…".to_string();
+        app.ui.status_error = false;
+        app.telegram_job = Some(Job { rx: _rx, path: String::new(), temporary: false, preview: None, name: String::new(), token: _token_for_job });
+        Ok(())
+    }
 }
 
 /// Chats that have talked to the bot, newest last, one row per id.
@@ -881,6 +887,7 @@ fn read_file(path: &str) -> Result<(String, Vec<u8>), String> {
     }
 }
 
+#[cfg(not(target_arch = "wasm32"))]
 fn read_error(path: &str, error: &str) -> String {
     let name = file_name(path);
     format!("Could not read {name}: {}", redact(error, ""))
@@ -1032,6 +1039,7 @@ fn png_preview(app: &mut PhotocraftApp, path: &str) -> Result<Option<String>, St
 }
 
 #[allow(clippy::too_many_arguments)]
+#[cfg(not(target_arch = "wasm32"))]
 fn send_to_chats(
     send: &crate::TelegramSendFn,
     token: &str,
@@ -1303,10 +1311,8 @@ mod tests {
 
     #[test]
     fn remember_sent_files_caps_at_ten_even_when_fresh_is_larger() {
-        let mut app = PhotocraftApp::new(
-            photocraft_engine::Session::new(),
-            crate::Services { save_telegram: Some(Box::new(|_| Ok(()))), ..Default::default() },
-        );
+        let mut app =
+            PhotocraftApp::new(photocraft_engine::Session::new(), crate::Services { save_telegram: Some(Box::new(|_| Ok(()))), ..Default::default() });
         app.telegram.sent_files = vec![json!({"id": "old", "name": "old.psd"})];
         let fresh: Vec<Value> = (0..12).map(|n| json!({"id": format!("n{n}"), "name": format!("f{n}.psd")})).collect();
         remember_sent_files(&mut app, &fresh);
@@ -1445,10 +1451,7 @@ mod tests {
         assert_eq!(message_link(channel).as_deref(), Some("https://t.me/c/555/9"));
         let public = r#"{"ok":true,"result":{"message_id":4,"chat":{"id":1,"username":"mychan"}}}"#;
         assert_eq!(message_link(public).as_deref(), Some("https://t.me/mychan/4"));
-        assert_eq!(
-            message_link(r#"{"ok":true,"result":{"message_id":1,"chat":{"id":42}}}"#).as_deref(),
-            Some("tg://openmessage?user_id=42&message_id=1")
-        );
+        assert_eq!(message_link(r#"{"ok":true,"result":{"message_id":1,"chat":{"id":42}}}"#).as_deref(), Some("tg://openmessage?user_id=42&message_id=1"));
         let sent = r#"{"ok":true,"result":{"message_id":2,"document":{"file_id":"abc","file_name":"hill.psd"}}}"#;
         assert_eq!(sent_files_from_reply(sent)[0].get("id").and_then(Value::as_str), Some("abc"));
         let updates = r#"{"ok":true,"result":[{"message":{"chat":{"id":42,"first_name":"Sam"}}},{"message":{"chat":{"id":42,"first_name":"Sam"}}},{"channel_post":{"chat":{"id":-1007,"title":"Desk"}}}]}"#;
