@@ -9,6 +9,8 @@ use crate::PhotocraftApp;
 
 /// Sta.sh accepts smaller files than Telegram. Larger ones fail with a validation error.
 const MAX_BYTES: u64 = 30 * 1024 * 1024;
+const BASE_SCOPES: &str = "stash gallery browse";
+const ALL_SCOPES: &str = "stash gallery browse publish user.manage";
 
 /// Loopback the user must whitelist on their DeviantArt app. A fixed port so the redirect URI
 /// does not change between logins.
@@ -28,6 +30,7 @@ pub enum WriteKind {
 pub struct Settings {
     pub client_id: String,
     pub refresh_token: String,
+    pub scopes: String,
     pub title: String,
     pub tags: String,
     pub send_on_save: bool,
@@ -69,6 +72,11 @@ pub fn settings_from_json(text: &str) -> Settings {
     Settings {
         client_id: text_of("clientId"),
         refresh_token: text_of("refreshToken"),
+        scopes: value
+            .get("scopes")
+            .and_then(Value::as_str)
+            .map(str::to_string)
+            .unwrap_or_else(|| if text_of("refreshToken").is_empty() { String::new() } else { ALL_SCOPES.into() }),
         title: text_of("title"),
         tags: text_of("tags"),
         send_on_save: flag("sendOnSave"),
@@ -98,6 +106,7 @@ pub fn settings_json(s: &Settings) -> String {
     serde_json::to_string(&json!({
         "clientId": s.client_id,
         "refreshToken": s.refresh_token,
+        "scopes": s.scopes,
         "title": s.title,
         "tags": s.tags,
         "sendOnSave": s.send_on_save,
@@ -175,6 +184,7 @@ pub fn poll(app: &mut PhotocraftApp, ctx: &egui::Context) {
     match (job.kind, finished) {
         (JobKind::Connect, Some(Ok(token))) => {
             app.deviantart.refresh_token = token;
+            app.deviantart.scopes = job.name.clone();
             if let Some(dialog) = app.ui.dialogs.iter_mut().find(|dialog| owns(&dialog.fields)) {
                 dialog.fields.insert("connected".into(), json!(true));
             }
@@ -356,7 +366,7 @@ pub fn body(app: &mut PhotocraftApp, ui: &mut egui::Ui, f: &mut serde_json::Map<
             ui.label(egui::RichText::new(tl!("Connected")).strong());
             if crate::widgets::secondary_button(ui, tl!("Connect again"), 150.0).clicked() {
                 app.deviantart.client_id = client_id.clone();
-                if let Err(error) = start_connect(app) {
+                if let Err(error) = start_connect(app, "") {
                     app.ui.status = error;
                     app.ui.status_error = true;
                 }
@@ -369,7 +379,7 @@ pub fn body(app: &mut PhotocraftApp, ui: &mut egui::Ui, f: &mut serde_json::Map<
         });
     } else if crate::widgets::secondary_button(ui, tl!("Connect DeviantArt"), 220.0).clicked() {
         app.deviantart.client_id = client_id;
-        if let Err(error) = start_connect(app) {
+        if let Err(error) = start_connect(app, "") {
             app.ui.status = error;
             app.ui.status_error = true;
         }
@@ -444,6 +454,12 @@ pub fn body(app: &mut PhotocraftApp, ui: &mut egui::Ui, f: &mut serde_json::Map<
         } else if item_id.trim().is_empty() || item_id == "0" {
             app.ui.status = tl!("Upload with OK first. Publish uses the Sta.sh item from that upload.").to_string();
             app.ui.status_error = true;
+        } else if !app.deviantart.scopes.split_whitespace().any(|scope| scope == "publish") {
+            app.ui.status = tl!("Reconnect to DeviantArt to grant permission to publish.").to_string();
+            if let Err(error) = start_connect(app, "publish") {
+                app.ui.status = error;
+                app.ui.status_error = true;
+            }
         } else if let Err(error) = start_call(
             app,
             &json!({"op":"publish","itemId": item_id.parse::<i64>().unwrap_or(0), "mature": mature, "level": "moderate", "classes": [], "creativeCommons": creative_commons, "commercial": commercial, "modify": "no"}).to_string(),
@@ -475,6 +491,14 @@ pub fn body(app: &mut PhotocraftApp, ui: &mut egui::Ui, f: &mut serde_json::Map<
         }
     });
     if crate::widgets::secondary_button(ui, tl!("Set as DeviantArt profile picture"), 260.0).clicked() {
+        if !app.deviantart.scopes.split_whitespace().any(|scope| scope == "user.manage") {
+            app.ui.status = tl!("Reconnect to DeviantArt to grant permission to change your profile picture.").to_string();
+            if let Err(error) = start_connect(app, "user.manage") {
+                app.ui.status = error;
+                app.ui.status_error = true;
+            }
+            return;
+        }
         match avatar_file(app, &avatar) {
             Ok(path) => {
                 if let Err(error) = start_call(app, &json!({"op":"avatar","path": path}).to_string()) {
@@ -564,7 +588,7 @@ pub(crate) struct Job {
     name: String,
 }
 
-fn start_connect(app: &mut PhotocraftApp) -> Result<(), String> {
+fn start_connect(app: &mut PhotocraftApp, additional_scopes: &str) -> Result<(), String> {
     if app.deviantart_job.is_some() {
         return Err(tl!("A DeviantArt submit is already running.").to_string());
     }
@@ -575,6 +599,8 @@ fn start_connect(app: &mut PhotocraftApp) -> Result<(), String> {
     let Some(connect) = app.services.deviantart_connect.clone() else {
         return Err(tl!("DeviantArt submitting needs the desktop app.").to_string());
     };
+    let scopes = requested_scopes(&app.deviantart.scopes, &format!("{BASE_SCOPES} {additional_scopes}"));
+    let scopes_for_job = scopes.clone();
     let (tx, rx) = std::sync::mpsc::channel();
     #[cfg(target_arch = "wasm32")]
     {
@@ -585,13 +611,23 @@ fn start_connect(app: &mut PhotocraftApp) -> Result<(), String> {
     std::thread::Builder::new()
         .name("pc-da-login".into())
         .spawn(move || {
-            let _ = tx.send(connect(&client_id));
+            let _ = tx.send(connect(&client_id, &scopes));
         })
         .map_err(|error| error.to_string())?;
     app.ui.status = tl!("Waiting for DeviantArt…").to_string();
     app.ui.status_error = false;
-    app.deviantart_job = Some(Job { rx, kind: JobKind::Connect, path: String::new(), temporary: false, name: String::new() });
+    app.deviantart_job = Some(Job { rx, kind: JobKind::Connect, path: String::new(), temporary: false, name: scopes_for_job });
     Ok(())
+}
+
+fn requested_scopes(granted: &str, needed: &str) -> String {
+    let mut scopes = Vec::new();
+    for scope in granted.split_whitespace().chain(needed.split_whitespace()) {
+        if matches!(scope, "stash" | "gallery" | "browse" | "publish" | "user.manage") && !scopes.contains(&scope) {
+            scopes.push(scope);
+        }
+    }
+    scopes.join(" ")
 }
 
 fn start_submit(app: &mut PhotocraftApp, path: String, temporary: bool) -> Result<(), String> {

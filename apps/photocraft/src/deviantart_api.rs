@@ -20,18 +20,30 @@ const TOKEN: &str = "https://www.deviantart.com/oauth2/token";
 const SUBMIT: &str = "https://www.deviantart.com/api/v1/oauth2/stash/submit";
 
 /// Open the browser, wait for the loopback redirect, and return the refresh token.
-pub fn connect(client_id: &str) -> Result<String, String> {
+pub fn connect(client_id: &str, scopes: &str) -> Result<String, String> {
     if client_id.is_empty() || !client_id.chars().all(|c| c.is_ascii_digit()) {
         return Err("The DeviantArt app id should be a number.".to_string());
     }
+    let scopes: Vec<&str> = scopes.split_whitespace().collect();
+    if scopes.is_empty() || scopes.iter().any(|scope| !matches!(*scope, "stash" | "gallery" | "browse" | "publish" | "user.manage")) {
+        return Err("The requested DeviantArt permissions are invalid.".to_string());
+    }
+    let scope = scopes.join(" ");
     let verifier = verifier();
     let state = hex_token();
     let challenge = code_challenge(&verifier);
-    let listener = TcpListener::bind("127.0.0.1:43821").map_err(|_| "listen".to_string())?;
+    let listener = TcpListener::bind("127.0.0.1:43821").map_err(|error| {
+        if error.kind() == std::io::ErrorKind::AddrInUse {
+            "Another PhotoCraft login is already using the DeviantArt callback port. Finish that login or close the other app instance, then try again.".to_string()
+        } else {
+            "Could not open the DeviantArt callback listener.".to_string()
+        }
+    })?;
     listener.set_nonblocking(true).map_err(|_| "listen".to_string())?;
     let url = format!(
-        "{AUTHORIZE}?response_type=code&client_id={client_id}&redirect_uri={}&scope=stash%20publish%20gallery%20browse%20user.manage&code_challenge={challenge}&code_challenge_method=S256&state={state}",
-        encode(REDIRECT_URI)
+        "{AUTHORIZE}?response_type=code&client_id={client_id}&redirect_uri={}&scope={}&code_challenge={challenge}&code_challenge_method=S256&state={state}",
+        encode(REDIRECT_URI),
+        encode(&scope)
     );
     open::that(&url).map_err(|error| redact(&error.to_string()))?;
     let code = wait_for_oauth_code(&listener, &state, Instant::now() + Duration::from_secs(180))?;

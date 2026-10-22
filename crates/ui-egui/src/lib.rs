@@ -634,7 +634,7 @@ pub struct Services {
 /// A document histogram being computed off the UI thread: (document, revision, receiver of
 /// (document, compute ms, histograms)).
 /// Browser login. Returns the refresh token. Must not log it.
-pub type DeviantArtConnectFn = std::sync::Arc<dyn Fn(&str) -> Result<String, String> + Send + Sync>;
+pub type DeviantArtConnectFn = std::sync::Arc<dyn Fn(&str, &str) -> Result<String, String> + Send + Sync>;
 /// Sta.sh submit. Arguments: refresh token, app id, title, comments, tags, file name, bytes.
 pub type DeviantArtSubmitFn = std::sync::Arc<dyn Fn(&str, &str, &str, &str, &[String], &str, &[u8]) -> Result<String, String> + Send + Sync>;
 /// Publish, edit, gallery, download or avatar. Arguments: refresh token, app id, JSON request.
