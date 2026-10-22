@@ -921,19 +921,13 @@ pub fn confirm(app: &mut PhotocraftApp, f: &Map<String, Value>) -> Result<Value,
     let suggested = format!("{stem}.{ext}");
     let f = f.clone();
     app.pick_save(&suggested, move |app, path| {
-        let out = export_document(&doc, &f, None)?;
-        let export = app.services.export.as_ref().ok_or("no exporter configured")?;
-        let (bytes, warnings) = export(&out, &path, &settings)?;
-        let write = app.services.write.as_mut().ok_or("no writer configured")?;
-        write(&path, &bytes)?;
-        let template = "Exported {path} ({size})";
-        app.ui.status = crate::i18n::fmt(tl!(template), &[("path", &path), ("size", &crate::sizing::human_bytes(bytes.len() as f64))]);
-        app.ui.status_error = false;
-        let template = "Exported {path}";
-        let what = crate::i18n::fmt(tl!(template), &[("path", &crate::file_open::display_name(&path))]);
-        crate::notices::io_warnings(app, &what, &warnings);
-        crate::deviantart::after_written(app, &path, crate::deviantart::WriteKind::Export);
-        Ok(json!({"path": path, "bytes": bytes.len(), "warnings": warnings}))
+        let r = write_export(app, &doc, &f, &path)?;
+        if !f.contains_key("__layer") {
+            let mut step = settings_of(&f);
+            step.insert("path".into(), json!(path));
+            app.session.journal.push((COMMAND.into(), Value::Object(step)));
+        }
+        Ok(r)
     })
 }
 
@@ -950,6 +944,7 @@ fn write_export(app: &mut PhotocraftApp, doc: &Document, f: &Map<String, Value>,
     let template = "Exported {path}";
     let what = crate::i18n::fmt(tl!(template), &[("path", &crate::file_open::display_name(path))]);
     crate::notices::io_warnings(app, &what, &warnings);
+    crate::deviantart::after_written(app, path, crate::deviantart::WriteKind::Export);
     Ok(json!({"path": path, "bytes": bytes.len(), "warnings": warnings}))
 }
 

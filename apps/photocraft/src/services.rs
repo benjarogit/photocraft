@@ -629,6 +629,7 @@ pub fn native(automation: Option<photocraft_automation::AuthorizedWorkspace>) ->
         load_deviantart: Some(Box::new(load_deviantart_file)),
         save_deviantart: Some(Box::new(|text: &str| save_deviantart_file(text))),
         deviantart_connect: Some(std::sync::Arc::new(crate::deviantart_api::connect)),
+        deviantart_current_refresh: Some(std::sync::Arc::new(crate::deviantart_api::current_refresh)),
         deviantart_submit: Some(std::sync::Arc::new(|refresh, client_id, title, comments, tags, filename, bytes| {
             crate::deviantart_api::submit(refresh, client_id, title, comments, tags, filename, bytes)
         })),
@@ -644,19 +645,32 @@ const DEVIANTART_KEYCHAIN_USER: &str = "deviantart-refresh-token";
 /// back over the one DeviantArt just issued.
 fn save_deviantart_file(text: &str) -> Result<(), String> {
     let (rest, token) = photocraft_ui_egui::deviantart::without_token(text)?;
-    // Keychain first: never rewrite the file without the token until storage succeeded.
-    if token.is_empty() {
-        crate::deviantart_api::clear_login();
-    } else if crate::deviantart_api::current_refresh().is_empty() {
-        crate::deviantart_api::adopt_login(&token)?;
-    }
     let path = config_dir().ok_or_else(|| "no config directory".to_string())?.join("deviantart.json");
-    write_atomic(&path, rest.as_bytes())?;
+    if token.is_empty() {
+        crate::deviantart_api::clear_login()?;
+        write_atomic(&path, rest.as_bytes())?;
+    } else if crate::services::store_deviantart_token(&token).is_ok() {
+        write_atomic(&path, rest.as_bytes())?;
+    } else {
+        // Secret Service/keychain can be unavailable on minimal Linux sessions. Keep the
+        // credential in an owner-only temporary file until the keychain becomes available.
+        write_secret_atomic(&path, text.as_bytes())?;
+    }
+    Ok(())
+}
+
+fn write_secret_atomic(path: &Path, bytes: &[u8]) -> Result<(), String> {
+    use std::io::Write;
+    let parent = path.parent().ok_or_else(|| "no config directory".to_string())?;
+    let mut file = tempfile::Builder::new().prefix(".deviantart-").tempfile_in(parent).map_err(|error| error.to_string())?;
     #[cfg(unix)]
     {
         use std::os::unix::fs::PermissionsExt;
-        let _ = std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o600));
+        file.as_file().set_permissions(std::fs::Permissions::from_mode(0o600)).map_err(|error| error.to_string())?;
     }
+    file.write_all(bytes).map_err(|error| error.to_string())?;
+    file.as_file().sync_all().map_err(|error| error.to_string())?;
+    file.persist(path).map_err(|error| error.error.to_string())?;
     Ok(())
 }
 

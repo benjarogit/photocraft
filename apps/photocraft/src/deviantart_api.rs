@@ -386,23 +386,26 @@ pub fn adopt_login(token: &str) -> Result<(), String> {
     session.refresh = token.to_string();
     session.access.clear();
     session.until = Instant::now();
-    let stored = crate::services::store_deviantart_token(token);
     drop(session);
+    // The UI persists the token to its restricted settings-file fallback if the keychain is
+    // unavailable. Never hold the login mutex during keychain I/O.
+    let _ = crate::services::store_deviantart_token(token);
     login_changed().notify_all();
-    stored
+    Ok(())
 }
 
 /// The user disconnected, or DeviantArt rejected the refresh token.
-pub fn clear_login() {
+pub fn clear_login() -> Result<(), String> {
+    crate::services::store_deviantart_token("")?;
     let mut session = login_mut();
     session.generation = session.generation.wrapping_add(1);
-    session.rejected_refresh.clone_from(&session.refresh);
+    session.rejected_refresh = session.refresh.clone();
     session.refresh.clear();
     session.access.clear();
     session.until = Instant::now();
-    let _ = crate::services::store_deviantart_token("");
     drop(session);
     login_changed().notify_all();
+    Ok(())
 }
 
 /// The refresh token the next save must not overwrite.
@@ -456,20 +459,26 @@ fn bearer(client_id: &str, refresh_from_caller: &str) -> Result<String, String> 
                 session.access = access.clone();
                 let lifetime = seconds.saturating_sub(60).max(30);
                 session.until = Instant::now() + Duration::from_secs(lifetime);
-                let _ = crate::services::store_deviantart_token(&next);
                 drop(session);
+                let _ = crate::services::store_deviantart_token(&next);
                 login_changed().notify_all();
                 return Ok(access);
             }
             Err(error) => {
+                let clear_stored_token;
                 if login_rejected(&error) {
                     session.generation = session.generation.wrapping_add(1);
-                    session.rejected_refresh.clone_from(&session.refresh);
+                    session.rejected_refresh = session.refresh.clone();
                     session.refresh.clear();
                     session.access.clear();
-                    let _ = crate::services::store_deviantart_token("");
+                    clear_stored_token = true;
+                } else {
+                    clear_stored_token = false;
                 }
                 drop(session);
+                if clear_stored_token {
+                    let _ = crate::services::store_deviantart_token("");
+                }
                 login_changed().notify_all();
                 return Err(error);
             }

@@ -213,6 +213,9 @@ pub fn poll(app: &mut PhotocraftApp, ctx: &egui::Context) {
                     app.ui.status = crate::i18n::fmt(tl!("Opened {name}."), &[("name", &name)]);
                     app.ui.status_error = false;
                 }
+            } else {
+                app.ui.status = tl!("Could not open the DeviantArt download.").to_string();
+                app.ui.status_error = true;
             }
         }
         (JobKind::Submit, Some(Ok(body))) => {
@@ -992,10 +995,19 @@ fn remember_rotated_login(app: &mut PhotocraftApp) {
     if app.deviantart.refresh_token.is_empty() {
         return;
     }
-    let Some(text) = app.services.load_deviantart.as_mut().and_then(|load| load()) else { return };
-    let token = settings_from_json(&text).refresh_token;
-    if !token.is_empty() {
+    let token = app
+        .services
+        .deviantart_current_refresh
+        .as_ref()
+        .map(|current| current())
+        .filter(|token| !token.is_empty())
+        .or_else(|| app.services.load_deviantart.as_mut().and_then(|load| load()).map(|text| settings_from_json(&text).refresh_token));
+    if let Some(token) = token.filter(|token| !token.is_empty()) {
         app.deviantart.refresh_token = token;
+        if let Err(error) = save_settings(app) {
+            app.ui.status = error;
+            app.ui.status_error = true;
+        }
     }
 }
 

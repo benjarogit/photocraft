@@ -627,6 +627,7 @@ pub struct Services {
     pub load_deviantart: Option<LoadTextFn>,
     pub save_deviantart: Option<SaveTextFn>,
     pub deviantart_connect: Option<DeviantArtConnectFn>,
+    pub deviantart_current_refresh: Option<DeviantArtCurrentRefreshFn>,
     pub deviantart_submit: Option<DeviantArtSubmitFn>,
     pub deviantart_call: Option<DeviantArtCallFn>,
 }
@@ -635,6 +636,8 @@ pub struct Services {
 /// (document, compute ms, histograms)).
 /// Browser login. Returns the refresh token. Must not log it.
 pub type DeviantArtConnectFn = std::sync::Arc<dyn Fn(&str, &str) -> Result<String, String> + Send + Sync>;
+/// Current refresh token after DeviantArt rotates it. Never log the returned value.
+pub type DeviantArtCurrentRefreshFn = std::sync::Arc<dyn Fn() -> String + Send + Sync>;
 /// Sta.sh submit. Arguments: refresh token, app id, title, comments, tags, file name, bytes.
 pub type DeviantArtSubmitFn = std::sync::Arc<dyn Fn(&str, &str, &str, &str, &[String], &str, &[u8]) -> Result<String, String> + Send + Sync>;
 /// Publish, edit, gallery, download or avatar. Arguments: refresh token, app id, JSON request.
@@ -1112,6 +1115,7 @@ impl PhotocraftApp {
         };
         // Saved preferences are in place before the first frame; recovery starts in upkeep.
         prefs_ui::load(&mut app);
+        layers_panel_ui::restore_options(&mut app);
         if let Some(text) = app.services.load_deviantart.as_mut().and_then(|load| load()) {
             app.deviantart = deviantart::settings_from_json(&text);
         }
@@ -1711,8 +1715,10 @@ impl PhotocraftApp {
         if self.save_options_open() {
             return Err("Answer the TIFF, Targa or DDS Options before starting another save".into());
         }
-        let r = self.write_save(path.clone(), None, None)?;
-        self.session.journal.push(("file.save".into(), Value::Object(Default::default())));
+        let r = self.write_save(path.clone(), None, choices)?;
+        let mut step = Value::Object(Default::default());
+        choices.record(&mut step);
+        self.session.journal.push(("file.save".into(), step));
         deviantart::arm_after_save(self, &path, deviantart::WriteKind::Save, &r);
         Ok(r)
     }
