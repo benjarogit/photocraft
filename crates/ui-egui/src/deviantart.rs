@@ -9,6 +9,7 @@ use crate::PhotocraftApp;
 
 mod errors;
 mod format;
+mod pending;
 #[cfg(test)]
 mod tests;
 
@@ -159,6 +160,10 @@ pub fn after_written(app: &mut PhotocraftApp, path: &str, kind: WriteKind) {
         }
         return;
     }
+    if app.deviantart_job.is_some() {
+        pending::enqueue(app, path);
+        return;
+    }
     if let Err(error) = start_submit(app, path.to_string(), false) {
         app.ui.status = error;
         app.ui.status_error = true;
@@ -176,7 +181,10 @@ pub fn arm_after_save(app: &mut PhotocraftApp, path: &str, kind: WriteKind, resu
 }
 
 pub fn poll(app: &mut PhotocraftApp, ctx: &egui::Context) {
-    let Some(job) = app.deviantart_job.as_ref() else { return };
+    let Some(job) = app.deviantart_job.as_ref() else {
+        pending::start_next(app, ctx);
+        return;
+    };
     let finished = match job.rx.try_recv() {
         Ok(result) => Some(result),
         Err(std::sync::mpsc::TryRecvError::Empty) => {
@@ -311,6 +319,7 @@ pub fn poll(app: &mut PhotocraftApp, ctx: &egui::Context) {
         }
         _ => {}
     }
+    pending::start_next(app, ctx);
 }
 
 pub fn owns(fields: &serde_json::Map<String, Value>) -> bool {

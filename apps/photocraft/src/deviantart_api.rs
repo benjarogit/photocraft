@@ -401,7 +401,10 @@ pub fn adopt_login(token: &str) -> Result<(), String> {
 
 /// The user disconnected, or DeviantArt rejected the refresh token.
 pub fn clear_login() -> Result<(), String> {
-    crate::services::store_deviantart_token("")?;
+    clear_login_with(|| crate::services::store_deviantart_token(""))
+}
+
+fn clear_login_with(clear: impl FnOnce() -> Result<(), String>) -> Result<(), String> {
     let mut session = login_mut();
     session.generation = session.generation.wrapping_add(1);
     session.rejected_refresh = session.refresh.clone();
@@ -410,7 +413,7 @@ pub fn clear_login() -> Result<(), String> {
     session.until = Instant::now();
     drop(session);
     login_changed().notify_all();
-    Ok(())
+    clear()
 }
 
 /// The refresh token the next save must not overwrite.
@@ -750,6 +753,19 @@ mod tests {
         assert_eq!(stash_src(text, 7).as_deref(), Some("https://images-wixmp.wixmp.com/hill.png"));
         assert!(stash_src(r#"{"entries":[{"itemid":7,"files":[{"src":"https://evil.example/x"}]}]}"#, 7).is_none());
         assert_eq!(rows.len(), 2);
+    }
+
+    #[test]
+    fn deviantart_clear_login_discards_live_tokens_when_keychain_fails() {
+        {
+            let mut session = login_mut();
+            session.refresh = "old-refresh".into();
+            session.access = "old-access".into();
+        }
+        assert!(clear_login_with(|| Err("keychain unavailable".into())).is_err());
+        let session = login_mut();
+        assert!(session.refresh.is_empty());
+        assert!(session.access.is_empty());
     }
 
     #[test]
