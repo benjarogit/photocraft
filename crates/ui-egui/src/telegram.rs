@@ -275,7 +275,8 @@ fn open_dialog(app: &mut PhotocraftApp, pending: Option<String>) -> u64 {
     let mut fields = serde_json::Map::new();
     fields.insert("__telegram".into(), json!(true));
     fields.insert("__label".into(), json!("Send to Telegram"));
-    fields.insert("token".into(), json!(app.telegram.bot_token));
+    app.telegram_token_draft.clone_from(&app.telegram.bot_token);
+    fields.insert("tokenSet".into(), json!(!app.telegram_token_draft.is_empty()));
     fields.insert("chat".into(), json!(app.telegram.chat_id));
     fields.insert("onSave".into(), json!(app.telegram.send_on_save));
     fields.insert("onSaveAs".into(), json!(app.telegram.send_on_save_as));
@@ -309,9 +310,10 @@ pub fn body(app: &mut PhotocraftApp, ui: &mut egui::Ui, f: &mut serde_json::Map<
     }
     ui.add_space(8.0);
     ui.label(tl!("Bot token"));
-    let mut token = f.get("token").and_then(Value::as_str).unwrap_or("").to_string();
+    let mut token = app.telegram_token_draft.clone();
     if ui.add(egui::TextEdit::singleline(&mut token).password(true).desired_width(ui.available_width())).changed() {
-        f.insert("token".into(), json!(token.clone()));
+        app.telegram_token_draft.clone_from(&token);
+        f.insert("tokenSet".into(), json!(!token.is_empty()));
     }
     ui.label(egui::RichText::new(tl!("The bot token is kept in the system keychain, not in PhotoCraft's settings file.")).color(t.text_dim));
     ui.add_space(4.0);
@@ -418,7 +420,7 @@ pub fn body(app: &mut PhotocraftApp, ui: &mut egui::Ui, f: &mut serde_json::Map<
 }
 
 pub fn confirm(app: &mut PhotocraftApp, f: &serde_json::Map<String, Value>) -> Result<Value, String> {
-    let token = f.get("token").and_then(Value::as_str).unwrap_or("").trim().to_string();
+    let token = app.telegram_token_draft.trim().to_string();
     let chat = f.get("chat").and_then(Value::as_str).unwrap_or("").trim().to_string();
     validate_token(&token)?;
     let chats = parse_chats(&chat)?;
@@ -441,6 +443,7 @@ pub fn confirm(app: &mut PhotocraftApp, f: &serde_json::Map<String, Value>) -> R
     };
     save(&text)?;
     app.telegram = next;
+    app.telegram_token_draft.clear();
     if app.session.active().is_none() && pending.is_none() {
         app.ui.status = "Telegram is set up. Save or export a file, then send it.".to_string();
         app.ui.status_error = false;
@@ -644,14 +647,13 @@ fn start_download(app: &mut PhotocraftApp, token: &str, file_id: &str, name: &st
         .spawn(move || {
             let result = match download(&token, &file_id) {
                 Ok(bytes) => {
-                    let result = (|| {
+                    (|| {
                         let temp_dir = tempfile::Builder::new().prefix("photocraft-telegram-in-").tempdir().map_err(|error| error.to_string())?;
                         let path = temp_dir.path().join(&name);
                         std::fs::write(&path, &bytes).map_err(|error| error.to_string())?;
                         let _ = temp_dir.keep();
                         Ok(format!("OPEN\t{}", path.display()))
-                    })();
-                    result
+                    })()
                 }
                 Err(error) => Err(redact(&error, &token)),
             };
@@ -816,13 +818,13 @@ struct SendReport {
 
 /// The send thread returns either the new JSON report or, from an older build, a bare link.
 fn send_report(body: &str) -> SendReport {
-    if let Ok(value) = serde_json::from_str::<Value>(body) {
-        if let Some(urls) = value.get("urls").and_then(Value::as_array) {
-            let urls = urls.iter().filter_map(|v| v.as_str().map(str::to_string)).filter(|url| !url.is_empty()).collect();
-            let files = value.get("files").and_then(Value::as_array).cloned().unwrap_or_default();
-            let pin_failed = value.get("pinFailed").and_then(Value::as_bool).unwrap_or(false);
-            return SendReport { urls, files, pin_failed };
-        }
+    if let Ok(value) = serde_json::from_str::<Value>(body)
+        && let Some(urls) = value.get("urls").and_then(Value::as_array)
+    {
+        let urls = urls.iter().filter_map(|v| v.as_str().map(str::to_string)).filter(|url| !url.is_empty()).collect();
+        let files = value.get("files").and_then(Value::as_array).cloned().unwrap_or_default();
+        let pin_failed = value.get("pinFailed").and_then(Value::as_bool).unwrap_or(false);
+        return SendReport { urls, files, pin_failed };
     }
     let (text, pin_failed) = body.split_once("\nPINFAIL").map(|(ok, _)| (ok.to_string(), true)).unwrap_or((body.to_string(), false));
     let urls = if text.starts_with("http") || text.starts_with("tg:") {
@@ -1391,7 +1393,7 @@ mod tests {
         app.session.execute("file.new", json!({"width": 8, "height": 8})).unwrap();
         app.session.active_mut().unwrap().path = Some(path.display().to_string());
         let mut fields = serde_json::Map::new();
-        fields.insert("token".into(), json!(token()));
+        app.telegram_token_draft = token();
         fields.insert("chat".into(), json!("42, 42"));
         fields.insert("format".into(), json!("file"));
         let started = confirm(&mut app, &fields).unwrap();
@@ -1476,7 +1478,7 @@ mod tests {
         );
         app.session.execute("file.new", json!({"width": 8, "height": 8, "name": "Sketch"})).unwrap();
         let mut fields = serde_json::Map::new();
-        fields.insert("token".into(), json!(token()));
+        app.telegram_token_draft = token();
         fields.insert("chat".into(), json!("42"));
         fields.insert("format".into(), json!("png"));
         let started = confirm(&mut app, &fields).unwrap();

@@ -656,6 +656,8 @@ pub struct PhotocraftApp {
     pub services: Services,
     /// File › Send to Telegram. Not part of [`UiState`]: the control channel must not see the token.
     pub telegram: telegram::Settings,
+    /// The Telegram token being edited. Kept outside `UiState` so dialog inspection cannot expose it.
+    pub(crate) telegram_token_draft: String,
     /// A send whose HTTP request is still running. Polled from the frame loop.
     pub(crate) telegram_job: Option<telegram::Job>,
     /// Canvas caches per (document, display): CPU textures hold monitor values; the GPU
@@ -973,6 +975,7 @@ impl PhotocraftApp {
             ui: UiState::default(),
             services,
             telegram: telegram::Settings::default(),
+            telegram_token_draft: String::new(),
             telegram_job: None,
             canvases: HashMap::new(),
             navigator_textures: HashMap::new(),
@@ -1118,6 +1121,7 @@ impl PhotocraftApp {
         };
         // Saved preferences are in place before the first frame; recovery starts in upkeep.
         prefs_ui::load(&mut app);
+        layers_panel_ui::restore_options(&mut app);
         if let Some(text) = app.services.load_telegram.as_mut().and_then(|load| load()) {
             app.telegram = telegram::settings_from_json(&text);
         }
@@ -1717,8 +1721,10 @@ impl PhotocraftApp {
         if self.save_options_open() {
             return Err("Answer the TIFF, Targa or DDS Options before starting another save".into());
         }
-        let r = self.write_save(path.clone(), None, None)?;
-        self.session.journal.push(("file.save".into(), Value::Object(Default::default())));
+        let r = self.write_save(path.clone(), None, choices)?;
+        let mut step = Value::Object(Default::default());
+        choices.record(&mut step);
+        self.session.journal.push(("file.save".into(), step));
         telegram::arm_after_save(self, &path, telegram::WriteKind::Save, &r);
         Ok(r)
     }

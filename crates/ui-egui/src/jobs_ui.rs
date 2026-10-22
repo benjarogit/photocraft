@@ -151,6 +151,9 @@ pub struct SaveJob {
     /// The job has ended (cancelled, say) but its worker may still be running: kept until it
     /// returns, so quitting and another save to the same file wait for it.
     pub ended: bool,
+    /// Started with Save in Background off: the app waits for it under the modal progress dialog
+    /// (see [`foreground_save`]).
+    pub foreground: bool,
     /// Send this file to Telegram once the write has finished. None for saves the user did not arm.
     pub notify_telegram: Option<crate::telegram::WriteKind>,
 }
@@ -307,7 +310,8 @@ pub fn start_save(
             Ok(Some((path, warnings)))
         }
         Started::Job(job) => {
-            app.jobs.saves.push(SaveJob { job, doc, revision, path, copy, automation, state, ended: false, notify_telegram: None });
+            let foreground = !app.session.prefs().file_handling.save_in_background;
+            app.jobs.saves.push(SaveJob { job, doc, revision, path, copy, automation, state, ended: false, foreground, notify_telegram: None });
             // Control and MCP requests wait on it, as for other jobs.
             app.jobs.last_started = Some(job);
             // The status bar's progress readout names the save; clear any old message.
