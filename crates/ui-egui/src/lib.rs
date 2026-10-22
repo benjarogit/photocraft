@@ -651,6 +651,7 @@ pub struct PhotocraftApp {
     /// File › Submit to DeviantArt. Not part of [`UiState`]: the control channel must not see the token.
     pub deviantart: deviantart::Settings,
     pub(crate) deviantart_job: Option<deviantart::Job>,
+    pub(crate) deviantart_pending: std::collections::VecDeque<String>,
     /// Canvas caches per (document, display): CPU textures hold monitor values; the GPU
     /// canvas state is shared (`canvas::GPU_OUTPUT`).
     canvases: HashMap<(DocId, u32), canvas::CanvasCache>,
@@ -967,6 +968,7 @@ impl PhotocraftApp {
             services,
             deviantart: deviantart::Settings::default(),
             deviantart_job: None,
+            deviantart_pending: std::collections::VecDeque::new(),
             canvases: HashMap::new(),
             navigator_textures: HashMap::new(),
             display_memo: HashMap::new(),

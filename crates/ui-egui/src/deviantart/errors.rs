@@ -32,6 +32,7 @@ pub(super) fn login_was_rejected(error: &str) -> bool {
 
 pub(super) fn report_deviantart_error(app: &mut PhotocraftApp, error: &str, adopt_rotation: bool) {
     if login_was_rejected(error) {
+        app.deviantart_pending.clear();
         app.deviantart.refresh_token.clear();
         let _ = save_settings(app);
     } else if adopt_rotation {
@@ -44,6 +45,7 @@ pub(super) fn report_deviantart_error(app: &mut PhotocraftApp, error: &str, adop
 }
 
 pub(super) fn disconnect(app: &mut PhotocraftApp) {
+    app.deviantart_pending.clear();
     app.deviantart.refresh_token.clear();
     match save_settings(app) {
         Ok(()) => {

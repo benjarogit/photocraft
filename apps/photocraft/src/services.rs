@@ -16,6 +16,10 @@ use std::sync::Arc;
 #[cfg(test)]
 mod recovery_tests;
 
+mod deviantart_storage;
+pub(crate) use deviantart_storage::store_deviantart_token;
+use deviantart_storage::{load_deviantart_file, save_deviantart_file};
+
 /// Everything File › Open reads: PhotoCraft, Photoshop, OpenRaster, Krita and Affinity documents, flat images, and
 /// Photoshop brushes (.abr), gradients (.grd), swatches (.aco, .act, .ase) and keyboard shortcut sets
 /// (.kys), which go to the preset libraries and Edit › Keyboard Shortcuts.
@@ -634,79 +638,6 @@ pub fn native(automation: Option<photocraft_automation::AuthorizedWorkspace>) ->
             crate::deviantart_api::submit(refresh, client_id, title, comments, tags, filename, bytes)
         })),
         ..recovery_services(recovery_dir())
-    }
-}
-
-const DEVIANTART_KEYCHAIN: &str = "ai.storyteller.photocraft";
-const DEVIANTART_KEYCHAIN_USER: &str = "deviantart-refresh-token";
-
-/// App id, title and switches on disk. A settings save must not put an older refresh token
-/// back over the one DeviantArt just issued.
-fn save_deviantart_file(text: &str) -> Result<(), String> {
-    let (rest, token) = photocraft_ui_egui::deviantart::without_token(text)?;
-    let path = config_dir().ok_or_else(|| "no config directory".to_string())?.join("deviantart.json");
-    if token.is_empty() {
-        crate::deviantart_api::clear_login()?;
-        write_atomic(&path, rest.as_bytes())?;
-    } else if crate::services::store_deviantart_token(&token).is_ok() {
-        write_atomic(&path, rest.as_bytes())?;
-    } else {
-        // Secret Service/keychain can be unavailable on minimal Linux sessions. Keep the
-        // credential in an owner-only temporary file until the keychain becomes available.
-        write_secret_atomic(&path, text.as_bytes())?;
-    }
-    Ok(())
-}
-
-fn write_secret_atomic(path: &Path, bytes: &[u8]) -> Result<(), String> {
-    use std::io::Write;
-    let parent = path.parent().ok_or_else(|| "no config directory".to_string())?;
-    let mut file = tempfile::Builder::new().prefix(".deviantart-").tempfile_in(parent).map_err(|error| error.to_string())?;
-    #[cfg(unix)]
-    {
-        use std::os::unix::fs::PermissionsExt;
-        file.as_file().set_permissions(std::fs::Permissions::from_mode(0o600)).map_err(|error| error.to_string())?;
-    }
-    file.write_all(bytes).map_err(|error| error.to_string())?;
-    file.as_file().sync_all().map_err(|error| error.to_string())?;
-    file.persist(path).map_err(|error| error.error.to_string())?;
-    Ok(())
-}
-
-fn load_deviantart_file() -> Option<String> {
-    let path = config_dir()?.join("deviantart.json");
-    let text = std::fs::read_to_string(&path).ok()?;
-    let (_, embedded) = photocraft_ui_egui::deviantart::without_token(&text).ok()?;
-    let stored = match load_deviantart_token() {
-        Ok(token) => token,
-        // A keychain read error is not "no token": keep any embedded copy and do not migrate.
-        Err(_) => return Some(photocraft_ui_egui::deviantart::with_token(&text, &embedded)),
-    };
-    let token = if stored.is_empty() { embedded.clone() } else { stored };
-    if !embedded.is_empty() {
-        let _ = save_deviantart_file(&photocraft_ui_egui::deviantart::with_token(&text, &token));
-    }
-    Some(photocraft_ui_egui::deviantart::with_token(&text, &token))
-}
-
-pub(crate) fn store_deviantart_token(token: &str) -> Result<(), String> {
-    let entry = keyring::Entry::new(DEVIANTART_KEYCHAIN, DEVIANTART_KEYCHAIN_USER).map_err(|error| error.to_string())?;
-    if token.is_empty() {
-        return match entry.delete_credential() {
-            Ok(()) => Ok(()),
-            Err(keyring::Error::NoEntry) => Ok(()),
-            Err(error) => Err(error.to_string()),
-        };
-    }
-    entry.set_password(token).map_err(|error| error.to_string())
-}
-
-fn load_deviantart_token() -> Result<String, String> {
-    let entry = keyring::Entry::new(DEVIANTART_KEYCHAIN, DEVIANTART_KEYCHAIN_USER).map_err(|error| error.to_string())?;
-    match entry.get_password() {
-        Ok(token) => Ok(token),
-        Err(keyring::Error::NoEntry) => Ok(String::new()),
-        Err(error) => Err(error.to_string()),
     }
 }
 
