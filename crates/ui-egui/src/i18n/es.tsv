@@ -330,6 +330,7 @@
 	Blending Options…	Opciones de fusión…
 	Bevel & Emboss…	Bisel y relieve…
 	Use Global Light	Usar luz global
+	Overprint	Sobreimprimir
 	Inner Shadow…	Sombra interior…
 	Inner Glow…	Resplandor interior…
 	Satin…	Satinado…
@@ -2158,6 +2159,11 @@
 	Mixer Brush Tool	Herramienta Pincel mezclador
 	Color Replacement Tool	Herramienta Sustitución de color
 	Wet	Húmedo
+	Current Brush Load	Carga actual del pincel
+	Load Brush	Cargar pincel
+	Clean Brush	Limpiar pincel
+	Load the brush after each stroke	Cargar el pincel después de cada trazo
+	Clean the brush after each stroke	Limpiar el pincel después de cada trazo
 	Mix	Mezcla
 	Wetness Jitter	Variación de humedad
 	Mix Jitter	Variación de mezcla
@@ -2733,6 +2739,35 @@ cameraData	Lens	Objetivo
 	Mirror	Reflejar
 	Output Settings	Ajustes de salida
 	Output To	Salida a
+
+	Animation Options	Opciones de animación
+	Entire Document	Documento entero
+	Filter Options	Opciones de filtro
+	Layer Bounds	Límites de capa
+	Layers Panel Options	Opciones del panel Capas
+	Lock Layers	Bloquear capas
+	New Artboard…	Nueva mesa de trabajo…
+	New Group…	Nuevo grupo…
+	New Layer…	Nueva capa…
+	Panel Options…	Opciones de panel…
+	Prevent Auto-Nesting	Impedir anidación automática
+	Show Layers	Mostrar capas
+	Thumbnail Contents	Contenido de miniaturas
+	Thumbnail Size	Tamaño de miniaturas
+	Use Default Masks on Fill Layers	Usar máscaras predeterminadas en capas de relleno
+	Expand New Effects	Expandir nuevos efectos
+	Add “copy” to Copied Layers and Groups	Añadir «copia» a las capas y grupos duplicados
+	Preview on canvas when reordering layers	Previsualizar en el lienzo al reordenar capas
+	Show layer mask badges	Mostrar insignias de máscaras de capa
+
+# Smart Filter editors
+	Blending Options ({filter})	Opciones de fusión ({filter})
+	Hide the layer's effects and Smart Filters  ({key}-click: all layers)	Ocultar efectos de capa y filtros inteligentes  ({key}-clic: todas las capas)
+	Show the layer's effects and Smart Filters  ({key}-click: all layers)	Mostrar efectos de capa y filtros inteligentes  ({key}-clic: todas las capas)
+	Wait for the current job to finish.	Espere a que termine la tarea actual.
+	The document or Smart Filter changed. Reopen its dialog.	El documento o el filtro inteligente ha cambiado. Vuelva a abrir su diálogo.
+	Opacity must be between 0% and 100%.	La opacidad debe estar entre 0% y 100%.
+	Dissolve is approximated: it blends without Photoshop's dither.	Disolver es aproximado: se fusiona sin el tramado de Photoshop.
 	Loading fonts…	Cargando fuentes…
 	Response curve	Curva de respuesta
 	Tool	Herramienta
@@ -2780,6 +2815,10 @@ curves	Smooth	Suavizar
 	Click to place · Alt-click or drag off-canvas to remove	Clic para colocar · Alt-clic o arrastrar fuera del lienzo para quitar
 	No document open	Ningún documento abierto
 	{n} of {max} sample points	{n} de {max} puntos de muestreo
+
+# History panel menu (#2966)
+	New Snapshot…	Nueva instantánea…
+	History Options…	Opciones de historial…
 # Print dialog (#2697)
 	Emulsion Down	Emulsión hacia abajo
 	Functions	Funciones
@@ -2822,7 +2861,6 @@ curves	Smooth	Suavizar
 @id	select.all	Seleccionar todo
 	Delete Smart Filters	Eliminar filtros inteligentes
 	Enable Smart Filters	Activar filtros inteligentes
-	New Layer…	Nueva capa…
 	Delete Layer…	Eliminar capa…
 	Select Similar Colors	Seleccionar colores similares
 	Canvas rotation	Rotación del lienzo
@@ -2899,7 +2937,6 @@ curves	Smooth	Suavizar
 	Automatically Create New Snapshot When Saving	Crear automáticamente una instantánea nueva al guardar
 	Show New Snapshot Dialog by Default	Mostrar de forma predeterminada el cuadro de diálogo Nueva instantánea
 	Clear History	Borrar historial
-	Panel Options…	Opciones de panel…
 	View menu	Menú Vista
 	Keep view in sync	Mantener la vista sincronizada
 	{zoom}%	{zoom}%
@@ -3810,7 +3847,6 @@ layerLabel	No Color	Sin color
 	Lens Flare	Destello
 	Lighting Effects	Efectos de iluminación
 	Liquify	Licuar
-	Lock Layers	Bloquear capas
 	Lum	Lum
 	Match Color	Igualar color
 	Merge to HDR Pro	Combinar en HDR Pro
@@ -4131,6 +4167,110 @@ navigator	Zoom	Zoom
 	Sent to {printer}	Enviado a {printer}
 	set in Print Settings…	se establece en Ajustes de impresión…
 	ICO is limited to 256 × 256 pixels	ICO está limitado a 256 × 256 píxeles
+# History panel › History Brush source (#2966)
+	Paints from the History panel's source state	Pinta a partir del estado de origen del panel Historia
+	Sets the source for the history brush	Establece el origen del pincel de historia
+# Embedded Profile Mismatch: profile names beside the choices, Remember this choice
+	Use the embedded profile ({profile})	Usar el perfil incrustado ({profile})
+	Convert to the working space ({profile})	Convertir al espacio de trabajo ({profile})
+	Remember this choice for future images	Recordar esta opción para próximas imágenes
+	Turn the prompt back on with Ask On Mismatch in Edit › Color Settings.	Vuelve a activar el aviso con Ask On Mismatch en Edición › Ajustes de color.
+	Button Mode	Modo de botón
+	Button Mode On	Modo de botón activado
+
+# Darken / Lighten Interface (⇧⌘F1 / ⇧⌘F2)
+	Darken Interface	Oscurecer interfaz
+	Lighten Interface	Aclarar interfaz
+# Bevel & Emboss Technique.
+	Technique	Técnica
+	Chisel Hard	Cincelar duro
+	Chisel Soft	Cincelar suave
+	Open color-less EXR as ACEScg	Abrir EXR sin espacio de color como ACEScg
+# Export As metadata and profile options
+
+# View › Guides › right-click a guide
+	Edit Selected Guides	Editar guías seleccionadas
+	Clear Selected Guides	Borrar guías seleccionadas
+	Bicubic Automatic	Bicúbica automática
+	Bicubic Smoother	Bicúbica más suavizada
+	Bicubic Sharper	Bicúbica más enfocada
+	Pasting from other apps is unavailable	Pegar desde otras aplicaciones no está disponible
+	PhotoCraft can't reach the system clipboard in this session. On Wayland, a Flatpak sandbox hides the protocol that images from other apps are read through.	PhotoCraft no puede acceder al portapapeles del sistema en esta sesión. En Wayland, el entorno aislado de Flatpak oculta el protocolo con el que se leen las imágenes de otras aplicaciones.
+	To paste from other apps, start PhotoCraft under XWayland: `{command}`	Para pegar desde otras aplicaciones, inicia PhotoCraft en XWayland: `{command}`
+	Nothing to paste: PhotoCraft can't read the system clipboard here	Nada que pegar: PhotoCraft no puede leer aquí el portapapeles del sistema
+	Delete this set	Eliminar este conjunto
+	New Set…	Nuevo conjunto…
+	PhotoCraft Defaults	Valores por defecto de PhotoCraft
+	Save a list of these shortcuts as a web page	Guardar una lista de estos métodos abreviados como página web
+	Save the changes to this set	Guardar los cambios en este conjunto
+	Save these shortcuts as a .kys file	Guardar estos métodos abreviados como archivo .kys
+	Save these shortcuts as a new set	Guardar estos métodos abreviados como un conjunto nuevo
+	Set deleted.	Conjunto eliminado.
+	Set saved.	Conjunto guardado.
+	Set:	Conjunto:
+	Summarize…	Resumir…
+	There are too many sets: delete one first.	Hay demasiados conjuntos: elimine uno primero.
+	set name	nombre del conjunto
+	{set} (modified)	{set} (modificado)
+	Show file name in title	Mostrar nombre de archivo en el título
+
+# Image › Mode › Bitmap (#5559)
+	50% Threshold	Umbral 50%
+	Pattern Dither	Tramado de motivo
+	Diffusion Dither	Tramado de difusión
+	Halftone Screen	Trama de semitonos
+	Custom Pattern	Motivo personalizado
+	Frequency:	Frecuencia:
+	Lines/Inch	Líneas/pulgada
+	Lines/Centimeter	Líneas/centímetro
+	Ellipse	Elipse
+	Accept and Go to Conflict	Aceptar e ir al conflicto
+	Changes undone.	Cambios deshechos.
+	Choose a new shortcut for this command, or leave it without one.	Elija un nuevo método abreviado para este comando o déjelo sin ninguno.
+	Put this command's shortcuts back as they were	Restaurar los métodos abreviados de este comando como estaban
+	Take the shortcut from the other command and select it	Quitar el método abreviado al otro comando y seleccionarlo
+	Undo Changes	Deshacer cambios
+	{shortcut} is reserved by the system and can't be assigned.	{shortcut} está reservado por el sistema y no se puede asignar.
+	Low-Latency Drawing (vsync off, applies at next launch)	Dibujo de baja latencia (sin sincronización vertical, se aplica al volver a iniciar)
+# Free Transform: a new layer while the box is open (#5859)
+	Free Transform is still being applied; try again when it has finished.	Transformación libre aún se está aplicando; inténtelo de nuevo cuando termine.
+	The transform couldn't be applied.	No se pudo aplicar la transformación.
+# Preferences › Performance › GPU Memory; the status bar and slow-redraw notice
+	Its layers need {needed} of GPU memory; the budget leaves them {budget}.	Sus capas necesitan {needed} de memoria de GPU; el presupuesto les deja {budget}.
+	Set GPU Memory in Preferences › Performance to what your graphics card can hold, at most 3/8 of its memory. Automatic follows Memory Usage, within a quarter of this computer's memory and 3/8 of the card's, and doesn't count the document against a card whose memory is known. The status bar shows GPU Memory Full while they don't fit.	Ajuste Memoria de GPU en Preferencias › Rendimiento a lo que pueda alojar su tarjeta gráfica, como máximo 3/8 de su memoria. Automático sigue Uso de memoria, dentro de una cuarta parte de la memoria de este equipo y 3/8 de la de la tarjeta, y no descuenta el documento en una tarjeta cuya memoria se conoce. Mientras no quepan, la barra de estado muestra Memoria de GPU llena.
+	GPU Memory Full	Memoria de GPU llena
+	The layers need {needed} of GPU memory and may hold {budget}, so edits that redraw the whole document do it on the CPU. Click to set GPU Memory.	Las capas necesitan {needed} de memoria de GPU y pueden ocupar {budget}, así que las ediciones que redibujan todo el documento lo hacen en la CPU. Haga clic para ajustar Memoria de GPU.
+	GPU memory budget: {budget}	Presupuesto de memoria de GPU: {budget}
+	This document's layers: {needed} of {budget} for layers	Capas de este documento: {needed} de {budget} para capas
+	This document's layers need {needed} but may hold {budget}: whole-document redraws use the CPU	Las capas de este documento necesitan {needed} pero pueden ocupar {budget}: los redibujados de todo el documento usan la CPU
+	GPU Memory (MB, 0 = Automatic)	Memoria de GPU (MB, 0 = Automático)
+	{name} was changed by another app after it was opened or saved here.	Otra aplicación cambió {name} después de abrirlo o guardarlo aquí.
+	Replace it with this document, or cancel and use File › Save As to keep both.	Reemplázalo con este documento, o cancela y usa Archivo › Guardar como para conservar ambos.
+	Decrease Brush Size	Reducir tamaño del pincel
+	Increase Brush Size	Aumentar tamaño del pincel
+	Decrease Brush Hardness	Reducir dureza del pincel
+	Increase Brush Hardness	Aumentar dureza del pincel
+	Memory Usage	Uso de memoria
+	Per-document RAM limit (MB)	Límite de RAM por documento (MB)
+	Installed RAM: {ram} MB; this limit: {percent}%	RAM instalada: {ram} MB; este límite: {percent}%
+	Limits each open document's pixels plus History. Oldest undo states are discarded when the limit is exceeded.	Limita los píxeles más el Historial de cada documento abierto. Se descartan los estados de deshacer más antiguos al superar el límite.
+	Applies immediately when saved. Memory is not reserved in advance.	Se aplica al guardar. La memoria no se reserva de antemano.
+	With GPU Memory set to Automatic, this also limits the GPU layer budget. That budget is capped at one quarter of installed RAM and, when known, three eighths of the graphics card's memory, with a 512 MB minimum. Raising this limit beyond those caps does not increase the GPU budget.	Con Memoria GPU en Automático, también limita el presupuesto GPU. Está topeado a un cuarto de la RAM y, si se conoce, tres octavos de la memoria de la tarjeta, mínimo 512 MB. Subir el límite no aumenta el presupuesto GPU.
+	Use	Usar
+	In Front	Delante
+	Behind	Detrás
+
+# DDS Options (#1327)
+	DDS Options	Opciones de DDS
+	Generate Mipmaps	Generar mipmaps
+
+# Color Table (.act) dialog
+	There is no color table to save.	No hay ninguna tabla de colores para guardar.
+@plural	Saved {n} color to {file}|Saved {n} colors to {file}	Se guardó {n} color en {file}|Se guardaron {n} colores en {file}
+
+# Graphics Adapter preference (#1885)
+	GPU adapter	Adaptador de GPU
+
 # File › Submit to DeviantArt
 	Could not prepare a file to send: {error}	No se pudo preparar un archivo para enviar: {error}
 	There is no saved file to send. Choose PSD or PNG.	No hay un archivo guardado para enviar. Elige PSD o PNG.
@@ -4154,31 +4294,13 @@ navigator	Zoom	Zoom
 	A DeviantArt submit is already running.	Ya hay un envío a DeviantArt en curso.
 	Waiting for DeviantArt…	Esperando a DeviantArt…
 	Submitting {name} to DeviantArt…	Enviando {name} a DeviantArt…
-	Submitted {name} to Sta.sh. Item {id}.	{name} enviado a Sta.sh. Elemento {id}.
 	That file is larger than DeviantArt accepts (30 MB).	El archivo es más grande de lo que DeviantArt acepta (30 MB).
 	DeviantArt is connected.	DeviantArt está conectado.
-	Opened {name}.	{name} abierto.
-	Connect again after this update so gallery, publish and the profile picture are allowed.	Conéctate otra vez para permitir la galería, publicar y la foto de perfil.
-	Sta.sh item id	Id de elemento de Sta.sh
-	Publish this publicly	Publicar de forma pública
-	Not for all ages	No para todas las edades
-	License	Licencia
-	Creative Commons	Creative Commons
-	Commercial use	Uso comercial
-	Publish	Publicar
-	Deviation id	Id de la obra
-	Update title and tags	Actualizar título y etiquetas
-	My gallery	Mi galería
-	Profile picture	Foto de perfil
-	Set as DeviantArt profile picture	Usar como foto de perfil de DeviantArt
-	Confirm that this publish is public.	Confirma que esta publicación es pública.
 	Create a Public app on DeviantArt, without a client secret. Copy the address below into the redirect field, paste the client id here, then connect.	Crea una app pública en DeviantArt, sin client secret. Copia la dirección de abajo en la redirección, pega aquí el client id y conecta.
 	Copied the redirect address.	Dirección de redirección copiada.
 	Connected	Conectado
 	PNG is what DeviantArt shows. A PSD is only stored as a file in Sta.sh.	PNG es lo que muestra DeviantArt. Un PSD queda en Sta.sh solo como archivo.
 	OK uploads to Sta.sh. Nothing is public until you publish.	OK sube a Sta.sh. No es público hasta que publiques.
-	More options	Más opciones
-	Upload with OK first. Publish uses the Sta.sh item from that upload.	Sube primero con OK. Publicar usa el elemento de Sta.sh de esa subida.
 	Connect again	Conectar de nuevo
 	Disconnect DeviantArt	Desconectar DeviantArt
 	Submit to DeviantArt…	Enviar a DeviantArt…
@@ -4186,84 +4308,4 @@ navigator	Zoom	Zoom
 	Open the Sta.sh page	Abrir la página de Sta.sh
 	DeviantArt was disconnected.	DeviantArt se desconectó.
 	The DeviantArt login expired. Connect again.	El inicio de sesión de DeviantArt caducó. Conéctese de nuevo.
-	Open the Telegram message	Abrir el mensaje de Telegram
-	The ten newest files sent to this bot. Click one to open it in PhotoCraft.	Los diez archivos más nuevos enviados a este bot. Un clic abre uno en PhotoCraft.
-	Your published works. Click one to open it in PhotoCraft. Sta.sh drafts are not in this list.	Tus obras publicadas. Un clic abre una en PhotoCraft. Los borradores de Sta.sh no están en esta lista.
-	Get files	Traer archivos
-	Files sent from PhotoCraft, and the ten newest files sent to this bot. Click one to open it in PhotoCraft.	Archivos enviados desde PhotoCraft y los diez más nuevos enviados a este bot. Un clic abre uno en PhotoCraft.
-	No files yet. Send one from here, or send the bot a file, then try again.	Aún no hay archivos. Envía uno desde aquí o al bot y vuelve a intentarlo.
-	Sta.sh drafts from this account, then published works. Click one to open it in PhotoCraft.	Borradores de Sta.sh de esta cuenta y luego obras publicadas. Un clic abre uno en PhotoCraft.
-	No Sta.sh files yet.	Aún no hay nada en Sta.sh.
-	No published works in the gallery.	No hay obras publicadas en la galería.
-	Telegram did not return a link for this chat.	Telegram no devolvió un enlace para este chat.
-	Sta.sh drafts open their page. Published works open in PhotoCraft.	Los borradores de Sta.sh abren su página. Las obras publicadas se abren en PhotoCraft.
-	DeviantArt did not offer a download.	DeviantArt no ofreció una descarga.
 	Saved file	Archivo guardado
-
-# Embedded Profile Mismatch: profile names beside the choices, Remember this choice
-	Use the embedded profile ({profile})	Usar el perfil incrustado ({profile})
-	Convert to the working space ({profile})	Convertir al espacio de trabajo ({profile})
-	Remember this choice for future images	Recordar esta opción para próximas imágenes
-	Turn the prompt back on with Ask On Mismatch in Edit › Color Settings.	Vuelve a activar el aviso con Ask On Mismatch en Edición › Ajustes de color.
-	Button Mode	Modo de botón
-	Button Mode On	Modo de botón activado
-
-# Darken / Lighten Interface (⇧⌘F1 / ⇧⌘F2)
-	Darken Interface	Oscurecer interfaz
-	Lighten Interface	Aclarar interfaz
-# Bevel & Emboss Technique.
-	Technique	Técnica
-	Chisel Hard	Cincelar duro
-	Chisel Soft	Cincelar suave
-	Open color-less EXR as ACEScg	Abrir EXR sin espacio de color como ACEScg
-# Export As metadata and profile options
-
-# View › Guides › right-click a guide
-	Edit Selected Guides	Editar guías seleccionadas
-	Clear Selected Guides	Borrar guías seleccionadas
-	Delete this set	Eliminar este conjunto
-	New Set…	Nuevo conjunto…
-	PhotoCraft Defaults	Valores por defecto de PhotoCraft
-	Save a list of these shortcuts as a web page	Guardar una lista de estos métodos abreviados como página web
-	Save the changes to this set	Guardar los cambios en este conjunto
-	Save these shortcuts as a .kys file	Guardar estos métodos abreviados como archivo .kys
-	Save these shortcuts as a new set	Guardar estos métodos abreviados como un conjunto nuevo
-	Set deleted.	Conjunto eliminado.
-	Set saved.	Conjunto guardado.
-	Set:	Conjunto:
-	Summarize…	Resumir…
-	There are too many sets: delete one first.	Hay demasiados conjuntos: elimine uno primero.
-	set name	nombre del conjunto
-	{set} (modified)	{set} (modificado)
-	Accept and Go to Conflict	Aceptar e ir al conflicto
-	Changes undone.	Cambios deshechos.
-	Choose a new shortcut for this command, or leave it without one.	Elija un nuevo método abreviado para este comando o déjelo sin ninguno.
-	Put this command's shortcuts back as they were	Restaurar los métodos abreviados de este comando como estaban
-	Take the shortcut from the other command and select it	Quitar el método abreviado al otro comando y seleccionarlo
-	Undo Changes	Deshacer cambios
-	{shortcut} is reserved by the system and can't be assigned.	{shortcut} está reservado por el sistema y no se puede asignar.
-	Low-Latency Drawing (vsync off, applies at next launch)	Dibujo de baja latencia (sin sincronización vertical, se aplica al volver a iniciar)
-# Free Transform: a new layer while the box is open (#5859)
-	Free Transform is still being applied; try again when it has finished.	Transformación libre aún se está aplicando; inténtelo de nuevo cuando termine.
-	The transform couldn't be applied.	No se pudo aplicar la transformación.
-# Preferences › Performance › GPU Memory; the status bar and slow-redraw notice
-	Its layers need {needed} of GPU memory; the budget leaves them {budget}.	Sus capas necesitan {needed} de memoria de GPU; el presupuesto les deja {budget}.
-	Set GPU Memory in Preferences › Performance to what your graphics card can hold, at most 3/8 of its memory. Automatic follows Memory Usage, within a quarter of this computer's memory and 3/8 of the card's, and doesn't count the document against a card whose memory is known. The status bar shows GPU Memory Full while they don't fit.	Ajuste Memoria de GPU en Preferencias › Rendimiento a lo que pueda alojar su tarjeta gráfica, como máximo 3/8 de su memoria. Automático sigue Uso de memoria, dentro de una cuarta parte de la memoria de este equipo y 3/8 de la de la tarjeta, y no descuenta el documento en una tarjeta cuya memoria se conoce. Mientras no quepan, la barra de estado muestra Memoria de GPU llena.
-	GPU Memory Full	Memoria de GPU llena
-	The layers need {needed} of GPU memory and may hold {budget}, so edits that redraw the whole document do it on the CPU. Click to set GPU Memory.	Las capas necesitan {needed} de memoria de GPU y pueden ocupar {budget}, así que las ediciones que redibujan todo el documento lo hacen en la CPU. Haga clic para ajustar Memoria de GPU.
-	GPU memory budget: {budget}	Presupuesto de memoria de GPU: {budget}
-	This document's layers: {needed} of {budget} for layers	Capas de este documento: {needed} de {budget} para capas
-	This document's layers need {needed} but may hold {budget}: whole-document redraws use the CPU	Las capas de este documento necesitan {needed} pero pueden ocupar {budget}: los redibujados de todo el documento usan la CPU
-	GPU Memory (MB, 0 = Automatic)	Memoria de GPU (MB, 0 = Automático)
-	{name} was changed by another app after it was opened or saved here.	Otra aplicación cambió {name} después de abrirlo o guardarlo aquí.
-	Replace it with this document, or cancel and use File › Save As to keep both.	Reemplázalo con este documento, o cancela y usa Archivo › Guardar como para conservar ambos.
-
-# File › Submit to DeviantArt: result messages
-	Published on DeviantArt.	Publicado en DeviantArt.
-	Updated the title and tags on DeviantArt.	Se actualizaron el título y las etiquetas en DeviantArt.
-	Set the DeviantArt profile picture.	Se estableció la foto de perfil de DeviantArt.
-
-	Decrease Brush Size	Reducir tamaño del pincel
-	Increase Brush Size	Aumentar tamaño del pincel
-	Decrease Brush Hardness	Reducir dureza del pincel
-	Increase Brush Hardness	Aumentar dureza del pincel

@@ -328,6 +328,7 @@
 	Blending Options…	レイヤー効果…
 	Bevel & Emboss…	ベベルとエンボス…
 	Use Global Light	グローバルライトを使用
+	Overprint	オーバープリント
 	Inner Shadow…	シャドウ (内側)…
 	Inner Glow…	光彩 (内側)…
 	Satin…	サテン…
@@ -2153,6 +2154,11 @@
 	Mixer Brush Tool	混合ブラシツール
 	Color Replacement Tool	色の置き換えツール
 	Wet	ウェット
+	Current Brush Load	現在のブラシの絵の具
+	Load Brush	ブラシに補充
+	Clean Brush	ブラシを洗浄
+	Load the brush after each stroke	ストロークごとにブラシに補充
+	Clean the brush after each stroke	ストロークごとにブラシを洗浄
 	Mix	混合
 	Wetness Jitter	ウェットのジッター
 	Mix Jitter	混合のジッター
@@ -3662,6 +3668,32 @@ cameraData	Lens	レンズ
 	Mirror	ミラー
 	Output Settings	出力設定
 	Output To	出力先
+
+	Animation Options	アニメーションオプション
+	Entire Document	ドキュメント全体
+	Filter Options	フィルターオプション
+	Layer Bounds	レイヤーの境界
+	Layers Panel Options	レイヤーパネルオプション
+	New Artboard…	新規アートボード…
+	New Group…	新規グループ…
+	Prevent Auto-Nesting	自動的な入れ子を防ぐ
+	Show Layers	レイヤーを表示
+	Thumbnail Contents	サムネールの内容
+	Thumbnail Size	サムネールのサイズ
+	Use Default Masks on Fill Layers	塗りつぶしレイヤーにデフォルトのマスクを使用
+	Expand New Effects	新しい効果を展開
+	Add “copy” to Copied Layers and Groups	コピーしたレイヤーとグループの名前に「コピー」を追加
+	Preview on canvas when reordering layers	レイヤーの並べ替え時にカンバスでプレビュー
+	Show layer mask badges	レイヤーマスクのバッジを表示
+
+# Smart Filter editors
+	Blending Options ({filter})	描画オプション ({filter})
+	Hide the layer's effects and Smart Filters  ({key}-click: all layers)	レイヤー効果とスマートフィルターを非表示  ({key}+クリック: すべてのレイヤー)
+	Show the layer's effects and Smart Filters  ({key}-click: all layers)	レイヤー効果とスマートフィルターを表示  ({key}+クリック: すべてのレイヤー)
+	Wait for the current job to finish.	現在の処理が完了するまでお待ちください。
+	The document or Smart Filter changed. Reopen its dialog.	ドキュメントまたはスマートフィルターが変更されました。ダイアログを開き直してください。
+	Opacity must be between 0% and 100%.	不透明度は0%から100%の範囲で指定してください。
+	Dissolve is approximated: it blends without Photoshop's dither.	ディザ合成は近似です。Photoshop のディザなしでブレンドします。
 	Loading fonts…	フォントを読み込み中…
 	Response curve	応答カーブ
 	Simulate Pressure	筆圧をシミュレート
@@ -3705,6 +3737,10 @@ curves	Smooth	スムーズ
 	Click to place · Alt-click or drag off-canvas to remove	クリックで配置 · Alt キーを押しながらクリック、またはカンバス外へドラッグで削除
 	No document open	ドキュメントが開かれていません
 	{n} of {max} sample points	{max} 個中 {n} 個のサンプルポイント
+
+# History panel menu (#2966)
+	New Snapshot…	新規スナップショット…
+	History Options…	ヒストリーオプション…
 # Print dialog (#2697)
 	Emulsion Down	乳剤面を下
 	Functions	機能
@@ -3848,75 +3884,9 @@ curves	Smooth	スムーズ
 	Reset All Locked Settings	ロックされた設定をすべて初期化
 	Copy Texture to Other Tools	テクスチャを他のツールにコピー
 	ICO is limited to 256 × 256 pixels	ICO は 256 × 256 ピクセルまでです
-# File › Submit to DeviantArt
-	Could not prepare a file to send: {error}	送るファイルを用意できませんでした: {error}
-	There is no saved file to send. Choose PSD or PNG.	送れる保存済みのファイルがありません。PSD か PNG を選んでください。
-	Submitting needs an internet connection.	送信にはインターネット接続が必要です。
-	Open the DeviantArt developer page	DeviantArt の開発者ページを開く
-	DeviantArt app id	DeviantArt アプリ ID
-	The DeviantArt login stays in the system keychain, not in PhotoCraft's settings file.	DeviantArt のログインは PhotoCraft の設定ファイルではなく、システムのキーチェーンに保存されます。
-	Connect DeviantArt	DeviantArt に接続
-	Title	題名
-	Tags	タグ
-	Letters, numbers and underscores, separated by commas.	文字、数字、アンダースコア。カンマで区切ります。
-	Submit as	送信形式
-	Also submit when I Save	保存時にも送信
-	Also submit when I Save As	別名保存時にも送信
-	Also submit when I Save a Copy	コピー保存時にも送信
-	Also submit when I Export	書き出し時にも送信
-	DeviantArt is set up. Save or export a file, then submit it.	DeviantArt の準備ができました。ファイルを保存または書き出してから送信してください。
-	Connect DeviantArt first.	先に DeviantArt に接続してください。
-	The DeviantArt app id should be a number.	DeviantArt のアプリ ID は数字です。
-	DeviantArt submitting needs the desktop app.	DeviantArt への送信はデスクトップアプリだけです。
-	A DeviantArt submit is already running.	DeviantArt への送信がすでに実行中です。
-	Waiting for DeviantArt…	DeviantArt を待っています…
-	Submitting {name} to DeviantArt…	{name} を DeviantArt に送信しています…
-	Submitted {name} to Sta.sh. Item {id}.	{name} を Sta.sh に送信しました。項目 {id}。
-	That file is larger than DeviantArt accepts (30 MB).	ファイルが DeviantArt の上限（30 MB）を超えています。
-	DeviantArt is connected.	DeviantArt に接続しました。
-	Opened {name}.	{name} を開きました。
-	Connect again after this update so gallery, publish and the profile picture are allowed.	ギャラリー、公開、プロフィール画像を使うには、もう一度接続してください。
-	Sta.sh item id	Sta.sh 項目 ID
-	Publish this publicly	公開する
-	Not for all ages	全年齢向けではない
-	License	ライセンス
-	Creative Commons	クリエイティブ・コモンズ
-	Commercial use	商用利用
-	Publish	公開
-	Deviation id	作品 ID
-	Update title and tags	題名とタグを更新
-	My gallery	自分のギャラリー
-	Profile picture	プロフィール画像
-	Set as DeviantArt profile picture	DeviantArt のプロフィール画像にする
-	Confirm that this publish is public.	この公開が公開設定であることを確認してください。
-	Create a Public app on DeviantArt, without a client secret. Copy the address below into the redirect field, paste the client id here, then connect.	DeviantArt で公開アプリを作ります。client secret は不要です。下のアドレスをリダイレクトにコピーし、ここにクライアント ID を貼って接続します。
-	Copied the redirect address.	リダイレクトアドレスをコピーしました。
-	Connected	接続済み
-	PNG is what DeviantArt shows. A PSD is only stored as a file in Sta.sh.	DeviantArt が表示するのは PNG です。PSD は Sta.sh にファイルとして置かれるだけです。
-	OK uploads to Sta.sh. Nothing is public until you publish.	OK は Sta.sh に送ります。公開は公開操作のあとです。
-	More options	詳細オプション
-	Upload with OK first. Publish uses the Sta.sh item from that upload.	先に OK でアップロードします。公開はその Sta.sh 項目を使います。
-	Connect again	再接続
-	Disconnect DeviantArt	DeviantArt を切断
-	Submit to DeviantArt…	DeviantArt に送る…
-	Submitted {name} to Sta.sh. It stays private until you publish it.	{name} は Sta.sh にあります。公開するまで非公開です。
-	Open the Sta.sh page	Sta.sh のページを開く
-	DeviantArt was disconnected.	DeviantArt を切断しました。
-	The DeviantArt login expired. Connect again.	DeviantArt のログインの有効期限が切れました。もう一度接続してください。
-	Open the Telegram message	Telegram のメッセージを開く
-	The ten newest files sent to this bot. Click one to open it in PhotoCraft.	このボットに送られた新しい順10件。クリックすると PhotoCraft で開きます。
-	Your published works. Click one to open it in PhotoCraft. Sta.sh drafts are not in this list.	公開済みの作品です。クリックすると PhotoCraft で開きます。Sta.sh の下書きはこの一覧にありません。
-	Get files	ファイルを取得
-	Files sent from PhotoCraft, and the ten newest files sent to this bot. Click one to open it in PhotoCraft.	PhotoCraft から送ったファイルと、このボットに送られた新しい順10件。クリックすると PhotoCraft で開きます。
-	No files yet. Send one from here, or send the bot a file, then try again.	まだファイルがありません。ここから送るか、ボットにファイルを送ってからもう一度。
-	Sta.sh drafts from this account, then published works. Click one to open it in PhotoCraft.	このアカウントの Sta.sh 下書き、そのあと公開作品。クリックすると PhotoCraft で開きます。
-	No Sta.sh files yet.	Sta.sh にはまだ何もありません。
-	No published works in the gallery.	ギャラリーに公開作品はありません。
-	Telegram did not return a link for this chat.	Telegram はこのチャットのリンクを返しませんでした。
-	Sta.sh drafts open their page. Published works open in PhotoCraft.	Sta.sh の下書きはそのページを開きます。公開作品は PhotoCraft で開きます。
-	DeviantArt did not offer a download.	DeviantArt はダウンロードを用意しませんでした。
-	Saved file	保存済みのファイル
-
+# History panel › History Brush source (#2966)
+	Paints from the History panel's source state	ヒストリーパネルのソース状態からペイントします
+	Sets the source for the history brush	ヒストリーブラシのソースを設定します
 # Embedded Profile Mismatch: profile names beside the choices, Remember this choice
 	Use the embedded profile ({profile})	埋め込みプロファイルを使用 ({profile})
 	Convert to the working space ({profile})	作業用スペースに変換 ({profile})
@@ -3935,6 +3905,13 @@ curves	Smooth	スムーズ
 # View › Guides › right-click a guide
 	Edit Selected Guides	選択したガイドを編集
 	Clear Selected Guides	選択したガイドを消去
+	Bicubic Automatic	バイキュービック法 (自動)
+	Bicubic Smoother	バイキュービック法 - 滑らか
+	Bicubic Sharper	バイキュービック法 - シャープ
+	Pasting from other apps is unavailable	他のアプリからの貼り付けは利用できません
+	PhotoCraft can't reach the system clipboard in this session. On Wayland, a Flatpak sandbox hides the protocol that images from other apps are read through.	このセッションでは PhotoCraft がシステムのクリップボードにアクセスできません。Wayland では、Flatpak のサンドボックスが他のアプリの画像を読み取るためのプロトコルを隠します。
+	To paste from other apps, start PhotoCraft under XWayland: `{command}`	他のアプリから貼り付けるには、XWayland 上で PhotoCraft を起動してください: `{command}`
+	Nothing to paste: PhotoCraft can't read the system clipboard here	貼り付けるものがありません: ここでは PhotoCraft がシステムのクリップボードを読み取れません
 	Delete this set	このセットを削除
 	New Set…	新規セット…
 	PhotoCraft Defaults	PhotoCraft 初期設定
@@ -3949,6 +3926,18 @@ curves	Smooth	スムーズ
 	There are too many sets: delete one first.	セットが多すぎます。先に 1 つ削除してください。
 	set name	セット名
 	{set} (modified)	{set}（変更あり）
+	Show file name in title	タイトルにファイル名を表示
+
+# Image › Mode › Bitmap (#5559)
+	50% Threshold	50% しきい値
+	Pattern Dither	パターンディザ
+	Diffusion Dither	拡散ディザ
+	Halftone Screen	ハーフトーンスクリーン
+	Custom Pattern	カスタムパターン
+	Frequency:	線数:
+	Lines/Inch	線/インチ
+	Lines/Centimeter	線/センチメートル
+	Ellipse	楕円
 	Accept and Go to Conflict	適用して競合へ移動
 	Changes undone.	変更を取り消しました。
 	Choose a new shortcut for this command, or leave it without one.	このコマンドに新しいショートカットを選択するか、なしのままにしてください。
@@ -3972,13 +3961,67 @@ curves	Smooth	スムーズ
 	Replace	置き換え
 	{name} was changed by another app after it was opened or saved here.	{name} は、ここで開くか保存した後に別のアプリで変更されました。
 	Replace it with this document, or cancel and use File › Save As to keep both.	この書類で置き換えるか、キャンセルしてファイル › 名前を付けて保存で両方を残してください。
-
-# File › Submit to DeviantArt: result messages
-	Published on DeviantArt.	DeviantArt に公開しました。
-	Updated the title and tags on DeviantArt.	DeviantArt のタイトルとタグを更新しました。
-	Set the DeviantArt profile picture.	DeviantArt のプロフィール画像を設定しました。
-
 	Decrease Brush Size	ブラシサイズを小さく
 	Increase Brush Size	ブラシサイズを大きく
 	Decrease Brush Hardness	ブラシの硬さを下げる
 	Increase Brush Hardness	ブラシの硬さを上げる
+	Memory Usage	メモリ使用量
+	Per-document RAM limit (MB)	ドキュメントあたりの RAM 上限 (MB)
+	Installed RAM: {ram} MB; this limit: {percent}%	搭載 RAM: {ram} MB、この上限: {percent}%
+	Limits each open document's pixels plus History. Oldest undo states are discarded when the limit is exceeded.	開いている各ドキュメントのピクセルと履歴を制限します。上限を超えると最も古い取り消し状態が破棄されます。
+	Applies immediately when saved. Memory is not reserved in advance.	保存するとすぐに適用されます。メモリは事前に予約されません。
+	With GPU Memory set to Automatic, this also limits the GPU layer budget. That budget is capped at one quarter of installed RAM and, when known, three eighths of the graphics card's memory, with a 512 MB minimum. Raising this limit beyond those caps does not increase the GPU budget.	GPU メモリが自動のとき、GPU レイヤー予算も制限します。上限は搭載 RAM の 1/4、判明していればグラフィックメモリの 3/8、最低 512 MB です。これ以上に上げても GPU 予算は増えません。
+	Use	使用
+	In Front	前面
+	Behind	背面
+
+# DDS Options (#1327)
+	DDS Options	DDS オプション
+	Compression	圧縮
+	Generate Mipmaps	ミップマップを生成
+
+# Color Table (.act) dialog
+	There is no color table to save.	保存するカラーテーブルがありません。
+@plural	Saved {n} color to {file}|Saved {n} colors to {file}	{file} に {n} 色を保存しました
+
+# Graphics Adapter preference (#1885)
+	GPU adapter	GPU アダプター
+
+# File › Submit to DeviantArt
+	Could not prepare a file to send: {error}	送るファイルを用意できませんでした: {error}
+	There is no saved file to send. Choose PSD or PNG.	送れる保存済みのファイルがありません。PSD か PNG を選んでください。
+	Submitting needs an internet connection.	送信にはインターネット接続が必要です。
+	Open the DeviantArt developer page	DeviantArt の開発者ページを開く
+	DeviantArt app id	DeviantArt アプリ ID
+	The DeviantArt login stays in the system keychain, not in PhotoCraft's settings file.	DeviantArt のログインは PhotoCraft の設定ファイルではなく、システムのキーチェーンに保存されます。
+	Connect DeviantArt	DeviantArt に接続
+	Title	題名
+	Tags	タグ
+	Letters, numbers and underscores, separated by commas.	文字、数字、アンダースコア。カンマで区切ります。
+	Submit as	送信形式
+	Also submit when I Save	保存時にも送信
+	Also submit when I Save As	別名保存時にも送信
+	Also submit when I Save a Copy	コピー保存時にも送信
+	Also submit when I Export	書き出し時にも送信
+	DeviantArt is set up. Save or export a file, then submit it.	DeviantArt の準備ができました。ファイルを保存または書き出してから送信してください。
+	Connect DeviantArt first.	先に DeviantArt に接続してください。
+	The DeviantArt app id should be a number.	DeviantArt のアプリ ID は数字です。
+	DeviantArt submitting needs the desktop app.	DeviantArt への送信はデスクトップアプリだけです。
+	A DeviantArt submit is already running.	DeviantArt への送信がすでに実行中です。
+	Waiting for DeviantArt…	DeviantArt を待っています…
+	Submitting {name} to DeviantArt…	{name} を DeviantArt に送信しています…
+	That file is larger than DeviantArt accepts (30 MB).	ファイルが DeviantArt の上限（30 MB）を超えています。
+	DeviantArt is connected.	DeviantArt に接続しました。
+	Create a Public app on DeviantArt, without a client secret. Copy the address below into the redirect field, paste the client id here, then connect.	DeviantArt で公開アプリを作ります。client secret は不要です。下のアドレスをリダイレクトにコピーし、ここにクライアント ID を貼って接続します。
+	Copied the redirect address.	リダイレクトアドレスをコピーしました。
+	Connected	接続済み
+	PNG is what DeviantArt shows. A PSD is only stored as a file in Sta.sh.	DeviantArt が表示するのは PNG です。PSD は Sta.sh にファイルとして置かれるだけです。
+	OK uploads to Sta.sh. Nothing is public until you publish.	OK は Sta.sh に送ります。公開は公開操作のあとです。
+	Connect again	再接続
+	Disconnect DeviantArt	DeviantArt を切断
+	Submit to DeviantArt…	DeviantArt に送る…
+	Submitted {name} to Sta.sh. It stays private until you publish it.	{name} は Sta.sh にあります。公開するまで非公開です。
+	Open the Sta.sh page	Sta.sh のページを開く
+	DeviantArt was disconnected.	DeviantArt を切断しました。
+	The DeviantArt login expired. Connect again.	DeviantArt のログインの有効期限が切れました。もう一度接続してください。
+	Saved file	保存済みのファイル

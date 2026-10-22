@@ -334,6 +334,7 @@
 	Blending Options…	Možnosti prolnutí…
 	Bevel & Emboss…	Úkos a reliéf…
 	Use Global Light	Použít globální světlo
+	Overprint	Přetisk
 	Inner Shadow…	Vnitřní stín…
 	Inner Glow…	Vnitřní záře…
 	Satin…	Satén…
@@ -2171,6 +2172,11 @@
 	Color Replacement Tool	Nástroj Nahrazení barvy
 	Color Replacement	Nahrazení barvy
 	Wet	Vlhkost
+	Current Brush Load	Aktuální náplň štětce
+	Load Brush	Naplnit štětec
+	Clean Brush	Vyčistit štětec
+	Load the brush after each stroke	Naplnit štětec po každém tahu
+	Clean the brush after each stroke	Vyčistit štětec po každém tahu
 	Mix	Míchání
 	Wetness Jitter	Kolísání vlhkosti
 	Mix Jitter	Kolísání míchání
@@ -2662,6 +2668,36 @@ cameraData	Lens	Objektiv
 	Duplicate Layer	Duplikovat vrstvu
 	Contract	Zúžit
 
+	Animation Options	Možnosti animace
+	Entire Document	Celý dokument
+	Filter Options	Možnosti filtrování
+	Layer Bounds	Hranice vrstvy
+	Layers Panel Options	Možnosti panelu Vrstvy
+	Lock Layers	Zamknout vrstvy
+	New Artboard…	Nové kreslicí plátno…
+	New Group	Nová skupina
+	New Group…	Nová skupina…
+	New Layer…	Nová vrstva…
+	Panel Options…	Možnosti panelu…
+	Prevent Auto-Nesting	Zabránit automatickému vnoření
+	Show Layers	Zobrazit vrstvy
+	Thumbnail Contents	Obsah miniatur
+	Thumbnail Size	Velikost miniatur
+	Use Default Masks on Fill Layers	Používat výchozí masky u vrstev výplně
+	Expand New Effects	Rozbalovat nové efekty
+	Add “copy” to Copied Layers and Groups	Přidávat „kopie“ ke kopírovaným vrstvám a skupinám
+	Preview on canvas when reordering layers	Zobrazovat náhled na plátně při změně pořadí vrstev
+	Show layer mask badges	Zobrazovat odznaky masek vrstev
+
+# Smart Filter editors
+	Blending Options ({filter})	Volby prolnutí ({filter})
+	Hide the layer's effects and Smart Filters  ({key}-click: all layers)	Skrýt efekty vrstvy a inteligentní filtry  (kliknutí s {key}: všechny vrstvy)
+	Show the layer's effects and Smart Filters  ({key}-click: all layers)	Zobrazit efekty vrstvy a inteligentní filtry  (kliknutí s {key}: všechny vrstvy)
+	Wait for the current job to finish.	Počkejte na dokončení aktuální úlohy.
+	The document or Smart Filter changed. Reopen its dialog.	Dokument nebo inteligentní filtr se změnil. Znovu otevřete jeho dialog.
+	Opacity must be between 0% and 100%.	Krytí musí být mezi 0% a 100%.
+	Dissolve is approximated: it blends without Photoshop's dither.	Režim Rozpustit je pouze aproximován: prolíná bez ditheringu Photoshopu.
+
 # Dynamic labels the tl! literal scanner cannot see: filter and Filter Gallery parameter names and
 # choices (humanized from their keys), Camera Raw controls, render filters (Flame, Picture Frame, Tree),
 # measurement columns, file info fields and the macOS application menu. Translated the same way as
@@ -3083,7 +3119,6 @@ cameraData	Lens	Objektiv
 	Liquify	Zkapalnit
 	List	Seznam
 	Load Selection	Načíst výběr
-	Lock Layers	Zamknout vrstvy
 	Locked	Zamčeno
 	Long Lines	Dlouhé čáry
 	Long Strokes	Dlouhé tahy
@@ -3131,11 +3166,9 @@ cameraData	Lens	Objektiv
 	Neon Glow	Neonová záře
 	Neutralize	Neutralizovat
 	New Channel	Nový kanál
-	New Group	Nová skupina
 	New Guide	Nové vodítko
 	New Guide Layout	Nové rozvržení vodítek
 	New Layer Comp	Nová kompozice vrstev
-	New Layer…	Nová vrstva…
 	New Video Layer from File	Nová video vrstva ze souboru
 	New document	Nový dokument
 	New document…     ⌘N	Nový dokument…     ⌘N
@@ -3546,6 +3579,12 @@ curves	Smooth	Vyhladit
 	Click to place · Alt-click or drag off-canvas to remove	Kliknutím umístíte · Alt-kliknutím nebo přetažením mimo plátno odeberete
 	No document open	Není otevřen žádný dokument
 	{n} of {max} sample points	{n} z {max} bodů měření
+
+# History panel menu (#2966)
+	Step Forward	Krok vpřed
+	Clear History	Vymazat historii
+	New Snapshot…	Nový snímek…
+	History Options…	Volby historie…
 	Drag (lasso) or click points (polygonal) · {add} add · {sub} subtract	Táhněte (laso) nebo klikejte na body (mnohoúhelník) · {add} přidat · {sub} odečíst
 	The current gradient (pick one in Window › Gradients)	Aktuální přechod (vyberte v Okno › Přechody)
 # Canvas context menus, Channels panel menu, Layer Style blending page (labels rendered through a variable).
@@ -3778,6 +3817,109 @@ navigator	Zoom	Zvětšení
 	Sent to {printer}	Odesláno do {printer}
 	set in Print Settings…	nastavuje se v nastavení tisku…
 	ICO is limited to 256 × 256 pixels	ICO je omezen na 256 × 256 pixelů
+# History panel › History Brush source (#2966)
+	Paints from the History panel's source state	Maluje ze zdrojového stavu panelu Historie
+	Sets the source for the history brush	Nastaví zdroj pro štětec historie
+# Embedded Profile Mismatch: profile names beside the choices, Remember this choice
+	Use the embedded profile ({profile})	Použít vložený profil ({profile})
+	Convert to the working space ({profile})	Převést do pracovního prostoru barev ({profile})
+	Remember this choice for future images	Zapamatovat si tuto volbu pro další obrázky
+	Turn the prompt back on with Ask On Mismatch in Edit › Color Settings.	Dotaz znovu zapnete volbou Ask On Mismatch v nabídce Úpravy › Nastavení barev.
+	Button Mode	Režim tlačítka
+	Button Mode On	Režim tlačítka zapnutý
+
+# Darken / Lighten Interface (⇧⌘F1 / ⇧⌘F2)
+	Darken Interface	Ztmavit rozhraní
+	Lighten Interface	Zesvětlit rozhraní
+# Bevel & Emboss Technique.
+	Technique	Technika
+	Chisel Hard	Tvrdé tesání
+	Chisel Soft	Měkké tesání
+	Open color-less EXR as ACEScg	Otevřít EXR bez údaje o barevném prostoru jako ACEScg
+
+# View › Guides › right-click a guide
+	Edit Selected Guides	Upravit vybraná vodítka
+	Clear Selected Guides	Vymazat vybraná vodítka
+	Bicubic Automatic	Bikubická automatická
+	Bicubic Smoother	Bikubická hladší
+	Bicubic Sharper	Bikubická ostřejší
+	Pasting from other apps is unavailable	Vkládání z jiných aplikací není k dispozici
+	PhotoCraft can't reach the system clipboard in this session. On Wayland, a Flatpak sandbox hides the protocol that images from other apps are read through.	PhotoCraft v této relaci nemá přístup k systémové schránce. Na Waylandu sandbox Flatpaku skrývá protokol, přes který se čtou obrázky z jiných aplikací.
+	To paste from other apps, start PhotoCraft under XWayland: `{command}`	Chcete-li vkládat z jiných aplikací, spusťte PhotoCraft pod XWaylandem: `{command}`
+	Nothing to paste: PhotoCraft can't read the system clipboard here	Není co vložit: PhotoCraft zde nemůže číst systémovou schránku
+	Delete this set	Smazat tuto sadu
+	New Set…	Nová sada…
+	PhotoCraft Defaults	Výchozí PhotoCraft
+	Save a list of these shortcuts as a web page	Uložit seznam těchto zkratek jako webovou stránku
+	Save the changes to this set	Uložit změny do této sady
+	Save these shortcuts as a .kys file	Uložit tyto zkratky jako soubor .kys
+	Save these shortcuts as a new set	Uložit tyto zkratky jako novou sadu
+	Set deleted.	Sada smazána.
+	Set saved.	Sada uložena.
+	Set:	Sada:
+	Summarize…	Shrnout…
+	There are too many sets: delete one first.	Sad je příliš mnoho: nejprve jednu smažte.
+	set name	název sady
+	{set} (modified)	{set} (změněno)
+	Show file name in title	Zobrazit název souboru v titulu
+
+# Image › Mode › Bitmap (#5559)
+	50% Threshold	50% práh
+	Pattern Dither	Rozptyl se vzorkem
+	Diffusion Dither	Difuzní rozptyl
+	Halftone Screen	Polotónový rastr
+	Custom Pattern	Vlastní vzorek
+	Frequency:	Frekvence:
+	Lines/Inch	Linky/palec
+	Lines/Centimeter	Linky/centimetr
+	Ellipse	Elipsa
+	Accept and Go to Conflict	Přijmout a přejít ke konfliktu
+	Changes undone.	Změny vráceny.
+	Choose a new shortcut for this command, or leave it without one.	Zvolte pro tento příkaz novou zkratku, nebo ho nechte bez ní.
+	Put this command's shortcuts back as they were	Vrátit zkratky tohoto příkazu do původního stavu
+	Take the shortcut from the other command and select it	Odebrat zkratku druhému příkazu a vybrat ho
+	Undo Changes	Vrátit změny
+	{shortcut} is reserved by the system and can't be assigned.	{shortcut} je vyhrazena systémem a nelze ji přiřadit.
+	Low-Latency Drawing (vsync off, applies at next launch)	Kreslení s nízkou latencí (bez vertikální synchronizace, platí po dalším spuštění)
+# Free Transform: a new layer while the box is open (#5859)
+	Free Transform is still being applied; try again when it has finished.	Volná transformace se stále použije; zkuste to znovu, až skončí.
+	The transform couldn't be applied.	Transformaci nelze použít.
+# Preferences › Performance › GPU Memory; the status bar and slow-redraw notice
+	Its layers need {needed} of GPU memory; the budget leaves them {budget}.	Vrstvy potřebují {needed} paměti GPU; rozpočet jim ponechává {budget}.
+	Set GPU Memory in Preferences › Performance to what your graphics card can hold, at most 3/8 of its memory. Automatic follows Memory Usage, within a quarter of this computer's memory and 3/8 of the card's, and doesn't count the document against a card whose memory is known. The status bar shows GPU Memory Full while they don't fit.	V Předvolbách › Výkon nastavte Paměť GPU na tolik, kolik vaše grafická karta pojme, nejvýše 3/8 její paměti. Automaticky se řídí Využitím paměti, v rámci čtvrtiny paměti tohoto počítače a 3/8 paměti karty, a u karty se známou pamětí do ní dokument nezapočítává. Dokud se nevejdou, stavový řádek ukazuje Paměť GPU je plná.
+	GPU Memory Full	Paměť GPU je plná
+	The layers need {needed} of GPU memory and may hold {budget}, so edits that redraw the whole document do it on the CPU. Click to set GPU Memory.	Vrstvy potřebují {needed} paměti GPU a mohou zabrat {budget}, takže úpravy, které překreslují celý dokument, to dělají na CPU. Kliknutím nastavíte Paměť GPU.
+	GPU memory budget: {budget}	Rozpočet paměti GPU: {budget}
+	This document's layers: {needed} of {budget} for layers	Vrstvy tohoto dokumentu: {needed} z {budget} pro vrstvy
+	This document's layers need {needed} but may hold {budget}: whole-document redraws use the CPU	Vrstvy tohoto dokumentu potřebují {needed}, ale mohou zabrat {budget}: překreslení celého dokumentu probíhá na CPU
+	GPU Memory (MB, 0 = Automatic)	Paměť GPU (MB, 0 = Automaticky)
+	{name} was changed by another app after it was opened or saved here.	Soubor {name} změnila jiná aplikace poté, co byl zde otevřen nebo uložen.
+	Replace it with this document, or cancel and use File › Save As to keep both.	Nahraďte ho tímto dokumentem, nebo zrušte a použijte Soubor › Uložit jako, abyste zachovali obojí.
+	Decrease Brush Size	Zmenšit velikost štětce
+	Increase Brush Size	Zvětšit velikost štětce
+	Decrease Brush Hardness	Snížit tvrdost štětce
+	Increase Brush Hardness	Zvýšit tvrdost štětce
+	Memory Usage	Využití paměti
+	Per-document RAM limit (MB)	Limit RAM na dokument (MB)
+	Installed RAM: {ram} MB; this limit: {percent}%	Nainstalovaná RAM: {ram} MB; tento limit: {percent}%
+	Limits each open document's pixels plus History. Oldest undo states are discarded when the limit is exceeded.	Omezuje pixely plus Historii každého otevřeného dokumentu. Nejstarší stavy zpět se při překročení limitu zahodí.
+	Applies immediately when saved. Memory is not reserved in advance.	Platí hned po uložení. Paměť se předem nerezervuje.
+	With GPU Memory set to Automatic, this also limits the GPU layer budget. That budget is capped at one quarter of installed RAM and, when known, three eighths of the graphics card's memory, with a 512 MB minimum. Raising this limit beyond those caps does not increase the GPU budget.	Při GPU paměti Automaticky omezuje i GPU rozpočet. Strop je čtvrtina RAM a, je-li známo, tři osminy paměti karty, minimum 512 MB. Vyšší limit GPU rozpočet nezvýší.
+	Use	Použít
+	In Front	Vpředu
+	Behind	Vzadu
+
+# DDS Options (#1327)
+	DDS Options	Možnosti DDS
+	Generate Mipmaps	Generovat mipmapy
+
+# Color Table (.act) dialog
+	There is no color table to save.	Neexistuje žádná tabulka barev k uložení.
+@plural	Saved {n} color to {file}|Saved {n} colors to {file}	Uložena {n} barva do {file}|Uloženy {n} barvy do {file}|Uloženo {n} barev do {file}
+
+# Graphics Adapter preference (#1885)
+	GPU adapter	Adaptér GPU
+
 # File › Submit to DeviantArt
 	Could not prepare a file to send: {error}	Soubor k odeslání se nepodařilo připravit: {error}
 	There is no saved file to send. Choose PSD or PNG.	Není uložený soubor k odeslání. Zvol PSD nebo PNG.
@@ -3801,31 +3943,13 @@ navigator	Zoom	Zvětšení
 	A DeviantArt submit is already running.	Odesílání na DeviantArt už běží.
 	Waiting for DeviantArt…	Čeká se na DeviantArt…
 	Submitting {name} to DeviantArt…	Odesílání {name} na DeviantArt…
-	Submitted {name} to Sta.sh. Item {id}.	{name} odesláno do Sta.sh. Položka {id}.
 	That file is larger than DeviantArt accepts (30 MB).	Soubor je větší, než DeviantArt přijme (30 MB).
 	DeviantArt is connected.	DeviantArt je připojen.
-	Opened {name}.	{name} otevřeno.
-	Connect again after this update so gallery, publish and the profile picture are allowed.	Připojte se znovu, aby šly galerie, zveřejnění a profilový obrázek.
-	Sta.sh item id	Id položky Sta.sh
-	Publish this publicly	Zveřejnit veřejně
-	Not for all ages	Ne pro každý věk
-	License	Licence
-	Creative Commons	Creative Commons
-	Commercial use	Komerční užití
-	Publish	Zveřejnit
-	Deviation id	Id díla
-	Update title and tags	Aktualizovat název a štítky
-	My gallery	Moje galerie
-	Profile picture	Profilový obrázek
-	Set as DeviantArt profile picture	Nastavit jako profilový obrázek DeviantArt
-	Confirm that this publish is public.	Potvrďte, že zveřejnění je veřejné.
 	Create a Public app on DeviantArt, without a client secret. Copy the address below into the redirect field, paste the client id here, then connect.	Vytvořte veřejnou aplikaci na DeviantArt, bez client secret. Zkopírujte adresu níže do přesměrování, vložte sem client id a připojte se.
 	Copied the redirect address.	Adresa přesměrování zkopírována.
 	Connected	Připojeno
 	PNG is what DeviantArt shows. A PSD is only stored as a file in Sta.sh.	PNG je to, co DeviantArt ukazuje. PSD je ve Sta.sh jen soubor.
 	OK uploads to Sta.sh. Nothing is public until you publish.	OK nahraje do Sta.sh. Veřejné to není, dokud to nezveřejníte.
-	More options	Další volby
-	Upload with OK first. Publish uses the Sta.sh item from that upload.	Nejprve nahrajte přes OK. Zveřejnění použije položku Sta.sh z tohoto nahrání.
 	Connect again	Připojit znovu
 	Disconnect DeviantArt	Odpojit DeviantArt
 	Submit to DeviantArt…	Odeslat na DeviantArt…
@@ -3833,83 +3957,4 @@ navigator	Zoom	Zvětšení
 	Open the Sta.sh page	Otevřít stránku Sta.sh
 	DeviantArt was disconnected.	DeviantArt byl odpojen.
 	The DeviantArt login expired. Connect again.	Přihlášení k DeviantArt vypršelo. Připojte se znovu.
-	Open the Telegram message	Otevřít zprávu v Telegramu
-	The ten newest files sent to this bot. Click one to open it in PhotoCraft.	Deset nejnovějších souborů poslaných tomuto botovi. Kliknutím jeden otevřete ve PhotoCraftu.
-	Your published works. Click one to open it in PhotoCraft. Sta.sh drafts are not in this list.	Vaše zveřejněná díla. Kliknutím jedno otevřete ve PhotoCraftu. Koncepty ve Sta.sh v seznamu nejsou.
-	Get files	Získat soubory
-	Files sent from PhotoCraft, and the ten newest files sent to this bot. Click one to open it in PhotoCraft.	Soubory odeslané z PhotoCraftu a deset nejnovějších souborů tomuto botovi. Kliknutím jeden otevřete ve PhotoCraftu.
-	No files yet. Send one from here, or send the bot a file, then try again.	Zatím žádné soubory. Pošlete jeden odsud nebo botovi a zkuste to znovu.
-	Sta.sh drafts from this account, then published works. Click one to open it in PhotoCraft.	Koncepty Sta.sh z tohoto účtu a pak zveřejněná díla. Kliknutím jedno otevřete ve PhotoCraftu.
-	No Sta.sh files yet.	Ve Sta.sh zatím nic není.
-	No published works in the gallery.	V galerii nejsou žádná zveřejněná díla.
-	Telegram did not return a link for this chat.	Telegram nevrátil odkaz na tento chat.
-	Sta.sh drafts open their page. Published works open in PhotoCraft.	Koncepty Sta.sh otevřou svou stránku. Zveřejněná díla se otevřou ve PhotoCraftu.
-	DeviantArt did not offer a download.	DeviantArt nenabídl stažení.
 	Saved file	Uložený soubor
-
-# Embedded Profile Mismatch: profile names beside the choices, Remember this choice
-	Use the embedded profile ({profile})	Použít vložený profil ({profile})
-	Convert to the working space ({profile})	Převést do pracovního prostoru barev ({profile})
-	Remember this choice for future images	Zapamatovat si tuto volbu pro další obrázky
-	Turn the prompt back on with Ask On Mismatch in Edit › Color Settings.	Dotaz znovu zapnete volbou Ask On Mismatch v nabídce Úpravy › Nastavení barev.
-	Button Mode	Režim tlačítka
-	Button Mode On	Režim tlačítka zapnutý
-
-# Darken / Lighten Interface (⇧⌘F1 / ⇧⌘F2)
-	Darken Interface	Ztmavit rozhraní
-	Lighten Interface	Zesvětlit rozhraní
-# Bevel & Emboss Technique.
-	Technique	Technika
-	Chisel Hard	Tvrdé tesání
-	Chisel Soft	Měkké tesání
-	Open color-less EXR as ACEScg	Otevřít EXR bez údaje o barevném prostoru jako ACEScg
-
-# View › Guides › right-click a guide
-	Edit Selected Guides	Upravit vybraná vodítka
-	Clear Selected Guides	Vymazat vybraná vodítka
-	Delete this set	Smazat tuto sadu
-	New Set…	Nová sada…
-	PhotoCraft Defaults	Výchozí PhotoCraft
-	Save a list of these shortcuts as a web page	Uložit seznam těchto zkratek jako webovou stránku
-	Save the changes to this set	Uložit změny do této sady
-	Save these shortcuts as a .kys file	Uložit tyto zkratky jako soubor .kys
-	Save these shortcuts as a new set	Uložit tyto zkratky jako novou sadu
-	Set deleted.	Sada smazána.
-	Set saved.	Sada uložena.
-	Set:	Sada:
-	Summarize…	Shrnout…
-	There are too many sets: delete one first.	Sad je příliš mnoho: nejprve jednu smažte.
-	set name	název sady
-	{set} (modified)	{set} (změněno)
-	Accept and Go to Conflict	Přijmout a přejít ke konfliktu
-	Changes undone.	Změny vráceny.
-	Choose a new shortcut for this command, or leave it without one.	Zvolte pro tento příkaz novou zkratku, nebo ho nechte bez ní.
-	Put this command's shortcuts back as they were	Vrátit zkratky tohoto příkazu do původního stavu
-	Take the shortcut from the other command and select it	Odebrat zkratku druhému příkazu a vybrat ho
-	Undo Changes	Vrátit změny
-	{shortcut} is reserved by the system and can't be assigned.	{shortcut} je vyhrazena systémem a nelze ji přiřadit.
-	Low-Latency Drawing (vsync off, applies at next launch)	Kreslení s nízkou latencí (bez vertikální synchronizace, platí po dalším spuštění)
-# Free Transform: a new layer while the box is open (#5859)
-	Free Transform is still being applied; try again when it has finished.	Volná transformace se stále použije; zkuste to znovu, až skončí.
-	The transform couldn't be applied.	Transformaci nelze použít.
-# Preferences › Performance › GPU Memory; the status bar and slow-redraw notice
-	Its layers need {needed} of GPU memory; the budget leaves them {budget}.	Vrstvy potřebují {needed} paměti GPU; rozpočet jim ponechává {budget}.
-	Set GPU Memory in Preferences › Performance to what your graphics card can hold, at most 3/8 of its memory. Automatic follows Memory Usage, within a quarter of this computer's memory and 3/8 of the card's, and doesn't count the document against a card whose memory is known. The status bar shows GPU Memory Full while they don't fit.	V Předvolbách › Výkon nastavte Paměť GPU na tolik, kolik vaše grafická karta pojme, nejvýše 3/8 její paměti. Automaticky se řídí Využitím paměti, v rámci čtvrtiny paměti tohoto počítače a 3/8 paměti karty, a u karty se známou pamětí do ní dokument nezapočítává. Dokud se nevejdou, stavový řádek ukazuje Paměť GPU je plná.
-	GPU Memory Full	Paměť GPU je plná
-	The layers need {needed} of GPU memory and may hold {budget}, so edits that redraw the whole document do it on the CPU. Click to set GPU Memory.	Vrstvy potřebují {needed} paměti GPU a mohou zabrat {budget}, takže úpravy, které překreslují celý dokument, to dělají na CPU. Kliknutím nastavíte Paměť GPU.
-	GPU memory budget: {budget}	Rozpočet paměti GPU: {budget}
-	This document's layers: {needed} of {budget} for layers	Vrstvy tohoto dokumentu: {needed} z {budget} pro vrstvy
-	This document's layers need {needed} but may hold {budget}: whole-document redraws use the CPU	Vrstvy tohoto dokumentu potřebují {needed}, ale mohou zabrat {budget}: překreslení celého dokumentu probíhá na CPU
-	GPU Memory (MB, 0 = Automatic)	Paměť GPU (MB, 0 = Automaticky)
-	{name} was changed by another app after it was opened or saved here.	Soubor {name} změnila jiná aplikace poté, co byl zde otevřen nebo uložen.
-	Replace it with this document, or cancel and use File › Save As to keep both.	Nahraďte ho tímto dokumentem, nebo zrušte a použijte Soubor › Uložit jako, abyste zachovali obojí.
-
-# File › Submit to DeviantArt: result messages
-	Published on DeviantArt.	Zveřejněno na DeviantArt.
-	Updated the title and tags on DeviantArt.	Název a štítky na DeviantArt aktualizovány.
-	Set the DeviantArt profile picture.	Profilový obrázek DeviantArt nastaven.
-
-	Decrease Brush Size	Zmenšit velikost štětce
-	Increase Brush Size	Zvětšit velikost štětce
-	Decrease Brush Hardness	Snížit tvrdost štětce
-	Increase Brush Hardness	Zvýšit tvrdost štětce

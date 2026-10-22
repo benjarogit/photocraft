@@ -319,6 +319,7 @@
 	Blending Options…	Overvloeiopties…
 	Bevel & Emboss…	Schuine kant en reliëf…
 	Use Global Light	Globaal licht gebruiken
+	Overprint	Overdrukken
 	Inner Shadow…	Binnenschaduw…
 	Inner Glow…	Gloed binnen…
 	Satin…	Satijn…
@@ -2118,6 +2119,11 @@
 	Mixer Brush Tool	Mengpenseelgereedschap
 	Color Replacement Tool	Kleurvervangingsgereedschap
 	Wet	Nat
+	Current Brush Load	Huidige penseellading
+	Load Brush	Penseel laden
+	Clean Brush	Penseel reinigen
+	Load the brush after each stroke	Penseel laden na elke streek
+	Clean the brush after each stroke	Penseel reinigen na elke streek
 	Mix	Mengen
 	Wetness Jitter	Nattigheidsvariatie
 	Mix Jitter	Mengvariatie
@@ -3806,6 +3812,32 @@ cameraData	Lens	Lens
 	Mirror	Spiegelen
 	Output Settings	Uitvoerinstellingen
 	Output To	Uitvoer naar
+
+	Animation Options	Animatieopties
+	Entire Document	Hele document
+	Filter Options	Filteropties
+	Layer Bounds	Laaggrenzen
+	Layers Panel Options	Opties van het deelvenster Lagen
+	New Artboard…	Nieuw tekengebied…
+	New Group…	Nieuwe groep…
+	Prevent Auto-Nesting	Automatisch nesten voorkomen
+	Show Layers	Lagen tonen
+	Thumbnail Contents	Inhoud van miniaturen
+	Thumbnail Size	Grootte van miniaturen
+	Use Default Masks on Fill Layers	Standaardmaskers gebruiken op opvullagen
+	Expand New Effects	Nieuwe effecten uitvouwen
+	Add “copy” to Copied Layers and Groups	„kopie” toevoegen aan gekopieerde lagen en groepen
+	Preview on canvas when reordering layers	Voorvertoning op canvas bij herschikken van lagen
+	Show layer mask badges	Badges voor laagmaskers tonen
+
+# Smart Filter editors
+	Blending Options ({filter})	Overvloeiopties ({filter})
+	Hide the layer's effects and Smart Filters  ({key}-click: all layers)	Laageffecten en slimme filters verbergen  ({key}-klik: alle lagen)
+	Show the layer's effects and Smart Filters  ({key}-click: all layers)	Laageffecten en slimme filters tonen  ({key}-klik: alle lagen)
+	Wait for the current job to finish.	Wacht tot de huidige taak is voltooid.
+	The document or Smart Filter changed. Reopen its dialog.	Het document of het slimme filter is gewijzigd. Open het dialoogvenster opnieuw.
+	Opacity must be between 0% and 100%.	De dekking moet tussen 0% en 100% liggen.
+	Dissolve is approximated: it blends without Photoshop's dither.	Verspreiden is benaderd: het mengt zonder de dither van Photoshop.
 	Loading fonts…	Lettertypen laden…
 	Response curve	Responscurve
 	Simulate Pressure	Druk simuleren
@@ -3854,6 +3886,10 @@ curves	Smooth	Vloeiend maken
 # Color Sampler (added with the i18n coverage repair)
 	Click to place · Alt-click or drag off-canvas to remove	Klik om te plaatsen · Alt-klik of sleep buiten het canvas om te verwijderen
 	{n} of {max} sample points	{n} van {max} steekproefpunten
+
+# History panel menu (#2966)
+	New Snapshot…	Nieuwe momentopname…
+	History Options…	Geschiedenisopties…
 # Print dialog (#2697)
 	Emulsion Down	Emulsie omlaag
 	Functions	Functies
@@ -3930,6 +3966,109 @@ curves	Smooth	Vloeiend maken
 	Sent to {printer}	Verzonden naar {printer}
 	set in Print Settings…	instellen in de afdrukinstellingen…
 	ICO is limited to 256 × 256 pixels	ICO is beperkt tot 256 × 256 pixels
+# History panel › History Brush source (#2966)
+	Paints from the History panel's source state	Schildert vanuit de bronstatus van het deelvenster Geschiedenis
+	Sets the source for the history brush	Stelt de bron voor het historiepenseel in
+# Embedded Profile Mismatch: profile names beside the choices, Remember this choice
+	Use the embedded profile ({profile})	Het ingesloten profiel gebruiken ({profile})
+	Convert to the working space ({profile})	Omzetten naar de werkruimte ({profile})
+	Remember this choice for future images	Deze keuze onthouden voor volgende afbeeldingen
+	Turn the prompt back on with Ask On Mismatch in Edit › Color Settings.	Zet de vraag weer aan met Ask On Mismatch in Bewerken › Kleurinstellingen.
+	Button Mode	Knopmodus
+	Button Mode On	Knopmodus aan
+
+# Darken / Lighten Interface (⇧⌘F1 / ⇧⌘F2)
+	Darken Interface	Interface donkerder maken
+	Lighten Interface	Interface lichter maken
+# Bevel & Emboss Technique.
+	Technique	Techniek
+	Chisel Hard	Beitel hard
+	Chisel Soft	Beitel zacht
+	Open color-less EXR as ACEScg	EXR zonder kleurruimte als ACEScg openen
+
+# View › Guides › right-click a guide
+	Edit Selected Guides	Geselecteerde hulplijnen bewerken
+	Clear Selected Guides	Geselecteerde hulplijnen wissen
+	Bicubic Automatic	Bicubisch automatisch
+	Bicubic Smoother	Bicubisch vloeiender
+	Bicubic Sharper	Bicubisch scherper
+	Pasting from other apps is unavailable	Plakken vanuit andere apps is niet beschikbaar
+	PhotoCraft can't reach the system clipboard in this session. On Wayland, a Flatpak sandbox hides the protocol that images from other apps are read through.	PhotoCraft heeft in deze sessie geen toegang tot het systeemklembord. Onder Wayland verbergt een Flatpak-sandbox het protocol waarmee afbeeldingen uit andere apps worden gelezen.
+	To paste from other apps, start PhotoCraft under XWayland: `{command}`	Om vanuit andere apps te plakken, start je PhotoCraft onder XWayland: `{command}`
+	Nothing to paste: PhotoCraft can't read the system clipboard here	Niets om te plakken: PhotoCraft kan het systeemklembord hier niet lezen
+	Delete this set	Deze set verwijderen
+	New Set…	Nieuwe set…
+	PhotoCraft Defaults	PhotoCraft-standaard
+	Save a list of these shortcuts as a web page	Een lijst van deze sneltoetsen als webpagina opslaan
+	Save the changes to this set	De wijzigingen in deze set opslaan
+	Save these shortcuts as a .kys file	Deze sneltoetsen als .kys-bestand opslaan
+	Save these shortcuts as a new set	Deze sneltoetsen als nieuwe set opslaan
+	Set deleted.	Set verwijderd.
+	Set saved.	Set opgeslagen.
+	Set:	Set:
+	Summarize…	Samenvatten…
+	There are too many sets: delete one first.	Er zijn te veel sets: verwijder er eerst een.
+	set name	naam van de set
+	{set} (modified)	{set} (gewijzigd)
+	Show file name in title	Bestandsnaam in titel weergeven
+
+# Image › Mode › Bitmap (#5559)
+	50% Threshold	50% drempel
+	Pattern Dither	Patroondithering
+	Diffusion Dither	Diffusiedithering
+	Halftone Screen	Halftoonraster
+	Custom Pattern	Aangepast patroon
+	Frequency:	Frequentie:
+	Lines/Inch	Lijnen/inch
+	Lines/Centimeter	Lijnen/centimeter
+	Ellipse	Ellips
+	Accept and Go to Conflict	Accepteren en naar conflict
+	Changes undone.	Wijzigingen ongedaan gemaakt.
+	Choose a new shortcut for this command, or leave it without one.	Kies een nieuwe sneltoets voor deze opdracht of laat hem zonder.
+	Put this command's shortcuts back as they were	De sneltoetsen van deze opdracht herstellen
+	Take the shortcut from the other command and select it	De sneltoets van de andere opdracht afnemen en die selecteren
+	Undo Changes	Wijzigingen ongedaan maken
+	{shortcut} is reserved by the system and can't be assigned.	{shortcut} is door het systeem gereserveerd en kan niet worden toegewezen.
+	Low-Latency Drawing (vsync off, applies at next launch)	Tekenen met lage latentie (zonder vsync, na de volgende start)
+# Free Transform: a new layer while the box is open (#5859)
+	Free Transform is still being applied; try again when it has finished.	Vrije transformatie wordt nog toegepast; probeer het opnieuw als die klaar is.
+	The transform couldn't be applied.	De transformatie kon niet worden toegepast.
+# Preferences › Performance › GPU Memory; the status bar and slow-redraw notice
+	Its layers need {needed} of GPU memory; the budget leaves them {budget}.	De lagen hebben {needed} GPU-geheugen nodig; het budget laat ze {budget}.
+	Set GPU Memory in Preferences › Performance to what your graphics card can hold, at most 3/8 of its memory. Automatic follows Memory Usage, within a quarter of this computer's memory and 3/8 of the card's, and doesn't count the document against a card whose memory is known. The status bar shows GPU Memory Full while they don't fit.	Stel GPU-geheugen in bij Voorkeuren › Prestaties op wat uw videokaart aankan, hooguit 3/8 van haar geheugen. Automatisch volgt Geheugengebruik, binnen een kwart van het geheugen van deze computer en 3/8 van dat van de kaart, en rekent het document niet af van een kaart waarvan het geheugen bekend is. Zolang ze niet passen, toont de statusbalk GPU-geheugen vol.
+	GPU Memory Full	GPU-geheugen vol
+	The layers need {needed} of GPU memory and may hold {budget}, so edits that redraw the whole document do it on the CPU. Click to set GPU Memory.	De lagen hebben {needed} GPU-geheugen nodig en mogen {budget} gebruiken, dus bewerkingen die het hele document opnieuw tekenen doen dat op de CPU. Klik om GPU-geheugen in te stellen.
+	GPU memory budget: {budget}	GPU-geheugenbudget: {budget}
+	This document's layers: {needed} of {budget} for layers	Lagen van dit document: {needed} van {budget} voor lagen
+	This document's layers need {needed} but may hold {budget}: whole-document redraws use the CPU	De lagen van dit document hebben {needed} nodig maar mogen {budget} gebruiken: het hele document wordt op de CPU opnieuw getekend
+	GPU Memory (MB, 0 = Automatic)	GPU-geheugen (MB, 0 = Automatisch)
+	{name} was changed by another app after it was opened or saved here.	{name} is door een andere app gewijzigd nadat het hier is geopend of bewaard.
+	Replace it with this document, or cancel and use File › Save As to keep both.	Vervang het door dit document, of annuleer en gebruik Bestand › Opslaan als om beide te houden.
+	Decrease Brush Size	Penseelgrootte verkleinen
+	Increase Brush Size	Penseelgrootte vergroten
+	Decrease Brush Hardness	Penseelhardheid verlagen
+	Increase Brush Hardness	Penseelhardheid verhogen
+	Memory Usage	Geheugengebruik
+	Per-document RAM limit (MB)	RAM-limiet per document (MB)
+	Installed RAM: {ram} MB; this limit: {percent}%	Geïnstalleerd RAM: {ram} MB; deze limiet: {percent}%
+	Limits each open document's pixels plus History. Oldest undo states are discarded when the limit is exceeded.	Beperkt pixels plus Geschiedenis van elk geopend document. Oudste herstelstappen verdwijnen als de limiet wordt overschreden.
+	Applies immediately when saved. Memory is not reserved in advance.	Geldt meteen na opslaan. Geheugen wordt niet vooraf gereserveerd.
+	With GPU Memory set to Automatic, this also limits the GPU layer budget. That budget is capped at one quarter of installed RAM and, when known, three eighths of the graphics card's memory, with a 512 MB minimum. Raising this limit beyond those caps does not increase the GPU budget.	Bij GPU-geheugen Automatisch beperkt dit ook het GPU-laagbudget. Maximum is een kwart RAM en, indien bekend, drie achtste van het videogeheugen, minstens 512 MB. Hoger zetten vergroot het GPU-budget niet.
+	Use	Gebruiken
+	In Front	Voor
+	Behind	Achter
+
+# DDS Options (#1327)
+	DDS Options	DDS-opties
+	Generate Mipmaps	Mipmaps genereren
+
+# Color Table (.act) dialog
+	There is no color table to save.	Er is geen kleurtabel om op te slaan.
+@plural	Saved {n} color to {file}|Saved {n} colors to {file}	{n} kleur opgeslagen in {file}|{n} kleuren opgeslagen in {file}
+
+# Graphics Adapter preference (#1885)
+	GPU adapter	GPU-adapter
+
 # File › Submit to DeviantArt
 	Could not prepare a file to send: {error}	Kon geen bestand klaarmaken om te sturen: {error}
 	There is no saved file to send. Choose PSD or PNG.	Er is geen opgeslagen bestand om te sturen. Kies PSD of PNG.
@@ -3953,31 +4092,13 @@ curves	Smooth	Vloeiend maken
 	A DeviantArt submit is already running.	Er wordt al naar DeviantArt verzonden.
 	Waiting for DeviantArt…	Wachten op DeviantArt…
 	Submitting {name} to DeviantArt…	{name} naar DeviantArt verzenden…
-	Submitted {name} to Sta.sh. Item {id}.	{name} naar Sta.sh verzonden. Item {id}.
 	That file is larger than DeviantArt accepts (30 MB).	Het bestand is groter dan DeviantArt aanneemt (30 MB).
 	DeviantArt is connected.	DeviantArt is verbonden.
-	Opened {name}.	{name} geopend.
-	Connect again after this update so gallery, publish and the profile picture are allowed.	Verbind opnieuw zodat galerij, publiceren en de profielfoto mogen.
-	Sta.sh item id	Sta.sh-item-id
-	Publish this publicly	Openbaar publiceren
-	Not for all ages	Niet voor alle leeftijden
-	License	Licentie
-	Creative Commons	Creative Commons
-	Commercial use	Commercieel gebruik
-	Publish	Publiceren
-	Deviation id	Werk-id
-	Update title and tags	Titel en labels bijwerken
-	My gallery	Mijn galerij
-	Profile picture	Profielfoto
-	Set as DeviantArt profile picture	Instellen als DeviantArt-profielfoto
-	Confirm that this publish is public.	Bevestig dat deze publicatie openbaar is.
 	Create a Public app on DeviantArt, without a client secret. Copy the address below into the redirect field, paste the client id here, then connect.	Maak een openbare app op DeviantArt, zonder client secret. Kopieer het adres hieronder naar de omleiding, plak hier de client-id en verbind.
 	Copied the redirect address.	Omleidingsadres gekopieerd.
 	Connected	Verbonden
 	PNG is what DeviantArt shows. A PSD is only stored as a file in Sta.sh.	PNG is het beeld dat DeviantArt toont. Een PSD ligt in Sta.sh alleen als bestand.
 	OK uploads to Sta.sh. Nothing is public until you publish.	OK uploadt naar Sta.sh. Openbaar wordt het pas bij publiceren.
-	More options	Meer opties
-	Upload with OK first. Publish uses the Sta.sh item from that upload.	Upload eerst met OK. Publiceren gebruikt het Sta.sh-item van die upload.
 	Connect again	Opnieuw verbinden
 	Disconnect DeviantArt	DeviantArt verbreken
 	Submit to DeviantArt…	Naar DeviantArt sturen…
@@ -3985,83 +4106,4 @@ curves	Smooth	Vloeiend maken
 	Open the Sta.sh page	Sta.sh-pagina openen
 	DeviantArt was disconnected.	DeviantArt is verbroken.
 	The DeviantArt login expired. Connect again.	De DeviantArt-login is verlopen. Maak opnieuw verbinding.
-	Open the Telegram message	Telegram-bericht openen
-	The ten newest files sent to this bot. Click one to open it in PhotoCraft.	De tien nieuwste bestanden naar deze bot. Een klik opent er een in PhotoCraft.
-	Your published works. Click one to open it in PhotoCraft. Sta.sh drafts are not in this list.	Je gepubliceerde werken. Een klik opent er een in PhotoCraft. Sta.sh-concepten staan niet in deze lijst.
-	Get files	Bestanden ophalen
-	Files sent from PhotoCraft, and the ten newest files sent to this bot. Click one to open it in PhotoCraft.	Bestanden die PhotoCraft stuurde, en de tien nieuwste naar deze bot. Een klik opent er een in PhotoCraft.
-	No files yet. Send one from here, or send the bot a file, then try again.	Nog geen bestanden. Stuur er een vanaf hier of naar de bot, en probeer het opnieuw.
-	Sta.sh drafts from this account, then published works. Click one to open it in PhotoCraft.	Sta.sh-concepten van dit account, daarna gepubliceerde werken. Een klik opent er een in PhotoCraft.
-	No Sta.sh files yet.	Er staat nog niets in Sta.sh.
-	No published works in the gallery.	Geen gepubliceerde werken in de galerie.
-	Telegram did not return a link for this chat.	Telegram gaf geen link voor deze chat.
-	Sta.sh drafts open their page. Published works open in PhotoCraft.	Sta.sh-concepten openen hun pagina. Gepubliceerde werken openen in PhotoCraft.
-	DeviantArt did not offer a download.	DeviantArt bood geen download aan.
 	Saved file	Opgeslagen bestand
-
-# Embedded Profile Mismatch: profile names beside the choices, Remember this choice
-	Use the embedded profile ({profile})	Het ingesloten profiel gebruiken ({profile})
-	Convert to the working space ({profile})	Omzetten naar de werkruimte ({profile})
-	Remember this choice for future images	Deze keuze onthouden voor volgende afbeeldingen
-	Turn the prompt back on with Ask On Mismatch in Edit › Color Settings.	Zet de vraag weer aan met Ask On Mismatch in Bewerken › Kleurinstellingen.
-	Button Mode	Knopmodus
-	Button Mode On	Knopmodus aan
-
-# Darken / Lighten Interface (⇧⌘F1 / ⇧⌘F2)
-	Darken Interface	Interface donkerder maken
-	Lighten Interface	Interface lichter maken
-# Bevel & Emboss Technique.
-	Technique	Techniek
-	Chisel Hard	Beitel hard
-	Chisel Soft	Beitel zacht
-	Open color-less EXR as ACEScg	EXR zonder kleurruimte als ACEScg openen
-
-# View › Guides › right-click a guide
-	Edit Selected Guides	Geselecteerde hulplijnen bewerken
-	Clear Selected Guides	Geselecteerde hulplijnen wissen
-	Delete this set	Deze set verwijderen
-	New Set…	Nieuwe set…
-	PhotoCraft Defaults	PhotoCraft-standaard
-	Save a list of these shortcuts as a web page	Een lijst van deze sneltoetsen als webpagina opslaan
-	Save the changes to this set	De wijzigingen in deze set opslaan
-	Save these shortcuts as a .kys file	Deze sneltoetsen als .kys-bestand opslaan
-	Save these shortcuts as a new set	Deze sneltoetsen als nieuwe set opslaan
-	Set deleted.	Set verwijderd.
-	Set saved.	Set opgeslagen.
-	Set:	Set:
-	Summarize…	Samenvatten…
-	There are too many sets: delete one first.	Er zijn te veel sets: verwijder er eerst een.
-	set name	naam van de set
-	{set} (modified)	{set} (gewijzigd)
-	Accept and Go to Conflict	Accepteren en naar conflict
-	Changes undone.	Wijzigingen ongedaan gemaakt.
-	Choose a new shortcut for this command, or leave it without one.	Kies een nieuwe sneltoets voor deze opdracht of laat hem zonder.
-	Put this command's shortcuts back as they were	De sneltoetsen van deze opdracht herstellen
-	Take the shortcut from the other command and select it	De sneltoets van de andere opdracht afnemen en die selecteren
-	Undo Changes	Wijzigingen ongedaan maken
-	{shortcut} is reserved by the system and can't be assigned.	{shortcut} is door het systeem gereserveerd en kan niet worden toegewezen.
-	Low-Latency Drawing (vsync off, applies at next launch)	Tekenen met lage latentie (zonder vsync, na de volgende start)
-# Free Transform: a new layer while the box is open (#5859)
-	Free Transform is still being applied; try again when it has finished.	Vrije transformatie wordt nog toegepast; probeer het opnieuw als die klaar is.
-	The transform couldn't be applied.	De transformatie kon niet worden toegepast.
-# Preferences › Performance › GPU Memory; the status bar and slow-redraw notice
-	Its layers need {needed} of GPU memory; the budget leaves them {budget}.	De lagen hebben {needed} GPU-geheugen nodig; het budget laat ze {budget}.
-	Set GPU Memory in Preferences › Performance to what your graphics card can hold, at most 3/8 of its memory. Automatic follows Memory Usage, within a quarter of this computer's memory and 3/8 of the card's, and doesn't count the document against a card whose memory is known. The status bar shows GPU Memory Full while they don't fit.	Stel GPU-geheugen in bij Voorkeuren › Prestaties op wat uw videokaart aankan, hooguit 3/8 van haar geheugen. Automatisch volgt Geheugengebruik, binnen een kwart van het geheugen van deze computer en 3/8 van dat van de kaart, en rekent het document niet af van een kaart waarvan het geheugen bekend is. Zolang ze niet passen, toont de statusbalk GPU-geheugen vol.
-	GPU Memory Full	GPU-geheugen vol
-	The layers need {needed} of GPU memory and may hold {budget}, so edits that redraw the whole document do it on the CPU. Click to set GPU Memory.	De lagen hebben {needed} GPU-geheugen nodig en mogen {budget} gebruiken, dus bewerkingen die het hele document opnieuw tekenen doen dat op de CPU. Klik om GPU-geheugen in te stellen.
-	GPU memory budget: {budget}	GPU-geheugenbudget: {budget}
-	This document's layers: {needed} of {budget} for layers	Lagen van dit document: {needed} van {budget} voor lagen
-	This document's layers need {needed} but may hold {budget}: whole-document redraws use the CPU	De lagen van dit document hebben {needed} nodig maar mogen {budget} gebruiken: het hele document wordt op de CPU opnieuw getekend
-	GPU Memory (MB, 0 = Automatic)	GPU-geheugen (MB, 0 = Automatisch)
-	{name} was changed by another app after it was opened or saved here.	{name} is door een andere app gewijzigd nadat het hier is geopend of bewaard.
-	Replace it with this document, or cancel and use File › Save As to keep both.	Vervang het door dit document, of annuleer en gebruik Bestand › Opslaan als om beide te houden.
-
-# File › Submit to DeviantArt: result messages
-	Published on DeviantArt.	Gepubliceerd op DeviantArt.
-	Updated the title and tags on DeviantArt.	Titel en tags op DeviantArt bijgewerkt.
-	Set the DeviantArt profile picture.	DeviantArt-profielfoto ingesteld.
-
-	Decrease Brush Size	Penseelgrootte verkleinen
-	Increase Brush Size	Penseelgrootte vergroten
-	Decrease Brush Hardness	Penseelhardheid verlagen
-	Increase Brush Hardness	Penseelhardheid verhogen

@@ -1711,6 +1711,8 @@
 	Overlay	Preklapanje
 	Paint Bucket Tool	Alatka kofica s bojom
 	Paints from the document's opening state	Slika iz stanja dokumenta pri otvaranju
+	Paints from the History panel's source state	Slika iz izvornog stanja panela Istorija
+	Sets the source for the history brush	Postavlja izvor za četkicu istorije
 	Path Selection Tool	Alatka za selekciju putanje
 	Direct Selection Tool	Alatka za direktnu selekciju
 	Add Anchor Point Tool	Alatka za dodavanje sidrišne tačke
@@ -2095,6 +2097,11 @@
 	Apply the pen's tilt and rotation to the tip shape	Primeni nagib i rotaciju olovke na oblik vrha
 	Mixer Brush	Četkica za mešanje
 	Wet	Vlažnost
+	Current Brush Load	Trenutno punjenje četkice
+	Load Brush	Napuni četkicu
+	Clean Brush	Očisti četkicu
+	Load the brush after each stroke	Napuni četkicu posle svakog poteza
+	Clean the brush after each stroke	Očisti četkicu posle svakog poteza
 	Mix	Mešanje
 	Wetness Jitter	Kolebanje vlažnosti
 	Mix Jitter	Kolebanje mešanja
@@ -2270,6 +2277,8 @@
 	Create Snapshot	Napravi snimak stanja
 	Delete Snapshot	Obriši snimak stanja
 	New Snapshot	Novi snimak stanja
+	New Snapshot…	Novi snimak stanja…
+	History Options…	Opcije istorije…
 	Snapshot 1	Snimak stanja 1
 	Step Forward	Korak napred
 	Step Backward	Korak nazad
@@ -2629,6 +2638,7 @@
 	32 bit (float)	32 bita (pokretni zarez)
 	Floating point	Pokretni zarez
 	Use Global Light	Koristi globalno svetlo
+	Overprint	Pretisak
 	Native file drag-and-drop is unavailable	Izvorno prevlačenje i otpuštanje datoteka nije dostupno
 	Native file drag-and-drop is not supported on Wayland yet. Use File › Open, or copy the image in your file manager and paste it with {paste}.	Izvorno prevlačenje i otpuštanje datoteka još nije podržano na Wayland-u. Koristite Datoteka › Otvori ili kopirajte sliku u menadžeru datoteka i nalepite je pomoću {paste}.
 	To drop files, start PhotoCraft under XWayland: `{command}`	Da biste otpuštali datoteke, pokrenite PhotoCraft pod XWayland-om: `{command}`
@@ -4224,77 +4234,6 @@ shape	Appearance	Izgled
 	Color Indicates:	Boja označava:
 	Ink Characteristics	Karakteristike mastila
 	Solidity:	Punoća:
-# File › Submit to DeviantArt
-	A DeviantArt submit is already running.	Slanje na DeviantArt je već u toku.
-	Also submit when I Export	Pošalji i pri izvozu
-	Also submit when I Save	Pošalji i pri čuvanju
-	Also submit when I Save As	Pošalji i pri „Sačuvaj kao“
-	Also submit when I Save a Copy	Pošalji i pri čuvanju kopije
-	Commercial use	Komercijalna upotreba
-	Confirm that this publish is public.	Potvrdite da je ovo objavljivanje javno.
-	Connect DeviantArt	Poveži DeviantArt
-	Connect DeviantArt first.	Prvo povežite DeviantArt.
-	Connect again	Poveži ponovo
-	Connect again after this update so gallery, publish and the profile picture are allowed.	Povežite se ponovo posle ove izmene da bi galerija, objavljivanje i slika profila bili dozvoljeni.
-	Connected	Povezano
-	Copied the redirect address.	Adresa preusmeravanja je kopirana.
-	Could not prepare a file to send: {error}	Datoteka za slanje nije pripremljena: {error}
-	Creative Commons	Creative Commons
-	DeviantArt app id	ID aplikacije DeviantArt
-	DeviantArt is connected.	DeviantArt je povezan.
-	DeviantArt is set up. Save or export a file, then submit it.	DeviantArt je podešen. Sačuvajte ili izvezite datoteku, pa je pošaljite.
-	DeviantArt submitting needs the desktop app.	Slanje na DeviantArt postoji samo u desktop aplikaciji.
-	Deviation id	Broj dela
-	Disconnect DeviantArt	Prekini vezu sa DeviantArt
-	Letters, numbers and underscores, separated by commas.	Slova, brojevi i donje crte, odvojeni zarezima.
-	License	Licenca
-	More options	Još opcija
-	My gallery	Moja galerija
-	Not for all ages	Nije za sve uzraste
-	OK uploads to Sta.sh. Nothing is public until you publish.	OK šalje na Sta.sh. Ništa nije javno dok ne objavite.
-	Open the DeviantArt developer page	Otvori stranicu za programere DeviantArt
-	Opened {name}.	Otvoreno: {name}.
-	PNG is what DeviantArt shows. A PSD is only stored as a file in Sta.sh.	PNG je slika koju DeviantArt prikazuje. PSD u Sta.sh ostaje samo datoteka.
-	Profile picture	Slika profila
-	Publish	Objavi
-	Publish this publicly	Objavi javno
-	Set as DeviantArt profile picture	Postavi kao sliku profila na DeviantArt
-	Sta.sh item id	Broj stavke u Sta.sh
-	Submit as	Pošalji kao
-	Submitted {name} to Sta.sh. Item {id}.	{name} je poslato na Sta.sh. Stavka {id}.
-	Submitting needs an internet connection.	Za slanje je potrebna veza sa internetom.
-	Submitting {name} to DeviantArt…	Šaljem {name} na DeviantArt…
-	Tags	Oznake
-	That file is larger than DeviantArt accepts (30 MB).	Datoteka je veća nego što DeviantArt prima (30 MB).
-	The DeviantArt app id should be a number.	ID aplikacije DeviantArt treba da bude broj.
-	The DeviantArt login stays in the system keychain, not in PhotoCraft's settings file.	Prijava za DeviantArt ostaje u sistemskom privezku ključeva, ne u datoteci podešavanja PhotoCraft-a.
-	There is no saved file to send. Choose PSD or PNG.	Nema sačuvane datoteke za slanje. Izaberite PSD ili PNG.
-	Title	Naslov
-	Update title and tags	Ažuriraj naslov i oznake
-	Upload with OK first. Publish uses the Sta.sh item from that upload.	Prvo pošaljite sa OK. Objavljivanje koristi stavku Sta.sh iz tog slanja.
-	Waiting for DeviantArt…	Čekam DeviantArt…
-	Submit to DeviantArt…	Pošalji na DeviantArt…
-	Submitted {name} to Sta.sh. It stays private until you publish it.	{name} je u Sta.sh. Ostaje privatno dok ga ne objavite.
-	Open the Sta.sh page	Otvori stranicu Sta.sh
-	DeviantArt was disconnected.	DeviantArt je isključen.
-	The DeviantArt login expired. Connect again.	DeviantArt prijava je istekla. Povežite se ponovo.
-	Open the Telegram message	Otvori Telegram poruku
-	The ten newest files sent to this bot. Click one to open it in PhotoCraft.	Deset najnovijih datoteka poslatih ovom botu. Klik otvara jednu u PhotoCraftu.
-	Your published works. Click one to open it in PhotoCraft. Sta.sh drafts are not in this list.	Vaša objavljena dela. Klik otvara jedno u PhotoCraftu. Sta.sh nacrti nisu na ovoj listi.
-	Sent {name} to Telegram.	{name} je poslato na Telegram.
-	Sent {name}. {url}	Poslato: {name}. {url}
-	Could not pin the message. The file was still sent.	Poruka nije zakačena. Datoteka je ipak poslata.
-	Get files	Preuzmi datoteke
-	Files sent from PhotoCraft, and the ten newest files sent to this bot. Click one to open it in PhotoCraft.	Datoteke koje je PhotoCraft poslao i deset najnovijih ovom botu. Klik otvara jednu u PhotoCraftu.
-	No files yet. Send one from here, or send the bot a file, then try again.	Još nema datoteka. Pošaljite jednu odavde ili botu, pa pokušajte ponovo.
-	Sta.sh drafts from this account, then published works. Click one to open it in PhotoCraft.	Sta.sh nacrti ovog naloga, zatim objavljena dela. Klik otvara jedno u PhotoCraftu.
-	No Sta.sh files yet.	U Sta.sh još nema ničega.
-	No published works in the gallery.	U galeriji nema objavljenih dela.
-	Telegram did not return a link for this chat.	Telegram nije vratio vezu za ovaj razgovor.
-	Sta.sh drafts open their page. Published works open in PhotoCraft.	Sta.sh nacrti otvaraju svoju stranicu. Objavljena dela se otvaraju u PhotoCraftu.
-	DeviantArt did not offer a download.	DeviantArt nije ponudio preuzimanje.
-	Saved file	Sačuvana datoteka
-
 	Redrawing	Ponovno iscrtavanje
 # Edit › Content-Aware Fill workspace
 	Sampling Brush Tool	Alatka četkica za uzorkovanje
@@ -4334,6 +4273,13 @@ shape	Appearance	Izgled
 # View › Guides › right-click a guide
 	Edit Selected Guides	Uredi izabrane vodilje
 	Clear Selected Guides	Ukloni izabrane vodilje
+	Bicubic Automatic	Bikubično automatski
+	Bicubic Smoother	Bikubično glađe
+	Bicubic Sharper	Bikubično oštrije
+	Pasting from other apps is unavailable	Lepljenje iz drugih aplikacija nije dostupno
+	PhotoCraft can't reach the system clipboard in this session. On Wayland, a Flatpak sandbox hides the protocol that images from other apps are read through.	PhotoCraft u ovoj sesiji ne može da pristupi sistemskoj ostavi. Na Wayland-u, Flatpak sandbox skriva protokol preko kog se čitaju slike iz drugih aplikacija.
+	To paste from other apps, start PhotoCraft under XWayland: `{command}`	Da biste lepili iz drugih aplikacija, pokrenite PhotoCraft pod XWayland-om: `{command}`
+	Nothing to paste: PhotoCraft can't read the system clipboard here	Nema šta da se nalepi: PhotoCraft ovde ne može da čita sistemsku ostavu
 	Delete this set	Obriši ovaj skup
 	New Set…	Novi skup…
 	PhotoCraft Defaults	Podrazumevano za PhotoCraft
@@ -4348,6 +4294,45 @@ shape	Appearance	Izgled
 	There are too many sets: delete one first.	Previše skupova: prvo obrišite jedan.
 	set name	ime skupa
 	{set} (modified)	{set} (izmenjen)
+	Show file name in title	Prikaži naziv datoteke u naslovu
+
+# Image › Mode › Bitmap (#5559)
+	50% Threshold	Prag 50%
+	Pattern Dither	Dither šarom
+	Diffusion Dither	Difuzni dither
+	Halftone Screen	Polutonski raster
+	Custom Pattern	Prilagođena šara
+	Frequency:	Frekvencija:
+	Lines/Inch	Linija/inč
+	Lines/Centimeter	Linija/centimetar
+	Ellipse	Elipsa
+
+# Layers panel options
+	Add “copy” to Copied Layers and Groups	Dodaj „kopija” kopiranim slojevima i grupama
+	Animation Options	Opcije animacije
+	Entire Document	Ceo dokument
+	Expand New Effects	Proširi nove efekte
+	Filter Options	Opcije filtera
+	Layer Bounds	Granice sloja
+	Layers Panel Options	Opcije panela Slojevi
+	New Artboard…	Nova radna tabla…
+	New Group…	Nova grupa…
+	Prevent Auto-Nesting	Spreči automatsko ugnežđavanje
+	Preview on canvas when reordering layers	Pregled na platnu pri promeni redosleda slojeva
+	Show Layers	Prikaži slojeve
+	Show layer mask badges	Prikaži oznake maske sloja
+	Thumbnail Contents	Sadržaj sličice
+	Thumbnail Size	Veličina sličice
+	Use Default Masks on Fill Layers	Koristi podrazumevane maske na slojevima popune
+
+# Smart Filter editors
+	Blending Options ({filter})	Opcije stapanja ({filter})
+	Hide the layer's effects and Smart Filters  ({key}-click: all layers)	Sakrij efekte i pametne filtere sloja  ({key}-klik: svi slojevi)
+	Opacity must be between 0% and 100%.	Neprozirnost mora biti između 0% i 100%.
+	Dissolve is approximated: it blends without Photoshop's dither.	Rastapanje je približno: mešanje se vrši bez diteringa programa Photoshop.
+	Show the layer's effects and Smart Filters  ({key}-click: all layers)	Prikaži efekte i pametne filtere sloja  ({key}-klik: svi slojevi)
+	The document or Smart Filter changed. Reopen its dialog.	Dokument ili pametni filter se promenio. Ponovo otvorite njegov dijalog.
+	Wait for the current job to finish.	Sačekajte da se trenutni posao završi.
 	Accept and Go to Conflict	Prihvati i idi na sukob
 	Changes undone.	Izmene su poništene.
 	Choose a new shortcut for this command, or leave it without one.	Izaberite novu prečicu za ovu komandu ili je ostavite bez prečice.
@@ -4370,13 +4355,65 @@ shape	Appearance	Izgled
 	GPU Memory (MB, 0 = Automatic)	GPU memorija (MB, 0 = Automatski)
 	{name} was changed by another app after it was opened or saved here.	Datoteku {name} je izmenila druga aplikacija nakon što je ovde otvorena ili sačuvana.
 	Replace it with this document, or cancel and use File › Save As to keep both.	Zameni je ovim dokumentom ili otkaži i koristi Datoteka › Sačuvaj kao da zadržiš obe.
-
-# File › Submit to DeviantArt: result messages
-	Published on DeviantArt.	Objavljeno na DeviantArt-u.
-	Updated the title and tags on DeviantArt.	Naslov i oznake na DeviantArt-u su ažurirani.
-	Set the DeviantArt profile picture.	Profilna slika DeviantArt-a je postavljena.
-
 	Decrease Brush Size	Smanji veličinu četkice
 	Increase Brush Size	Povećaj veličinu četkice
 	Decrease Brush Hardness	Smanji tvrdoću četkice
 	Increase Brush Hardness	Povećaj tvrdoću četkice
+	Memory Usage	Upotreba memorije
+	Per-document RAM limit (MB)	RAM limit po dokumentu (MB)
+	Installed RAM: {ram} MB; this limit: {percent}%	Instalisan RAM: {ram} MB; ovaj limit: {percent}%
+	Limits each open document's pixels plus History. Oldest undo states are discarded when the limit is exceeded.	Ograničava piksele plus Istoriju svakog otvorenog dokumenta. Najstarija stanja opoziva se odbacuju kad se prekorači limit.
+	Applies immediately when saved. Memory is not reserved in advance.	Važi odmah po čuvanju. Memorija se unapred ne rezerviše.
+	With GPU Memory set to Automatic, this also limits the GPU layer budget. That budget is capped at one quarter of installed RAM and, when known, three eighths of the graphics card's memory, with a 512 MB minimum. Raising this limit beyond those caps does not increase the GPU budget.	Kad je GPU memorija Automatski, ograničava i GPU budžet. Plafon je četvrtina RAM-a i, ako je poznato, tri osmine memorije kartice, najmanje 512 MB. Veći limit ne povećava GPU budžet.
+	Use	Koristi
+	In Front	Ispred
+	Behind	Iza
+
+# DDS Options (#1327)
+	DDS Options	DDS opcije
+	Generate Mipmaps	Generiši mipmape
+
+# Color Table (.act) dialog
+	There is no color table to save.	Нема табеле боја за чување.
+@plural	Saved {n} color to {file}|Saved {n} colors to {file}	Сачувана је {n} боја у {file}|Сачуване су {n} боје у {file}|Сачувано је {n} боја у {file}
+
+# Graphics Adapter preference (#1885)
+	GPU adapter	GPU adapter
+
+# File › Submit to DeviantArt
+	A DeviantArt submit is already running.	Slanje na DeviantArt je već u toku.
+	Also submit when I Export	Pošalji i pri izvozu
+	Also submit when I Save	Pošalji i pri čuvanju
+	Also submit when I Save As	Pošalji i pri „Sačuvaj kao“
+	Also submit when I Save a Copy	Pošalji i pri čuvanju kopije
+	Connect DeviantArt	Poveži DeviantArt
+	Connect DeviantArt first.	Prvo povežite DeviantArt.
+	Connect again	Poveži ponovo
+	Connected	Povezano
+	Copied the redirect address.	Adresa preusmeravanja je kopirana.
+	Could not prepare a file to send: {error}	Datoteka za slanje nije pripremljena: {error}
+	DeviantArt app id	ID aplikacije DeviantArt
+	DeviantArt is connected.	DeviantArt je povezan.
+	DeviantArt is set up. Save or export a file, then submit it.	DeviantArt je podešen. Sačuvajte ili izvezite datoteku, pa je pošaljite.
+	DeviantArt submitting needs the desktop app.	Slanje na DeviantArt postoji samo u desktop aplikaciji.
+	Disconnect DeviantArt	Prekini vezu sa DeviantArt
+	Letters, numbers and underscores, separated by commas.	Slova, brojevi i donje crte, odvojeni zarezima.
+	OK uploads to Sta.sh. Nothing is public until you publish.	OK šalje na Sta.sh. Ništa nije javno dok ne objavite.
+	Open the DeviantArt developer page	Otvori stranicu za programere DeviantArt
+	PNG is what DeviantArt shows. A PSD is only stored as a file in Sta.sh.	PNG je slika koju DeviantArt prikazuje. PSD u Sta.sh ostaje samo datoteka.
+	Submit as	Pošalji kao
+	Submitting needs an internet connection.	Za slanje je potrebna veza sa internetom.
+	Submitting {name} to DeviantArt…	Šaljem {name} na DeviantArt…
+	Tags	Oznake
+	That file is larger than DeviantArt accepts (30 MB).	Datoteka je veća nego što DeviantArt prima (30 MB).
+	The DeviantArt app id should be a number.	ID aplikacije DeviantArt treba da bude broj.
+	The DeviantArt login stays in the system keychain, not in PhotoCraft's settings file.	Prijava za DeviantArt ostaje u sistemskom privezku ključeva, ne u datoteci podešavanja PhotoCraft-a.
+	There is no saved file to send. Choose PSD or PNG.	Nema sačuvane datoteke za slanje. Izaberite PSD ili PNG.
+	Title	Naslov
+	Waiting for DeviantArt…	Čekam DeviantArt…
+	Submit to DeviantArt…	Pošalji na DeviantArt…
+	Submitted {name} to Sta.sh. It stays private until you publish it.	{name} je u Sta.sh. Ostaje privatno dok ga ne objavite.
+	Open the Sta.sh page	Otvori stranicu Sta.sh
+	DeviantArt was disconnected.	DeviantArt je isključen.
+	The DeviantArt login expired. Connect again.	DeviantArt prijava je istekla. Povežite se ponovo.
+	Saved file	Sačuvana datoteka

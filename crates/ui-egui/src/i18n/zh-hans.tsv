@@ -333,6 +333,7 @@
 	Blending Options…	混合选项…
 	Bevel & Emboss…	斜面和浮雕…
 	Use Global Light	使用全局光
+	Overprint	叠印
 	Inner Shadow…	内阴影…
 	Inner Glow…	内发光…
 	Satin…	光泽…
@@ -772,6 +773,7 @@
 	Brush Settings	画笔设置
 	Brushes	画笔
 	Channels	通道
+	Channel	通道
 	Character	字符
 	Character Styles	字符样式
 	Clone Source	仿制源
@@ -1245,6 +1247,7 @@
 	Levels	色阶
 	Lighten	变亮
 	Lightness	明度
+	Result	结果
 	Lights	亮部
 	Limits:	限制：
 	Linear Gradient	线性渐变
@@ -2219,6 +2222,11 @@ cameraRaw	Blending	混合
 	Apply the pen's tilt and rotation to the tip shape	将笔的倾斜和旋转应用于笔尖形状
 	Mixer Brush	混合器画笔
 	Wet	湿润
+	Current Brush Load	当前画笔载入
+	Load Brush	载入画笔
+	Clean Brush	清理画笔
+	Load the brush after each stroke	每次描边后载入画笔
+	Clean the brush after each stroke	每次描边后清理画笔
 	Mix	混合
 	Wetness Jitter	湿润度抖动
 	Mix Jitter	混合抖动
@@ -2667,6 +2675,36 @@ cameraData	Lens	镜头
 	Output To	输出到
 	Duplicate Layer	复制图层
 	Contract	收缩
+
+	Animation Options	动画选项
+	Entire Document	整个文档
+	Filter Options	过滤选项
+	Layer Bounds	图层边界
+	Layers Panel Options	图层面板选项
+	Lock Layers	锁定图层
+	New Artboard…	新建画板…
+	New Group	新建组
+	New Group…	新建组…
+	New Layer…	新建图层…
+	Panel Options…	面板选项…
+	Prevent Auto-Nesting	防止自动嵌套
+	Show Layers	显示图层
+	Thumbnail Contents	缩略图内容
+	Thumbnail Size	缩略图大小
+	Use Default Masks on Fill Layers	在填充图层上使用默认蒙版
+	Expand New Effects	展开新效果
+	Add “copy” to Copied Layers and Groups	为复制的图层和组添加“副本”
+	Preview on canvas when reordering layers	重新排列图层时在画布上预览
+	Show layer mask badges	显示图层蒙版标记
+
+# Smart Filter editors
+	Blending Options ({filter})	混合选项 ({filter})
+	Hide the layer's effects and Smart Filters  ({key}-click: all layers)	隐藏图层效果和智能滤镜  （{key} 单击：所有图层）
+	Show the layer's effects and Smart Filters  ({key}-click: all layers)	显示图层效果和智能滤镜  （{key} 单击：所有图层）
+	Wait for the current job to finish.	请等待当前任务完成。
+	The document or Smart Filter changed. Reopen its dialog.	文档或智能滤镜已更改。请重新打开其对话框。
+	Opacity must be between 0% and 100%.	不透明度必须介于 0% 和 100% 之间。
+	Dissolve is approximated: it blends without Photoshop's dither.	“溶解”为近似效果：混合时没有 Photoshop 的抖动。
 	Loading fonts…	正在加载字体…
 	Response curve	响应曲线
 	Tool	工具
@@ -2724,6 +2762,13 @@ curves	Smooth	平滑
 	Click to place · Alt-click or drag off-canvas to remove	单击以放置 · Alt 单击或拖到画布外以移除
 	No document open	未打开任何文档
 	{n} of {max} sample points	{max} 个取样点中的 {n} 个
+
+# History panel menu (#2966)
+	Step Forward	前进一步
+	Step Backward	后退一步
+	Clear History	清除历史记录
+	New Snapshot…	新建快照…
+	History Options…	历史记录选项…
 # Print dialog (#2697)
 	Emulsion Down	药膜朝下
 	Functions	功能
@@ -2741,6 +2786,7 @@ curves	Smooth	平滑
 	Light Red	浅红色
 	Medium Blue	中蓝色
 	Light Gray	浅灰色
+	Stop	停止
 	Object Finder	对象查找程序
 	No object found there — drag a rectangle around it	那里未找到对象 — 请在其周围拖动矩形
 	Remove after each stroke	每次描边后移除
@@ -2786,75 +2832,9 @@ curves	Smooth	平滑
 	Sent to {printer}	已发送到 {printer}
 	set in Print Settings…	在打印设置中设置…
 	ICO is limited to 256 × 256 pixels	ICO 最大为 256 × 256 像素
-# File › Submit to DeviantArt
-	Could not prepare a file to send: {error}	无法准备要发送的文件：{error}
-	There is no saved file to send. Choose PSD or PNG.	没有可发送的已保存文件。请选择 PSD 或 PNG。
-	Submitting needs an internet connection.	提交需要互联网连接。
-	Open the DeviantArt developer page	打开 DeviantArt 开发者页面
-	DeviantArt app id	DeviantArt 应用 ID
-	The DeviantArt login stays in the system keychain, not in PhotoCraft's settings file.	DeviantArt 登录保存在系统密钥链中，不在 PhotoCraft 的设置文件里。
-	Connect DeviantArt	连接 DeviantArt
-	Title	标题
-	Tags	标签
-	Letters, numbers and underscores, separated by commas.	字母、数字和下划线，用逗号分隔。
-	Submit as	提交为
-	Also submit when I Save	保存时也提交
-	Also submit when I Save As	另存为时也提交
-	Also submit when I Save a Copy	存储副本时也提交
-	Also submit when I Export	导出时也提交
-	DeviantArt is set up. Save or export a file, then submit it.	DeviantArt 已设置。请先保存或导出文件，再提交。
-	Connect DeviantArt first.	请先连接 DeviantArt。
-	The DeviantArt app id should be a number.	DeviantArt 应用 ID 应为数字。
-	DeviantArt submitting needs the desktop app.	提交到 DeviantArt 仅在桌面应用中可用。
-	A DeviantArt submit is already running.	已有一次 DeviantArt 提交在进行。
-	Waiting for DeviantArt…	正在等待 DeviantArt…
-	Submitting {name} to DeviantArt…	正在将 {name} 提交到 DeviantArt…
-	Submitted {name} to Sta.sh. Item {id}.	已将 {name} 提交到 Sta.sh。项目 {id}。
-	That file is larger than DeviantArt accepts (30 MB).	文件大于 DeviantArt 接受的大小（30 MB）。
-	DeviantArt is connected.	已连接 DeviantArt。
-	Opened {name}.	已打开 {name}。
-	Connect again after this update so gallery, publish and the profile picture are allowed.	请重新连接，以便允许画廊、发布和个人头像。
-	Sta.sh item id	Sta.sh 项目 ID
-	Publish this publicly	公开发布
-	Not for all ages	不适合所有年龄
-	License	许可
-	Creative Commons	知识共享
-	Commercial use	商业使用
-	Publish	发布
-	Deviation id	作品 ID
-	Update title and tags	更新标题和标签
-	My gallery	我的画廊
-	Profile picture	个人头像
-	Set as DeviantArt profile picture	设为 DeviantArt 头像
-	Confirm that this publish is public.	请确认这次发布是公开的。
-	Create a Public app on DeviantArt, without a client secret. Copy the address below into the redirect field, paste the client id here, then connect.	在 DeviantArt 上创建一个公开应用，不要 client secret。把下面的地址复制到重定向，把客户端 ID 粘贴到这里，然后连接。
-	Copied the redirect address.	已复制重定向地址。
-	Connected	已连接
-	PNG is what DeviantArt shows. A PSD is only stored as a file in Sta.sh.	DeviantArt 显示的是 PNG。PSD 在 Sta.sh 里只是一个文件。
-	OK uploads to Sta.sh. Nothing is public until you publish.	OK 会上传到 Sta.sh。发布之前不会公开。
-	More options	更多选项
-	Upload with OK first. Publish uses the Sta.sh item from that upload.	请先用 OK 上传。发布会使用这次上传的 Sta.sh 项目。
-	Connect again	重新连接
-	Disconnect DeviantArt	断开 DeviantArt
-	Submit to DeviantArt…	发送到 DeviantArt…
-	Submitted {name} to Sta.sh. It stays private until you publish it.	{name} 已在 Sta.sh。发布之前不会公开。
-	Open the Sta.sh page	打开 Sta.sh 页面
-	DeviantArt was disconnected.	已断开 DeviantArt。
-	The DeviantArt login expired. Connect again.	DeviantArt 登录已过期。请重新连接。
-	Open the Telegram message	打开 Telegram 消息
-	The ten newest files sent to this bot. Click one to open it in PhotoCraft.	发给这个机器人的最新十个文件。点击一个即可在 PhotoCraft 中打开。
-	Your published works. Click one to open it in PhotoCraft. Sta.sh drafts are not in this list.	你已发布的作品。点击一个即可在 PhotoCraft 中打开。Sta.sh 草稿不在这个列表里。
-	Get files	取回文件
-	Files sent from PhotoCraft, and the ten newest files sent to this bot. Click one to open it in PhotoCraft.	PhotoCraft 发出的文件，以及发给这个机器人的最新十个文件。点击一个即可在 PhotoCraft 中打开。
-	No files yet. Send one from here, or send the bot a file, then try again.	还没有文件。从这里发送一个，或发给机器人一个文件，然后再试。
-	Sta.sh drafts from this account, then published works. Click one to open it in PhotoCraft.	这个账号的 Sta.sh 草稿，然后是已发布的作品。点击一个即可在 PhotoCraft 中打开。
-	No Sta.sh files yet.	Sta.sh 里还没有文件。
-	No published works in the gallery.	画廊里没有已发布的作品。
-	Telegram did not return a link for this chat.	Telegram 没有返回这个聊天的链接。
-	Sta.sh drafts open their page. Published works open in PhotoCraft.	Sta.sh 草稿会打开它的页面。已发布的作品在 PhotoCraft 中打开。
-	DeviantArt did not offer a download.	DeviantArt 没有提供下载。
-	Saved file	已保存的文件
-
+# History panel › History Brush source (#2966)
+	Paints from the History panel's source state	从历史记录面板的源状态绘画
+	Sets the source for the history brush	设置历史记录画笔的源
 # Embedded Profile Mismatch: profile names beside the choices, Remember this choice
 	Use the embedded profile ({profile})	使用嵌入的配置文件（{profile}）
 	Convert to the working space ({profile})	转换到工作空间（{profile}）
@@ -2878,6 +2858,13 @@ curves	Smooth	平滑
 # View › Guides › right-click a guide
 	Edit Selected Guides	编辑所选参考线
 	Clear Selected Guides	清除所选参考线
+	Bicubic Automatic	双三次（自动）
+	Bicubic Smoother	双三次（较平滑）
+	Bicubic Sharper	双三次（较锐利）
+	Pasting from other apps is unavailable	无法从其他应用粘贴
+	PhotoCraft can't reach the system clipboard in this session. On Wayland, a Flatpak sandbox hides the protocol that images from other apps are read through.	PhotoCraft 在此会话中无法访问系统剪贴板。在 Wayland 上，Flatpak 沙盒会隐藏读取其他应用图像所用的协议。
+	To paste from other apps, start PhotoCraft under XWayland: `{command}`	要从其他应用粘贴，请在 XWayland 下启动 PhotoCraft：`{command}`
+	Nothing to paste: PhotoCraft can't read the system clipboard here	没有可粘贴的内容：PhotoCraft 在此无法读取系统剪贴板
 	Delete this set	删除此组
 	New Set…	新建组…
 	PhotoCraft Defaults	PhotoCraft 默认值
@@ -2893,6 +2880,20 @@ curves	Smooth	平滑
 	set name	组名称
 	{set} (modified)	{set}（已修改）
 	Random	随机
+	Show file name in title	标题中显示文件名
+
+# Image › Mode › Bitmap (#5559)
+	50% Threshold	50% 阈值
+	Pattern Dither	图案仿色
+	Diffusion Dither	扩散仿色
+	Halftone Screen	半调网屏
+	Custom Pattern	自定图案
+	Frequency:	频率：
+	Lines/Inch	线/英寸
+	Lines/Centimeter	线/厘米
+	Ellipse	椭圆
+	Cross	十字
+	Method	方法
 	Accept and Go to Conflict	接受并转到冲突
 	Changes undone.	已撤消更改。
 	Choose a new shortcut for this command, or leave it without one.	为此命令选择新的快捷键，或保留为无快捷键。
@@ -2916,13 +2917,68 @@ curves	Smooth	平滑
 	Replace	替换
 	{name} was changed by another app after it was opened or saved here.	{name} 在此处打开或存储后已被其他应用更改。
 	Replace it with this document, or cancel and use File › Save As to keep both.	用此文档替换它，或取消并使用“文件 › 另存为”以保留两者。
-
-# File › Submit to DeviantArt: result messages
-	Published on DeviantArt.	已在 DeviantArt 上发布。
-	Updated the title and tags on DeviantArt.	已更新 DeviantArt 上的标题和标签。
-	Set the DeviantArt profile picture.	已设置 DeviantArt 头像。
-
 	Decrease Brush Size	减小画笔大小
 	Increase Brush Size	增大画笔大小
 	Decrease Brush Hardness	减小画笔硬度
 	Increase Brush Hardness	增大画笔硬度
+	Memory Usage	内存使用
+	Per-document RAM limit (MB)	每个文档的 RAM 上限 (MB)
+	Installed RAM: {ram} MB; this limit: {percent}%	已安装 RAM：{ram} MB；此上限：{percent}%
+	Limits each open document's pixels plus History. Oldest undo states are discarded when the limit is exceeded.	限制每个打开文档的像素加历史记录。超出上限时会丢弃最旧的撤销状态。
+	Applies immediately when saved. Memory is not reserved in advance.	保存后立即生效。不会预先占用内存。
+	With GPU Memory set to Automatic, this also limits the GPU layer budget. That budget is capped at one quarter of installed RAM and, when known, three eighths of the graphics card's memory, with a 512 MB minimum. Raising this limit beyond those caps does not increase the GPU budget.	当 GPU 内存为自动时，这也会限制 GPU 图层预算。上限为安装 RAM 的四分之一，以及（若已知）显存的八分之三，最低 512 MB。超过这些上限不会增加 GPU 预算。
+	Use	使用
+	In Front	前面
+	Behind	后面
+	Blend	混合
+
+# DDS Options (#1327)
+	DDS Options	DDS 选项
+	Compression	压缩
+	Generate Mipmaps	生成 Mipmap
+
+# Color Table (.act) dialog
+	There is no color table to save.	没有可保存的色表。
+@plural	Saved {n} color to {file}|Saved {n} colors to {file}	已将 {n} 种颜色保存到 {file}
+
+# Graphics Adapter preference (#1885)
+	GPU adapter	GPU 适配器
+
+# File › Submit to DeviantArt
+	Could not prepare a file to send: {error}	无法准备要发送的文件：{error}
+	There is no saved file to send. Choose PSD or PNG.	没有可发送的已保存文件。请选择 PSD 或 PNG。
+	Submitting needs an internet connection.	提交需要互联网连接。
+	Open the DeviantArt developer page	打开 DeviantArt 开发者页面
+	DeviantArt app id	DeviantArt 应用 ID
+	The DeviantArt login stays in the system keychain, not in PhotoCraft's settings file.	DeviantArt 登录保存在系统密钥链中，不在 PhotoCraft 的设置文件里。
+	Connect DeviantArt	连接 DeviantArt
+	Title	标题
+	Tags	标签
+	Letters, numbers and underscores, separated by commas.	字母、数字和下划线，用逗号分隔。
+	Submit as	提交为
+	Also submit when I Save	保存时也提交
+	Also submit when I Save As	另存为时也提交
+	Also submit when I Save a Copy	存储副本时也提交
+	Also submit when I Export	导出时也提交
+	DeviantArt is set up. Save or export a file, then submit it.	DeviantArt 已设置。请先保存或导出文件，再提交。
+	Connect DeviantArt first.	请先连接 DeviantArt。
+	The DeviantArt app id should be a number.	DeviantArt 应用 ID 应为数字。
+	DeviantArt submitting needs the desktop app.	提交到 DeviantArt 仅在桌面应用中可用。
+	A DeviantArt submit is already running.	已有一次 DeviantArt 提交在进行。
+	Waiting for DeviantArt…	正在等待 DeviantArt…
+	Submitting {name} to DeviantArt…	正在将 {name} 提交到 DeviantArt…
+	That file is larger than DeviantArt accepts (30 MB).	文件大于 DeviantArt 接受的大小（30 MB）。
+	DeviantArt is connected.	已连接 DeviantArt。
+	Create a Public app on DeviantArt, without a client secret. Copy the address below into the redirect field, paste the client id here, then connect.	在 DeviantArt 上创建一个公开应用，不要 client secret。把下面的地址复制到重定向，把客户端 ID 粘贴到这里，然后连接。
+	Copied the redirect address.	已复制重定向地址。
+	Connected	已连接
+	PNG is what DeviantArt shows. A PSD is only stored as a file in Sta.sh.	DeviantArt 显示的是 PNG。PSD 在 Sta.sh 里只是一个文件。
+	OK uploads to Sta.sh. Nothing is public until you publish.	OK 会上传到 Sta.sh。发布之前不会公开。
+	Connect again	重新连接
+	Disconnect DeviantArt	断开 DeviantArt
+	Submit to DeviantArt…	发送到 DeviantArt…
+	Submitted {name} to Sta.sh. It stays private until you publish it.	{name} 已在 Sta.sh。发布之前不会公开。
+	Open the Sta.sh page	打开 Sta.sh 页面
+	DeviantArt was disconnected.	已断开 DeviantArt。
+	The DeviantArt login expired. Connect again.	DeviantArt 登录已过期。请重新连接。
+	Saved file	已保存的文件
