@@ -1,0 +1,13 @@
+---
+description: Secure file handling and narrowly scoped network integrations
+alwaysApply: true
+---
+
+# File and network integrations
+
+- Put temporary files in an OS-created private temporary directory or create them atomically with exclusive creation and owner-only permissions. Never use predictable names in a shared temp directory. Remove the file and its temporary directory on success, failure, cancellation, and early return.
+- Treat paths and filenames from requests, documents, and remote services as untrusted. Prefer passing an already-open file or an app-owned temporary file. Otherwise canonicalize before checking containment, reject symlinks, and sanitize downloaded filenames before constructing paths.
+- Validate the scheme and host of every remote download against an explicit allow-list. Disable redirects or validate every redirect target before following it. Do not forward credentials to file hosts.
+- Request only the OAuth scopes needed for the operation. Do not hold a login or state mutex while waiting on network I/O. Handle loopback-port contention explicitly; use ephemeral ports only when the OAuth provider accepts them as registered redirect addresses.
+- Keep credentials out of serializable UI state and automation/control inspection. Hold secret drafts in private app state, redact secret-shaped fields from inspection output, and persist credentials only through protected storage with a clear fallback when it fails.
+- Keep integrations reviewable: separate independent features into focused changes, rebase on the PR's current base before requesting review, and report only checks that were actually run.
