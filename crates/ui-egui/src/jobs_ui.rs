@@ -151,9 +151,8 @@ pub struct SaveJob {
     /// The job has ended (cancelled, say) but its worker may still be running: kept until it
     /// returns, so quitting and another save to the same file wait for it.
     pub ended: bool,
-    /// Started with Save in Background off: the app waits for it under the modal progress dialog
-    /// (see [`foreground_save`]).
-    pub foreground: bool,
+    /// Submit this file to DeviantArt once the write has finished.
+    pub notify_deviantart: Option<crate::deviantart::WriteKind>,
 }
 
 /// The shell's job bookkeeping.
@@ -308,9 +307,7 @@ pub fn start_save(
             Ok(Some((path, warnings)))
         }
         Started::Job(job) => {
-            // Preferences › File Handling › Save in Background, read when the save starts.
-            let foreground = !app.session.prefs().file_handling.save_in_background;
-            app.jobs.saves.push(SaveJob { job, doc, revision, path, copy, automation, state, ended: false, foreground });
+            app.jobs.saves.push(SaveJob { job, doc, revision, path, copy, automation, state, ended: false, notify_deviantart: None });
             // Control and MCP requests wait on it, as for other jobs.
             app.jobs.last_started = Some(job);
             // The status bar's progress readout names the save; clear any old message.
@@ -337,6 +334,9 @@ fn finish_save(app: &mut PhotocraftApp, ctx: &egui::Context, save: SaveJob, labe
             }
             if !save.copy {
                 crate::discard_ui::saved_document(app, ctx, save.doc);
+            }
+            if let Some(kind) = save.notify_deviantart {
+                crate::deviantart::after_written(app, &save.path, kind);
             }
         }
         JobOutcome::Failed(err) => {

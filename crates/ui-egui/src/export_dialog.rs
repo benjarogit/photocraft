@@ -192,6 +192,7 @@ pub fn quick_export_selected_layers_png(app: &mut PhotocraftApp) -> Result<Value
             let write = app.services.write.as_mut().ok_or("no writer configured")?;
             write(&path, &bytes)?;
             crate::notices::io_warnings(app, &format!("Exported {}", crate::file_open::display_name(&path)), &warnings);
+            crate::deviantart::after_written(app, &path, crate::deviantart::WriteKind::Export);
             exported.push(json!({"path": path, "bytes": bytes.len(), "warnings": warnings}));
         }
         app.ui.status = format!("Exported {} PNG files", exported.len());
@@ -920,15 +921,19 @@ pub fn confirm(app: &mut PhotocraftApp, f: &Map<String, Value>) -> Result<Value,
     let suggested = format!("{stem}.{ext}");
     let f = f.clone();
     app.pick_save(&suggested, move |app, path| {
-        let r = write_export(app, &doc, &f, &path)?;
-        // An action being recorded keeps a whole-document export with its destination and
-        // settings (#7207). A layer's export isn't recorded: its layer is this document's.
-        if !f.contains_key("__layer") {
-            let mut step = settings_of(&f);
-            step.insert("path".into(), json!(path));
-            app.session.journal.push((COMMAND.into(), Value::Object(step)));
-        }
-        Ok(r)
+        let out = export_document(&doc, &f, None)?;
+        let export = app.services.export.as_ref().ok_or("no exporter configured")?;
+        let (bytes, warnings) = export(&out, &path, &settings)?;
+        let write = app.services.write.as_mut().ok_or("no writer configured")?;
+        write(&path, &bytes)?;
+        let template = "Exported {path} ({size})";
+        app.ui.status = crate::i18n::fmt(tl!(template), &[("path", &path), ("size", &crate::sizing::human_bytes(bytes.len() as f64))]);
+        app.ui.status_error = false;
+        let template = "Exported {path}";
+        let what = crate::i18n::fmt(tl!(template), &[("path", &crate::file_open::display_name(&path))]);
+        crate::notices::io_warnings(app, &what, &warnings);
+        crate::deviantart::after_written(app, &path, crate::deviantart::WriteKind::Export);
+        Ok(json!({"path": path, "bytes": bytes.len(), "warnings": warnings}))
     })
 }
 
@@ -989,6 +994,7 @@ fn confirm_layers(app: &mut PhotocraftApp, f: &Map<String, Value>, ids: &[photoc
             let template = "Exported {path}";
             let what = crate::i18n::fmt(tl!(template), &[("path", &crate::file_open::display_name(&path))]);
             crate::notices::io_warnings(app, &what, &warnings);
+            crate::deviantart::after_written(app, &path, crate::deviantart::WriteKind::Export);
             exported.push(json!({"path": path, "bytes": bytes.len(), "warnings": warnings}));
         }
         let template = "Exported {n} files";
