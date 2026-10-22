@@ -2877,6 +2877,7 @@ curves	Smooth	Glätten
 	Public Domain	Gemeinfrei
 	Copyright Url	Urheberrechts-URL
 	Keywords	Stichwörter
+	Title	Titel
 	Profile	Profil
 	Working	Arbeitsfarbraum
 	Working-cmyk	Arbeits-CMYK
@@ -3213,75 +3214,9 @@ curves	Smooth	Glätten
 	Sent to {printer}	An {printer} gesendet
 	set in Print Settings…	in den Druckeinstellungen festlegen…
 	ICO is limited to 256 × 256 pixels	ICO ist auf 256 × 256 Pixel begrenzt
-# File › Submit to DeviantArt
-	Could not prepare a file to send: {error}	Die Datei zum Senden konnte nicht vorbereitet werden: {error}
-	There is no saved file to send. Choose PSD or PNG.	Es gibt keine gespeicherte Datei. Wähle PSD oder PNG.
-	Submitting needs an internet connection.	Zum Senden braucht es eine Internetverbindung.
-	Open the DeviantArt developer page	DeviantArt-Entwicklerseite öffnen
-	DeviantArt app id	DeviantArt-App-ID
-	The DeviantArt login stays in the system keychain, not in PhotoCraft's settings file.	Die DeviantArt-Anmeldung bleibt im Schlüsselbund des Systems, nicht in PhotoCrafts Einstellungsdatei.
-	Connect DeviantArt	DeviantArt verbinden
-	Title	Titel
-	Tags	Schlagwörter
-	Letters, numbers and underscores, separated by commas.	Buchstaben, Zahlen und Unterstriche, durch Kommas getrennt.
-	Submit as	Senden als
-	Also submit when I Save	Auch beim Speichern senden
-	Also submit when I Save As	Auch bei „Speichern unter“ senden
-	Also submit when I Save a Copy	Auch bei „Kopie speichern“ senden
-	Also submit when I Export	Auch beim Exportieren senden
-	DeviantArt is set up. Save or export a file, then submit it.	DeviantArt ist eingerichtet. Speichere oder exportiere eine Datei und sende sie dann.
-	Connect DeviantArt first.	Verbinde zuerst DeviantArt.
-	The DeviantArt app id should be a number.	Die DeviantArt-App-ID sollte eine Zahl sein.
-	DeviantArt submitting needs the desktop app.	DeviantArt-Versand gibt es nur in der Desktop-App.
-	A DeviantArt submit is already running.	Ein DeviantArt-Versand läuft schon.
-	Waiting for DeviantArt…	Warte auf DeviantArt…
-	Submitting {name} to DeviantArt…	Sende {name} an DeviantArt…
-	Submitted {name} to Sta.sh. Item {id}.	{name} nach Sta.sh gesendet. Eintrag {id}.
-	That file is larger than DeviantArt accepts (30 MB).	Die Datei ist größer, als DeviantArt annimmt (30 MB).
-	DeviantArt is connected.	DeviantArt ist verbunden.
-	Opened {name}.	{name} geöffnet.
-	Connect again after this update so gallery, publish and the profile picture are allowed.	Verbinde dich noch einmal, damit Galerie, Veröffentlichung und Profilbild erlaubt sind.
-	Sta.sh item id	Sta.sh-Nummer (nach OK)
-	Publish this publicly	Öffentlich veröffentlichen
-	Not for all ages	Nicht für jedes Alter
-	License	Lizenz
-	Creative Commons	Creative Commons
-	Commercial use	Kommerzielle Nutzung
-	Publish	Veröffentlichen
-	Deviation id	DeviantArt-Nummer (nach dem Veröffentlichen)
-	Update title and tags	Titel und Schlagwörter aktualisieren
-	My gallery	Meine Galerie
-	Profile picture	Profilbild
-	Set as DeviantArt profile picture	Als DeviantArt-Profilbild setzen
-	Confirm that this publish is public.	Bestätige, dass diese Veröffentlichung öffentlich ist.
-	Create a Public app on DeviantArt, without a client secret. Copy the address below into the redirect field, paste the client id here, then connect.	Lege eine öffentliche App bei DeviantArt an, ohne Client-Secret. Kopiere die Adresse unten ins Weiterleitungsfeld, füge hier die Client-ID ein und verbinde.
-	Copied the redirect address.	Weiterleitungsadresse kopiert.
-	Connected	Verbunden
-	PNG is what DeviantArt shows. A PSD is only stored as a file in Sta.sh.	PNG ist das Bild, das DeviantArt zeigt. Ein PSD liegt in Sta.sh nur als Datei.
-	OK uploads to Sta.sh. Nothing is public until you publish.	OK lädt nach Sta.sh. Öffentlich wird es erst beim Veröffentlichen.
-	More options	Weitere Optionen
-	Upload with OK first. Publish uses the Sta.sh item from that upload.	Zuerst mit OK hochladen. Veröffentlichen nimmt den Sta.sh-Eintrag von diesem Upload.
-	Connect again	Erneut verbinden
-	Disconnect DeviantArt	DeviantArt trennen
-	Submit to DeviantArt…	An DeviantArt senden…
-	Submitted {name} to Sta.sh. It stays private until you publish it.	{name} liegt in Sta.sh. Öffentlich wird es erst beim Veröffentlichen.
-	Open the Sta.sh page	Sta.sh-Seite öffnen
-	DeviantArt was disconnected.	Die DeviantArt-Verbindung ist getrennt.
-	The DeviantArt login expired. Connect again.	Die DeviantArt-Anmeldung ist abgelaufen. Bitte erneut verbinden.
-	Open the Telegram message	Telegram-Nachricht öffnen
-	The ten newest files sent to this bot. Click one to open it in PhotoCraft.	Die zehn neuesten Dateien an diesen Bot. Ein Klick öffnet sie in PhotoCraft.
-	Your published works. Click one to open it in PhotoCraft. Sta.sh drafts are not in this list.	Deine veröffentlichten Werke. Ein Klick öffnet eines in PhotoCraft. Sta.sh-Entwürfe stehen nicht in dieser Liste.
-	Get files	Dateien holen
-	Files sent from PhotoCraft, and the ten newest files sent to this bot. Click one to open it in PhotoCraft.	Dateien, die PhotoCraft gesendet hat, und die zehn neuesten Dateien an diesen Bot. Ein Klick öffnet sie in PhotoCraft.
-	No files yet. Send one from here, or send the bot a file, then try again.	Noch keine Dateien. Sende eine von hier oder dem Bot eine Datei und versuch es noch einmal.
-	Sta.sh drafts from this account, then published works. Click one to open it in PhotoCraft.	Sta.sh-Entwürfe dieses Kontos, danach veröffentlichte Werke. Ein Klick öffnet eines in PhotoCraft.
-	No Sta.sh files yet.	In Sta.sh ist noch nichts.
-	No published works in the gallery.	In der Galerie sind keine veröffentlichten Werke.
-	Telegram did not return a link for this chat.	Telegram hat für diesen Chat keinen Link geliefert.
-	Sta.sh drafts open their page. Published works open in PhotoCraft.	Sta.sh-Entwürfe öffnen ihre Seite. Veröffentlichte Werke öffnen sich in PhotoCraft.
-	DeviantArt did not offer a download.	DeviantArt hat keinen Download angeboten.
-	Saved file	Gespeicherte Datei
-
+# History panel › History Brush source (#2966)
+	Paints from the History panel's source state	Malt aus dem Quellzustand des Protokollbedienfelds
+	Sets the source for the history brush	Legt die Quelle für den Protokollpinsel fest
 # Embedded Profile Mismatch: profile names beside the choices, Remember this choice
 	Use the embedded profile ({profile})	Eingebettetes Profil verwenden ({profile})
 	Convert to the working space ({profile})	In den Arbeitsfarbraum konvertieren ({profile})
@@ -3360,8 +3295,63 @@ curves	Smooth	Glätten
 	GPU Memory (MB, 0 = Automatic)	GPU-Speicher (MB, 0 = Automatisch)
 	{name} was changed by another app after it was opened or saved here.	{name} wurde von einer anderen App geändert, nachdem es hier geöffnet oder gespeichert wurde.
 	Replace it with this document, or cancel and use File › Save As to keep both.	Ersetze die Datei durch dieses Dokument oder brich ab und nutze Datei › Speichern unter, um beide zu behalten.
+	Memory Usage	Speichernutzung
+	Per-document RAM limit (MB)	RAM-Limit pro Dokument (MB)
+	Installed RAM: {ram} MB; this limit: {percent}%	Installierter RAM: {ram} MB; dieses Limit: {percent}%
+	Limits each open document's pixels plus History. Oldest undo states are discarded when the limit is exceeded.	Begrenzt Pixel plus Verlauf jedes offenen Dokuments. Die ältesten Widerrufsschritte werden verworfen, wenn das Limit überschritten wird.
+	Applies immediately when saved. Memory is not reserved in advance.	Gilt sofort nach dem Speichern. Speicher wird nicht im Voraus reserviert.
+	With GPU Memory set to Automatic, this also limits the GPU layer budget. That budget is capped at one quarter of installed RAM and, when known, three eighths of the graphics card's memory, with a 512 MB minimum. Raising this limit beyond those caps does not increase the GPU budget.	Bei GPU-Speicher = Automatisch begrenzt dies auch das GPU-Ebenenbudget. Das Budget ist auf ein Viertel des RAM und, wenn bekannt, drei Achtel des Grafikspeichers begrenzt, mindestens 512 MB. Ein höheres Limit erhöht das GPU-Budget nicht.
+	Use	Verwenden
+	In Front	Davor
+	Behind	Dahinter
+	Blend	Mischen
 
-# File › Submit to DeviantArt: result messages
-	Published on DeviantArt.	Auf DeviantArt veröffentlicht.
-	Updated the title and tags on DeviantArt.	Titel und Schlagwörter auf DeviantArt aktualisiert.
-	Set the DeviantArt profile picture.	DeviantArt-Profilbild gesetzt.
+# DDS Options (#1327)
+	DDS Options	DDS-Optionen
+	Compression	Komprimierung
+	Generate Mipmaps	Mipmaps erzeugen
+
+# Color Table (.act) dialog
+	There is no color table to save.	Es gibt keine Farbtabelle zum Speichern.
+@plural	Saved {n} color to {file}|Saved {n} colors to {file}	{n} Farbe in {file} gespeichert|{n} Farben in {file} gespeichert
+
+# Graphics Adapter preference (#1885)
+	GPU adapter	GPU-Adapter
+
+# File › Submit to DeviantArt
+	Could not prepare a file to send: {error}	Die Datei zum Senden konnte nicht vorbereitet werden: {error}
+	There is no saved file to send. Choose PSD or PNG.	Es gibt keine gespeicherte Datei. Wähle PSD oder PNG.
+	Submitting needs an internet connection.	Zum Senden braucht es eine Internetverbindung.
+	Open the DeviantArt developer page	DeviantArt-Entwicklerseite öffnen
+	DeviantArt app id	DeviantArt-App-ID
+	The DeviantArt login stays in the system keychain, not in PhotoCraft's settings file.	Die DeviantArt-Anmeldung bleibt im Schlüsselbund des Systems, nicht in PhotoCrafts Einstellungsdatei.
+	Connect DeviantArt	DeviantArt verbinden
+	Tags	Schlagwörter
+	Letters, numbers and underscores, separated by commas.	Buchstaben, Zahlen und Unterstriche, durch Kommas getrennt.
+	Submit as	Senden als
+	Also submit when I Save	Auch beim Speichern senden
+	Also submit when I Save As	Auch bei „Speichern unter“ senden
+	Also submit when I Save a Copy	Auch bei „Kopie speichern“ senden
+	Also submit when I Export	Auch beim Exportieren senden
+	DeviantArt is set up. Save or export a file, then submit it.	DeviantArt ist eingerichtet. Speichere oder exportiere eine Datei und sende sie dann.
+	Connect DeviantArt first.	Verbinde zuerst DeviantArt.
+	The DeviantArt app id should be a number.	Die DeviantArt-App-ID sollte eine Zahl sein.
+	DeviantArt submitting needs the desktop app.	DeviantArt-Versand gibt es nur in der Desktop-App.
+	A DeviantArt submit is already running.	Ein DeviantArt-Versand läuft schon.
+	Waiting for DeviantArt…	Warte auf DeviantArt…
+	Submitting {name} to DeviantArt…	Sende {name} an DeviantArt…
+	That file is larger than DeviantArt accepts (30 MB).	Die Datei ist größer, als DeviantArt annimmt (30 MB).
+	DeviantArt is connected.	DeviantArt ist verbunden.
+	Create a Public app on DeviantArt, without a client secret. Copy the address below into the redirect field, paste the client id here, then connect.	Lege eine öffentliche App bei DeviantArt an, ohne Client-Secret. Kopiere die Adresse unten ins Weiterleitungsfeld, füge hier die Client-ID ein und verbinde.
+	Copied the redirect address.	Weiterleitungsadresse kopiert.
+	Connected	Verbunden
+	PNG is what DeviantArt shows. A PSD is only stored as a file in Sta.sh.	PNG ist das Bild, das DeviantArt zeigt. Ein PSD liegt in Sta.sh nur als Datei.
+	OK uploads to Sta.sh. Nothing is public until you publish.	OK lädt nach Sta.sh. Öffentlich wird es erst beim Veröffentlichen.
+	Connect again	Erneut verbinden
+	Disconnect DeviantArt	DeviantArt trennen
+	Submit to DeviantArt…	An DeviantArt senden…
+	Submitted {name} to Sta.sh. It stays private until you publish it.	{name} liegt in Sta.sh. Öffentlich wird es erst beim Veröffentlichen.
+	Open the Sta.sh page	Sta.sh-Seite öffnen
+	DeviantArt was disconnected.	Die DeviantArt-Verbindung ist getrennt.
+	The DeviantArt login expired. Connect again.	Die DeviantArt-Anmeldung ist abgelaufen. Bitte erneut verbinden.
+	Saved file	Gespeicherte Datei

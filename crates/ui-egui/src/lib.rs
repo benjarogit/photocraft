@@ -629,7 +629,6 @@ pub struct Services {
     pub deviantart_connect: Option<DeviantArtConnectFn>,
     pub deviantart_current_refresh: Option<DeviantArtCurrentRefreshFn>,
     pub deviantart_submit: Option<DeviantArtSubmitFn>,
-    pub deviantart_call: Option<DeviantArtCallFn>,
 }
 
 /// A document histogram being computed off the UI thread: (document, revision, receiver of
@@ -640,9 +639,6 @@ pub type DeviantArtConnectFn = std::sync::Arc<dyn Fn(&str, &str) -> Result<Strin
 pub type DeviantArtCurrentRefreshFn = std::sync::Arc<dyn Fn() -> String + Send + Sync>;
 /// Sta.sh submit. Arguments: refresh token, app id, title, comments, tags, file name, bytes.
 pub type DeviantArtSubmitFn = std::sync::Arc<dyn Fn(&str, &str, &str, &str, &[String], &str, &[u8]) -> Result<String, String> + Send + Sync>;
-/// Publish, edit, gallery, download or avatar. Arguments: refresh token, app id, JSON request.
-pub type DeviantArtCallFn = std::sync::Arc<dyn Fn(&str, &str, &str) -> Result<String, String> + Send + Sync>;
-
 pub(crate) type HistJob = (DocId, u64, std::sync::mpsc::Receiver<(DocId, f64, std::sync::Arc<tone::Histograms>)>);
 
 /// The Info panel's cached sample: pixel x, y, document revision and Eyedropper Sample Size.

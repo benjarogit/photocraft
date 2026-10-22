@@ -633,7 +633,6 @@ pub fn native(automation: Option<photocraft_automation::AuthorizedWorkspace>) ->
         deviantart_submit: Some(std::sync::Arc::new(|refresh, client_id, title, comments, tags, filename, bytes| {
             crate::deviantart_api::submit(refresh, client_id, title, comments, tags, filename, bytes)
         })),
-        deviantart_call: Some(std::sync::Arc::new(crate::deviantart_api::call)),
         ..recovery_services(recovery_dir())
     }
 }
