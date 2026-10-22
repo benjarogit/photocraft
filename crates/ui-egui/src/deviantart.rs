@@ -7,6 +7,13 @@ use serde_json::{Value, json};
 
 use crate::PhotocraftApp;
 
+mod errors;
+mod format;
+#[cfg(test)]
+mod tests;
+
+pub use format::{clean_tags, item_id, multipart, stash_url};
+
 /// Sta.sh accepts smaller files than Telegram. Larger ones fail with a validation error.
 #[cfg(not(target_arch = "wasm32"))]
 const MAX_BYTES: u64 = 30 * 1024 * 1024;
@@ -222,7 +229,7 @@ pub fn poll(app: &mut PhotocraftApp, ctx: &egui::Context) {
         (JobKind::Submit, Some(Ok(body))) => {
             // DeviantArt invalidates the refresh token it just accepted and returns a new one.
             // Pick that up before saving, or the next call sends the dead token.
-            remember_rotated_login(app);
+            errors::remember_rotated_login(app);
             let id = item_id(&body).map(|id| id.to_string()).unwrap_or_default();
             let url = item_id(&body).and_then(stash_url);
             if !id.is_empty() {
@@ -245,28 +252,28 @@ pub fn poll(app: &mut PhotocraftApp, ctx: &egui::Context) {
             show_result(app, message, url);
         }
         (JobKind::Publish, Some(Ok(_))) => {
-            remember_rotated_login(app);
+            errors::remember_rotated_login(app);
             let message = tl!("Published on DeviantArt.").to_string();
             app.ui.status = message.clone();
             app.ui.status_error = false;
             show_result(app, message, None);
         }
         (JobKind::Edit, Some(Ok(_))) => {
-            remember_rotated_login(app);
+            errors::remember_rotated_login(app);
             let message = tl!("Updated the title and tags on DeviantArt.").to_string();
             app.ui.status = message.clone();
             app.ui.status_error = false;
             show_result(app, message, None);
         }
         (JobKind::Avatar, Some(Ok(_))) => {
-            remember_rotated_login(app);
+            errors::remember_rotated_login(app);
             let message = tl!("Set the DeviantArt profile picture.").to_string();
             app.ui.status = message.clone();
             app.ui.status_error = false;
             show_result(app, message, None);
         }
         (JobKind::Gallery, Some(Ok(body))) => {
-            remember_rotated_login(app);
+            errors::remember_rotated_login(app);
             if let Some(dialog) = app.ui.dialogs.iter_mut().find(|dialog| owns(&dialog.fields)) {
                 let rows = gallery_rows(&body);
                 if rows.is_empty() {
@@ -280,13 +287,13 @@ pub fn poll(app: &mut PhotocraftApp, ctx: &egui::Context) {
             app.ui.status_error = false;
         }
         (JobKind::Gallery, Some(Err(error))) => {
-            if login_was_rejected(&error) {
+            if errors::login_was_rejected(&error) {
                 app.deviantart.refresh_token.clear();
                 let _ = save_settings(app);
             } else {
-                remember_rotated_login(app);
+                errors::remember_rotated_login(app);
             }
-            let message = localize_error(&error);
+            let message = errors::localize_error(&error);
             if let Some(dialog) = app.ui.dialogs.iter_mut().find(|dialog| owns(&dialog.fields)) {
                 dialog.fields.insert("filesError".into(), json!(message.clone()));
             }
@@ -297,10 +304,10 @@ pub fn poll(app: &mut PhotocraftApp, ctx: &egui::Context) {
         | (JobKind::Publish, Some(Err(error)))
         | (JobKind::Edit, Some(Err(error)))
         | (JobKind::Avatar, Some(Err(error))) => {
-            report_deviantart_error(app, &error, true);
+            errors::report_deviantart_error(app, &error, true);
         }
         (_, Some(Err(error))) => {
-            report_deviantart_error(app, &error, !matches!(job.kind, JobKind::Connect));
+            errors::report_deviantart_error(app, &error, !matches!(job.kind, JobKind::Connect));
         }
         _ => {}
     }
@@ -380,7 +387,7 @@ pub fn body(app: &mut PhotocraftApp, ui: &mut egui::Ui, f: &mut serde_json::Map<
             }
             ui.add_enabled_ui(app.deviantart_job.is_none(), |ui| {
                 if crate::widgets::secondary_button(ui, tl!("Disconnect DeviantArt"), 170.0).clicked() {
-                    disconnect(app);
+                    errors::disconnect(app);
                 }
             });
         });
@@ -774,22 +781,6 @@ fn comments(name: &str, bytes: u64) -> String {
     format!("File: {name}\nFormat: {format}\nSize: {}", crate::sizing::human_bytes(bytes as f64))
 }
 
-/// DeviantArt tags allow letters, digits and underscores.
-pub fn clean_tags(text: &str) -> Vec<String> {
-    let mut out = Vec::new();
-    for raw in text.split(|c: char| c == ',' || c.is_whitespace()) {
-        let tag: String = raw.chars().filter(|c| c.is_ascii_alphanumeric() || *c == '_').take(64).collect();
-        if tag.is_empty() || out.iter().any(|have: &String| have.eq_ignore_ascii_case(&tag)) {
-            continue;
-        }
-        out.push(tag);
-        if out.len() == 30 {
-            break;
-        }
-    }
-    out
-}
-
 pub fn gallery_rows(text: &str) -> Vec<Value> {
     let mut out = Vec::new();
     let Ok(value) = serde_json::from_str::<Value>(text) else { return out };
@@ -971,178 +962,4 @@ fn show_result(app: &mut PhotocraftApp, message: String, url: Option<String>) {
         fields.insert("url".into(), json!(url));
     }
     app.ui.open_dialog(crate::state::DialogKind::Command, fields);
-}
-
-/// Sta.sh shows one private item at `https://www.deviantart.com/stash/0` plus the id in base 36.
-pub fn stash_url(item_id: i64) -> Option<String> {
-    if item_id <= 0 {
-        return None;
-    }
-    let mut n = item_id as u64;
-    let digits = b"0123456789abcdefghijklmnopqrstuvwxyz";
-    let mut code = Vec::new();
-    while n > 0 {
-        let index = (n % 36) as usize;
-        code.push(*digits.get(index)?);
-        n /= 36;
-    }
-    code.reverse();
-    let code = String::from_utf8(code).ok()?;
-    Some(format!("https://www.deviantart.com/stash/0{code}"))
-}
-
-pub fn item_id(body: &str) -> Option<i64> {
-    let value: Value = serde_json::from_str(body).ok()?;
-    value.get("itemid")?.as_i64()
-}
-
-/// DeviantArt rotates the refresh token on every use. The keychain has the new one; the
-/// dialog still holds the one it sent. Copy the keychain value before the next save.
-fn remember_rotated_login(app: &mut PhotocraftApp) {
-    // Disconnected (or never connected): do not bring a login back from the keychain.
-    if app.deviantart.refresh_token.is_empty() {
-        return;
-    }
-    let token = app
-        .services
-        .deviantart_current_refresh
-        .as_ref()
-        .map(|current| current())
-        .filter(|token| !token.is_empty())
-        .or_else(|| app.services.load_deviantart.as_mut().and_then(|load| load()).map(|text| settings_from_json(&text).refresh_token));
-    if let Some(token) = token.filter(|token| !token.is_empty()) {
-        app.deviantart.refresh_token = token;
-        if let Err(error) = save_settings(app) {
-            app.ui.status = error;
-            app.ui.status_error = true;
-        }
-    }
-}
-
-fn login_was_rejected(error: &str) -> bool {
-    let lower = error.to_ascii_lowercase();
-    lower.contains("invalid_grant") || lower.contains("invalid_token") || lower.contains("refresh token") || lower.contains("refresh_token")
-}
-
-fn report_deviantart_error(app: &mut PhotocraftApp, error: &str, adopt_rotation: bool) {
-    if login_was_rejected(error) {
-        app.deviantart.refresh_token.clear();
-        let _ = save_settings(app);
-    } else if adopt_rotation {
-        remember_rotated_login(app);
-    }
-    let message = localize_error(error);
-    app.ui.status = message.clone();
-    app.ui.status_error = true;
-    show_result(app, message, None);
-}
-
-fn disconnect(app: &mut PhotocraftApp) {
-    app.deviantart.refresh_token.clear();
-    match save_settings(app) {
-        Ok(()) => {
-            app.ui.status = tl!("DeviantArt was disconnected.").to_string();
-            app.ui.status_error = false;
-        }
-        Err(error) => {
-            app.ui.status = error;
-            app.ui.status_error = true;
-        }
-    }
-}
-
-fn localize_error(error: &str) -> String {
-    if login_was_rejected(error) {
-        return tl!("The DeviantArt login expired. Connect again.").to_string();
-    }
-    let source = match error {
-        "timeout" => "Waiting for DeviantArt timed out.",
-        "denied" => "DeviantArt did not grant access.",
-        "listen" => "Could not listen for the DeviantArt login.",
-        "no-code" => "DeviantArt did not return a code.",
-        "state" => "DeviantArt returned an unexpected login.",
-        "desktop" => "DeviantArt submitting needs the desktop app.",
-        other => other,
-    };
-    crate::i18n::t(source).to_string()
-}
-
-pub fn multipart(title: &str, comments: &str, tags: &[String], filename: &str, bytes: &[u8]) -> (String, Vec<u8>) {
-    let boundary = format!("PcDeviantArt{}", bytes.len());
-    let filename: String = filename.chars().map(|c| if matches!(c, '"' | '\r' | '\n' | '\\') { '_' } else { c }).collect();
-    let mut body = Vec::new();
-    part(&mut body, &boundary, "title", title);
-    part(&mut body, &boundary, "artist_comments", comments);
-    for (index, tag) in tags.iter().enumerate() {
-        part(&mut body, &boundary, &format!("tags[{index}]"), tag);
-    }
-    body.extend_from_slice(
-        format!("--{boundary}\r\nContent-Disposition: form-data; name=\"file\"; filename=\"{filename}\"\r\nContent-Type: application/octet-stream\r\n\r\n")
-            .as_bytes(),
-    );
-    body.extend_from_slice(bytes);
-    body.extend_from_slice(format!("\r\n--{boundary}--\r\n").as_bytes());
-    (format!("multipart/form-data; boundary={boundary}"), body)
-}
-
-fn part(body: &mut Vec<u8>, boundary: &str, name: &str, value: &str) {
-    body.extend_from_slice(format!("--{boundary}\r\nContent-Disposition: form-data; name=\"{name}\"\r\n\r\n{value}\r\n").as_bytes());
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn a_rejected_refresh_token_is_recognized() {
-        assert!(login_was_rejected("The refresh token is invalid"));
-        assert!(login_was_rejected("invalid_request: The refresh token is invalid."));
-        assert!(login_was_rejected("invalid_grant"));
-        assert!(!login_was_rejected("HTTP 500"));
-    }
-
-    #[test]
-    fn settings_drop_the_refresh_token() {
-        let text = settings_json(&Settings { client_id: "99".into(), refresh_token: "secret-token".into(), title: "Hill".into(), ..Settings::default() });
-        let (disk, token) = without_token(&text).unwrap();
-        assert_eq!(token, "secret-token");
-        assert!(!disk.contains("secret-token"));
-        assert!(disk.contains("99"));
-        let back = settings_from_json(&with_token(&disk, &token));
-        assert_eq!(back.refresh_token, "secret-token");
-        assert_eq!(back.title, "Hill");
-    }
-
-    #[test]
-    fn tags_keep_letters_numbers_and_underscores() {
-        assert_eq!(clean_tags("night sky, night, café, a-b"), vec!["night".to_string(), "sky".to_string(), "caf".to_string(), "ab".to_string()]);
-    }
-
-    #[test]
-    fn submit_body_carries_the_file_and_not_a_token() {
-        let (_, body) = multipart("Hill", "notes", &["night".into()], "hill.png", b"PNG");
-        let text = String::from_utf8_lossy(&body);
-        assert!(text.contains("name=\"title\""));
-        assert!(text.contains("Hill"));
-        assert!(text.contains("name=\"tags[0]\""));
-        assert!(text.contains("filename=\"hill.png\""));
-        assert!(text.contains("PNG"));
-        assert!(!text.contains("refresh"));
-        assert_eq!(item_id(r#"{"status":"success","itemid":42}"#), Some(42));
-        assert_eq!(stash_url(2730074306229899).as_deref(), Some("https://www.deviantart.com/stash/0qvqatlhzez"));
-        assert_eq!(stash_url(0), None);
-        let (_, quoted) = multipart("Hill", "notes", &[], "my \"best\" sketch.png", b"x");
-        let quoted = String::from_utf8_lossy(&quoted);
-        assert!(quoted.contains("filename=\"my _best_ sketch.png\""));
-        assert!(!quoted.contains("filename=\"my \"best\""));
-    }
-
-    #[test]
-    fn artist_comments_omit_the_local_path() {
-        let text = comments("hill.png", 1200);
-        assert!(text.contains("hill.png"));
-        assert!(text.contains("PNG"));
-        assert!(!text.contains('/'));
-        assert!(!text.contains("home"));
-    }
 }
