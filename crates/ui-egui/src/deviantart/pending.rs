@@ -18,7 +18,6 @@ pub(super) fn start_next(app: &mut PhotocraftApp, ctx: &egui::Context) {
         return;
     }
     if !app.deviantart.ready() {
-        app.deviantart_pending.clear();
         return;
     }
     while let Some(path) = app.deviantart_pending.pop_front() {

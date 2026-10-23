@@ -2,9 +2,10 @@ use super::*;
 
 #[test]
 fn a_rejected_refresh_token_is_recognized() {
-    assert!(super::errors::login_was_rejected("The refresh token is invalid"));
-    assert!(super::errors::login_was_rejected("invalid_request: The refresh token is invalid."));
-    assert!(super::errors::login_was_rejected("invalid_grant"));
+    assert!(!super::errors::login_was_rejected("The refresh token is invalid"));
+    assert!(super::errors::login_was_rejected("refresh-grant-rejected: invalid_grant"));
+    assert!(!super::errors::login_was_rejected("invalid_token"));
+    assert!(!super::errors::login_was_rejected("invalid_grant"));
     assert!(!super::errors::login_was_rejected("HTTP 500"));
 }
 
@@ -100,4 +101,61 @@ fn disconnect_drops_pending_automatic_submissions() {
     app.deviantart_pending.push_back("private.png".into());
     errors::disconnect(&mut app);
     assert!(app.deviantart_pending.is_empty());
+}
+
+#[test]
+fn multipart_boundary_avoids_file_and_text_delimiters() {
+    let (content_type, _) = multipart("--PcDeviantArt0", "\r\n--PcDeviantArt1--\r\n", &[], "a.png", b"\r\n--PcDeviantArt2\r\n");
+    assert_eq!(content_type, "multipart/form-data; boundary=PcDeviantArt3");
+}
+
+#[test]
+fn access_token_error_does_not_discard_the_refresh_token() {
+    let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), crate::Services::default());
+    app.deviantart.refresh_token = "still-valid".into();
+    errors::report_deviantart_error(&mut app, "invalid_token: access expired", false);
+    assert_eq!(app.deviantart.refresh_token, "still-valid");
+    errors::report_deviantart_error(&mut app, "refresh-grant-rejected: invalid_grant", false);
+    assert!(app.deviantart.refresh_token.is_empty());
+}
+
+#[test]
+fn disconnected_automatic_exports_keep_every_pending_path() {
+    let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), crate::Services::default());
+    app.deviantart.send_on_export = true;
+    after_written(&mut app, "first.png", WriteKind::Export);
+    after_written(&mut app, "second.png", WriteKind::Export);
+    poll(&mut app, &egui::Context::default());
+    assert_eq!(app.deviantart_pending.iter().map(String::as_str).collect::<Vec<_>>(), vec!["first.png", "second.png"]);
+    assert_eq!(app.ui.dialogs.iter().filter(|dialog| owns(&dialog.fields)).count(), 1);
+}
+
+#[test]
+fn window_close_waits_for_the_active_upload() {
+    let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), crate::Services::default());
+    let (_tx, rx) = std::sync::mpsc::channel();
+    app.deviantart_job = Some(Job { rx, kind: JobKind::Submit, path: String::new(), temporary: false, name: String::new() });
+    app.jobs.close_after_saves = true;
+    let ctx = egui::Context::default();
+    crate::jobs_ui::close_after_saves(&mut app, &ctx);
+    assert!(app.jobs.close_after_saves);
+    app.deviantart_job = None;
+    crate::jobs_ui::close_after_saves(&mut app, &ctx);
+    assert!(!app.jobs.close_after_saves);
+}
+
+#[test]
+fn automation_cannot_confirm_a_denied_deviantart_dialog() {
+    let services = crate::Services {
+        automation_command: Some(Box::new(|id, _| {
+            assert_eq!(id, "file.submitDeviantArt");
+            Err("network denied".into())
+        })),
+        ..crate::Services::default()
+    };
+    let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), services);
+    let id = open_dialog(&mut app, None);
+    app.automation_input = true;
+    assert_eq!(crate::dialogs::confirm(&mut app, id), Err("network denied".into()));
+    assert!(app.ui.dialog_mut(id).is_some());
 }

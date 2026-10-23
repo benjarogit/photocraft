@@ -10,7 +10,16 @@ const DEVIANTART_KEYCHAIN_USER: &str = "deviantart-refresh-token";
 /// back over the one DeviantArt just issued.
 pub(super) fn save_deviantart_file(text: &str) -> Result<(), String> {
     let path = config_dir().map(|dir| dir.join("deviantart.json"));
-    save_with(text, path.as_deref(), store_deviantart_token, crate::deviantart_api::clear_login)
+    let text = current_settings(text, &crate::deviantart_api::current_refresh())?;
+    save_with(&text, path.as_deref(), store_deviantart_token, crate::deviantart_api::clear_login)
+}
+
+fn current_settings(text: &str, live: &str) -> Result<String, String> {
+    let (_, requested) = photocraft_ui_egui::deviantart::without_token(text)?;
+    if requested.is_empty() || live.is_empty() {
+        return Ok(text.to_string());
+    }
+    Ok(photocraft_ui_egui::deviantart::with_token(text, live))
 }
 
 fn save_with(
@@ -75,7 +84,7 @@ fn restored_settings(text: &str, load: impl FnOnce() -> Result<String, String>) 
         Ok(token) => token,
         Err(_) => return Some((photocraft_ui_egui::deviantart::with_token(text, &embedded), false)),
     };
-    let token = if stored.is_empty() { &embedded } else { &stored };
+    let token = if embedded.is_empty() { &stored } else { &embedded };
     Some((photocraft_ui_egui::deviantart::with_token(text, token), !embedded.is_empty()))
 }
 
@@ -166,5 +175,23 @@ mod tests {
     fn deviantart_tokenless_settings_are_not_a_disconnect_signal() {
         let (loaded, _) = restored_settings("{}", || Ok("from-keychain".into())).unwrap();
         assert_eq!(photocraft_ui_egui::deviantart::settings_from_json(&loaded).refresh_token, "from-keychain");
+    }
+}
+
+#[cfg(test)]
+mod rotation_tests {
+    use super::*;
+    #[test]
+    fn embedded_fallback_wins_over_stale_keychain() {
+        let (text, migrate) = restored_settings(r#"{"refreshToken":"rotated"}"#, || Ok("stale".into())).unwrap();
+        assert!(migrate);
+        assert_eq!(photocraft_ui_egui::deviantart::settings_from_json(&text).refresh_token, "rotated");
+    }
+    #[test]
+    fn live_token_wins_over_stale_ui_but_never_cancels_disconnect() {
+        let text = current_settings(r#"{"refreshToken":"stale"}"#, "rotated").unwrap();
+        assert_eq!(photocraft_ui_egui::deviantart::settings_from_json(&text).refresh_token, "rotated");
+        let text = current_settings(r#"{"refreshToken":""}"#, "rotated").unwrap();
+        assert!(photocraft_ui_egui::deviantart::settings_from_json(&text).refresh_token.is_empty());
     }
 }
