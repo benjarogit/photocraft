@@ -159,3 +159,19 @@ fn automation_cannot_confirm_a_denied_deviantart_dialog() {
     assert_eq!(crate::dialogs::confirm(&mut app, id), Err("network denied".into()));
     assert!(app.ui.dialog_mut(id).is_some());
 }
+
+#[test]
+fn completed_download_adopts_the_rotated_refresh_token() {
+    let services = crate::Services {
+        deviantart_current_refresh: Some(std::sync::Arc::new(|| "rotated".into())),
+        save_deviantart: Some(Box::new(|_| Ok(()))),
+        ..crate::Services::default()
+    };
+    let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), services);
+    app.deviantart.refresh_token = "stale".into();
+    let (tx, rx) = std::sync::mpsc::channel();
+    tx.send(Ok("OPEN\t".into())).unwrap();
+    app.deviantart_job = Some(Job { rx, kind: JobKind::Download, path: String::new(), temporary: false, name: String::new() });
+    poll(&mut app, &egui::Context::default());
+    assert_eq!(app.deviantart.refresh_token, "rotated");
+}

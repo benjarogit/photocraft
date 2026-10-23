@@ -225,6 +225,7 @@ pub fn poll(app: &mut PhotocraftApp, ctx: &egui::Context) {
             }
         }
         (_, Some(Ok(body))) if body.starts_with("OPEN\t") => {
+            errors::remember_rotated_login(app);
             let path = body.trim_start_matches("OPEN\t");
             let opened = std::fs::read(path).ok();
             let name = file_name(path);

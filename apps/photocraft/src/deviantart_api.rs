@@ -804,4 +804,22 @@ mod tests {
         assert_eq!(safe_download_name(".."), "deviantart");
         assert_eq!(safe_download_name(""), "deviantart");
     }
+    #[test]
+    fn avatar_rejects_a_file_outside_the_private_export_directory() {
+        let file = tempfile::NamedTempFile::new().unwrap();
+        let request = serde_json::json!({"op":"avatar", "path":file.path()}).to_string();
+        assert_eq!(call("", "", &request), Err("DeviantArt address was rejected".into()));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn avatar_rejects_a_symlink_inside_the_private_export_directory() {
+        let dir = tempfile::Builder::new().prefix("photocraft-deviantart-").tempdir().unwrap();
+        let target = dir.path().join("image.png");
+        std::fs::write(&target, b"test").unwrap();
+        let link = dir.path().join("link.png");
+        std::os::unix::fs::symlink(&target, &link).unwrap();
+        let request = serde_json::json!({"op":"avatar", "path":link}).to_string();
+        assert_eq!(call("", "", &request), Err("DeviantArt address was rejected".into()));
+    }
 }
