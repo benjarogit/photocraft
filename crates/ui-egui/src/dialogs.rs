@@ -744,7 +744,9 @@ pub fn is_route_marker(key: &str) -> bool {
 /// the engine (a disk-change save, Export As, Save for Web, Print), so automation is judged for
 /// that command rather than for the dialog's `__command`.
 fn file_command(fields: &Fields) -> Option<&'static str> {
-    if crate::disk_change_prompt::owns(fields) {
+    if crate::telegram::owns(fields) {
+        Some("file.sendTelegram")
+    } else if crate::disk_change_prompt::owns(fields) {
         Some("file.save")
     } else if fields.contains_key("__export") {
         Some("file.export.exportAs")
@@ -776,6 +778,9 @@ pub fn confirm(app: &mut PhotocraftApp, id: u64) -> Result<Value, String> {
             return Err("confirm or cancel the guide color picker first".into());
         }
         crate::guide_layout_ui::validate(app, &d.fields)?;
+    }
+    if let Some(d) = app.ui.dialogs.iter().find(|d| d.id == id).filter(|d| crate::telegram::owns(&d.fields)) {
+        crate::telegram::validate(app, &d.fields)?;
     }
     let d = app.ui.close_dialog(id).ok_or_else(|| format!("no dialog {id}"))?;
     match d.kind {

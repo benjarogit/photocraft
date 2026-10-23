@@ -14,7 +14,7 @@ mod protocol;
 #[cfg(not(target_arch = "wasm32"))]
 use protocol::{read_error, send_to_chats};
 
-use protocol::{append_chat, caption, chat_selected, file_name, file_secs, png_preview, read_file, remember_sent_files, send_report};
+use protocol::{append_chat, caption, chat_selected, file_name, file_secs, png_preview_for, read_file, remember_sent_files, send_report};
 pub use protocol::{
     chats_from_updates, files_from_updates, first_message_id, media_group, message_link, multipart, parse_chats, redact, sent_files_from_reply,
     sent_message_id, utc_stamp, validate_chat, validate_token, with_token, without_token,
@@ -117,12 +117,25 @@ pub fn command(app: &mut PhotocraftApp) -> Result<Value, String> {
 /// Save, Save As and Export call this after the file is on disk. Each kind sends only when
 /// its own switch is on. A missing setup opens the dialog and leaves the saved file alone.
 pub fn after_written(app: &mut PhotocraftApp, path: &str, kind: WriteKind) {
+    let source = app.session.active().map(|st| st.doc.clone());
+    after_written_for(app, path, kind, source.as_deref());
+}
+
+pub(crate) fn after_written_for(app: &mut PhotocraftApp, path: &str, kind: WriteKind, source: Option<&photocraft_doc::Document>) {
     if !app.telegram.wants(kind) {
         return;
     }
     if !app.telegram.ready() {
         if !dialog_open(app) {
-            open_dialog(app, Some(path.to_string()));
+            let id = open_dialog(app, Some(path.to_string()));
+            if let Some(dialog) = app.ui.dialog_mut(id) {
+                if let Some(source) = source {
+                    dialog.fields.insert("__document".into(), json!(source.id.0));
+                } else {
+                    dialog.fields.remove("__document");
+                    dialog.fields.insert("__missingSource".into(), json!(true));
+                }
+            }
         }
         return;
     }
@@ -134,7 +147,7 @@ pub fn after_written(app: &mut PhotocraftApp, path: &str, kind: WriteKind) {
             return;
         }
     };
-    let preview = match png_preview(app, path) {
+    let preview = match png_preview_for(app, path, source) {
         Ok(preview) => preview,
         Err(error) => {
             app.ui.status = error;
@@ -281,6 +294,9 @@ fn dialog_open(app: &PhotocraftApp) -> bool {
 fn open_dialog(app: &mut PhotocraftApp, pending: Option<String>) -> u64 {
     let mut fields = serde_json::Map::new();
     fields.insert("__telegram".into(), json!(true));
+    if let Some(st) = app.session.active() {
+        fields.insert("__document".into(), json!(st.doc.id.0));
+    }
     fields.insert("__label".into(), json!("Send to Telegram"));
     app.telegram_token_draft.clone_from(&app.telegram.bot_token);
     fields.insert("tokenSet".into(), json!(!app.telegram_token_draft.is_empty()));
@@ -429,7 +445,21 @@ pub fn body(app: &mut PhotocraftApp, ui: &mut egui::Ui, f: &mut serde_json::Map<
     }
 }
 
+pub fn validate(app: &PhotocraftApp, f: &serde_json::Map<String, Value>) -> Result<(), String> {
+    validate_token(app.telegram_token_draft.trim())?;
+    parse_chats(f.get("chat").and_then(Value::as_str).unwrap_or("").trim())?;
+    Ok(())
+}
+
 pub fn confirm(app: &mut PhotocraftApp, f: &serde_json::Map<String, Value>) -> Result<Value, String> {
+    validate(app, f)?;
+    let source = if f.get("__missingSource").and_then(Value::as_bool) == Some(true) {
+        None
+    } else if let Some(id) = f.get("__document").and_then(Value::as_u64) {
+        app.session.documents().iter().find(|st| st.doc.id.0 == id).map(|st| st.doc.clone())
+    } else {
+        app.session.active().map(|st| st.doc.clone())
+    };
     let token = app.telegram_token_draft.trim().to_string();
     let chat = f.get("chat").and_then(Value::as_str).unwrap_or("").trim().to_string();
     validate_token(&token)?;
@@ -459,8 +489,8 @@ pub fn confirm(app: &mut PhotocraftApp, f: &serde_json::Map<String, Value>) -> R
         app.ui.status_error = false;
         return Ok(Value::Null);
     }
-    let (path, temporary) = resolve_payload(app, &format, pending)?;
-    let preview = png_preview(app, &path)?;
+    let (path, temporary) = resolve_payload(app, &format, pending, source.as_deref())?;
+    let preview = png_preview_for(app, &path, source.as_deref())?;
     let name = file_name(&path);
     start_send(app, path, temporary, chats, preview)?;
     Ok(json!({"sending": true, "name": name}))
@@ -567,37 +597,44 @@ fn start_send(app: &mut PhotocraftApp, path: String, temporary: bool, chats: Vec
     }
 }
 
-fn resolve_payload(app: &mut PhotocraftApp, format: &str, pending: Option<String>) -> Result<(String, bool), String> {
+fn resolve_payload(
+    app: &mut PhotocraftApp,
+    format: &str,
+    pending: Option<String>,
+    source: Option<&photocraft_doc::Document>,
+) -> Result<(String, bool), String> {
     match format {
-        "png" => export_temp(app, "png").map(|path| (path, true)),
-        "psd" => export_temp(app, "psd").map(|path| (path, true)),
-        _ => saved_file(app, pending).ok_or_else(|| "There is no saved file to send. Choose PSD or PNG.".to_string()),
+        "png" => export_temp_for(app, source.ok_or("source document is no longer open")?, "png").map(|path| (path, true)),
+        "psd" => export_temp_for(app, source.ok_or("source document is no longer open")?, "psd").map(|path| (path, true)),
+        _ => saved_file(app, pending, source).ok_or_else(|| "There is no saved file to send. Choose PSD or PNG.".to_string()),
     }
 }
 
-fn saved_file(app: &PhotocraftApp, pending: Option<String>) -> Option<(String, bool)> {
-    let path = pending
-        .filter(|path| std::fs::metadata(path).is_ok_and(|meta| meta.is_file()))
-        .or_else(|| app.session.active().and_then(|doc| doc.path.clone()).filter(|path| std::fs::metadata(path).is_ok_and(|meta| meta.is_file())))?;
+fn saved_file(app: &PhotocraftApp, pending: Option<String>, source: Option<&photocraft_doc::Document>) -> Option<(String, bool)> {
+    let path = pending.filter(|path| std::fs::metadata(path).is_ok_and(|meta| meta.is_file())).or_else(|| {
+        source
+            .and_then(|source| app.session.documents().iter().find(|st| st.doc.id == source.id))
+            .and_then(|st| st.path.clone())
+            .filter(|path| std::fs::metadata(path).is_ok_and(|meta| meta.is_file()))
+    })?;
     Some((path, false))
 }
 
-fn export_temp(app: &mut PhotocraftApp, extension: &str) -> Result<String, String> {
+fn export_temp_for(app: &mut PhotocraftApp, doc: &photocraft_doc::Document, extension: &str) -> Result<String, String> {
     #[cfg(target_arch = "wasm32")]
     {
-        let _ = (app, extension);
+        let _ = (app, doc, extension);
         return Err("Telegram sending needs the desktop app.".to_string());
     }
     #[cfg(not(target_arch = "wasm32"))]
     {
-        let doc = app.session.active().ok_or_else(|| "no document".to_string())?.doc.clone();
         let export = app.services.export.as_ref().ok_or_else(|| "Telegram sending needs the desktop app.".to_string())?;
         let stem = file_name(&doc.name);
         let temp_dir = tempfile::Builder::new().prefix("photocraft-telegram-").tempdir().map_err(|error| error.to_string())?;
         let path = temp_dir.path().join(format!("{stem}.{extension}"));
         let path_str = path.display().to_string();
         let settings = crate::ExportSettings { xmp_all: false, tiff_layers: false, ..crate::ExportSettings::default() };
-        let (bytes, _) = export(&doc, &path_str, &settings).map_err(|error| format!("Could not prepare a file to send: {error}"))?;
+        let (bytes, _) = export(doc, &path_str, &settings).map_err(|error| format!("Could not prepare a file to send: {error}"))?;
         if bytes.len() as u64 > MAX_BYTES {
             let _ = std::fs::remove_file(&path);
             return Err("That file is larger than Telegram accepts (50 MB).".to_string());

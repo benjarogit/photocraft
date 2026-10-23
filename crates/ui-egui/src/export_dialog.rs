@@ -201,6 +201,7 @@ pub fn quick_export_selected_layers_png(app: &mut PhotocraftApp) -> Result<Value
             let write = app.services.write.as_mut().ok_or("no writer configured")?;
             write(&path, &bytes)?;
             crate::notices::io_warnings(app, &format!("Exported {}", crate::file_open::display_name(&path)), &warnings);
+            crate::telegram::after_written_for(app, &path, crate::telegram::WriteKind::Export, Some(doc));
             exported.push(json!({"path": path, "bytes": bytes.len(), "warnings": warnings}));
         }
         app.ui.status = format!("Exported {} PNG files", exported.len());
@@ -1008,7 +1009,6 @@ pub fn confirm(app: &mut PhotocraftApp, f: &Map<String, Value>) -> Result<Value,
             step.insert("path".into(), json!(path));
             app.session.journal.push((COMMAND.into(), Value::Object(step)));
         }
-        crate::telegram::after_written(app, &path, crate::telegram::WriteKind::Export);
         Ok(r)
     })
 }
@@ -1026,6 +1026,7 @@ fn write_export(app: &mut PhotocraftApp, doc: &Document, f: &Map<String, Value>,
     let template = "Exported {path}";
     let what = crate::i18n::fmt(tl!(template), &[("path", &crate::file_open::display_name(path))]);
     crate::notices::io_warnings(app, &what, &warnings);
+    crate::telegram::after_written_for(app, path, crate::telegram::WriteKind::Export, Some(&out));
     Ok(json!({"path": path, "bytes": bytes.len(), "warnings": warnings}))
 }
 
@@ -1070,7 +1071,7 @@ fn confirm_layers(app: &mut PhotocraftApp, f: &Map<String, Value>, ids: &[photoc
             let template = "Exported {path}";
             let what = crate::i18n::fmt(tl!(template), &[("path", &crate::file_open::display_name(&path))]);
             crate::notices::io_warnings(app, &what, &warnings);
-            crate::telegram::after_written(app, &path, crate::telegram::WriteKind::Export);
+            crate::telegram::after_written_for(app, &path, crate::telegram::WriteKind::Export, Some(&out));
             exported.push(json!({"path": path, "bytes": bytes.len(), "warnings": warnings}));
         }
         let template = "Exported {n} files";

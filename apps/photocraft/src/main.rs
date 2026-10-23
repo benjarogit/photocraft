@@ -72,8 +72,7 @@ mod services;
 #[cfg(any(not(target_os = "macos"), test))]
 mod single_instance;
 mod telegram_api;
-// Windows gets pen pressure from winit (WM_POINTER); the web runner has its own listener.
-#[cfg(any(target_os = "macos", target_os = "linux", test))]
+// Tablet support (macOS AppKit monitor, Linux X11/Wayland, Windows barrel button).
 mod tablet;
 mod ui_state;
 mod window_frame;

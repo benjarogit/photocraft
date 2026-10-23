@@ -298,3 +298,67 @@ fn telegram_copy_is_translated_in_every_complete_catalog() {
         }
     }
 }
+
+#[test]
+fn invalid_input_keeps_the_telegram_dialog_and_drafts() {
+    let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), crate::Services::default());
+    let id = open_dialog(&mut app, None);
+    app.telegram_token_draft = "typo".into();
+    app.ui.dialog_mut(id).unwrap().fields.insert("chat".into(), json!("42"));
+    assert!(crate::dialogs::confirm(&mut app, id).is_err());
+    assert!(app.ui.dialog_mut(id).is_some());
+    assert_eq!(app.telegram_token_draft, "typo");
+    app.telegram_token_draft = token();
+    app.ui.dialog_mut(id).unwrap().fields.insert("chat".into(), json!("!invalid!"));
+    assert!(crate::dialogs::confirm(&mut app, id).is_err());
+    assert_eq!(app.ui.dialog_mut(id).unwrap().fields.get("chat"), Some(&json!("!invalid!")));
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+#[test]
+fn preview_uses_the_saved_source_instead_of_the_selected_tab() {
+    let seen = Arc::new(Mutex::new(Vec::new()));
+    let captured = seen.clone();
+    let mut app = PhotocraftApp::new(
+        photocraft_engine::Session::new(),
+        crate::Services {
+            export: Some(Box::new(move |doc, _, _| {
+                captured.lock().unwrap().push(doc.id);
+                Ok((b"PNG".to_vec(), Vec::new()))
+            })),
+            ..Default::default()
+        },
+    );
+    app.session.execute("file.new", json!({"width":8,"height":8,"name":"source"})).unwrap();
+    let source = app.session.active().unwrap().doc.clone();
+    app.session.execute("file.new", json!({"width":8,"height":8,"name":"other"})).unwrap();
+    app.telegram.also_png = true;
+    let preview = protocol::png_preview_for(&mut app, "source.psd", Some(&source)).unwrap().unwrap();
+    assert_eq!(*seen.lock().unwrap(), vec![source.id]);
+    remove_temp_path(&preview);
+    assert!(protocol::png_preview_for(&mut app, "closed.psd", None).unwrap().is_none());
+    assert_eq!(seen.lock().unwrap().len(), 1);
+}
+
+#[test]
+fn utc_stamp_handles_values_beyond_chrono_range() {
+    assert!(utc_stamp(u64::MAX).ends_with(" UTC"));
+    assert_ne!(utc_stamp(u64::MAX), "Unknown UTC time");
+    assert_eq!(utc_stamp(0), "1970-01-01 00:00 UTC");
+}
+
+#[test]
+fn automation_cannot_confirm_a_denied_telegram_dialog() {
+    let services = crate::Services {
+        automation_command: Some(Box::new(|id, _| {
+            assert_eq!(id, "file.sendTelegram");
+            Err("network denied".into())
+        })),
+        ..crate::Services::default()
+    };
+    let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), services);
+    let id = open_dialog(&mut app, None);
+    app.automation_input = true;
+    assert_eq!(crate::dialogs::confirm(&mut app, id), Err("network denied".into()));
+    assert!(app.ui.dialog_mut(id).is_some());
+}

@@ -340,7 +340,8 @@ fn finish_save(app: &mut PhotocraftApp, ctx: &egui::Context, save: SaveJob, labe
                 crate::discard_ui::saved_document(app, ctx, save.doc);
             }
             if let Some(kind) = save.notify_telegram {
-                crate::telegram::after_written(app, &save.path, kind);
+                let source = app.session.documents().iter().find(|st| st.doc.id == save.doc).map(|st| st.doc.clone());
+                crate::telegram::after_written_for(app, &save.path, kind, source.as_deref());
             }
         }
         JobOutcome::Failed(err) => {
