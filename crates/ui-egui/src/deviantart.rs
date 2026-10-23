@@ -126,8 +126,12 @@ pub fn after_written(app: &mut PhotocraftApp, path: &str, kind: WriteKind) {
         return;
     }
     if !app.deviantart.ready() {
+        pending::enqueue(app, path);
         if !dialog_open(app) {
-            open_dialog(app, Some(path.to_string()));
+            let id = open_dialog(app, None);
+            if let Some(dialog) = app.ui.dialog_mut(id) {
+                dialog.fields.insert("__autoPending".into(), json!(true));
+            }
         }
         return;
     }
@@ -149,6 +153,10 @@ pub fn arm_after_save(app: &mut PhotocraftApp, path: &str, kind: WriteKind, resu
         return;
     }
     after_written(app, path, kind);
+}
+
+pub(crate) fn busy(app: &PhotocraftApp) -> bool {
+    app.deviantart_job.is_some() || (app.deviantart.ready() && !app.deviantart_pending.is_empty())
 }
 
 pub fn poll(app: &mut PhotocraftApp, ctx: &egui::Context) {
@@ -209,6 +217,7 @@ pub fn poll(app: &mut PhotocraftApp, ctx: &egui::Context) {
         _ => {}
     }
     pending::start_next(app, ctx);
+    crate::jobs_ui::close_after_saves(app, ctx);
 }
 
 pub fn owns(fields: &serde_json::Map<String, Value>) -> bool {
@@ -339,6 +348,9 @@ pub fn body(app: &mut PhotocraftApp, ui: &mut egui::Ui, f: &mut serde_json::Map<
 pub fn confirm(app: &mut PhotocraftApp, f: &serde_json::Map<String, Value>) -> Result<Value, String> {
     apply_fields(app, f)?;
     save_settings(app)?;
+    if f.get("__autoPending").and_then(Value::as_bool) == Some(true) {
+        return Ok(Value::Null);
+    }
     let format = f.get("format").and_then(Value::as_str).unwrap_or("psd");
     let pending = f.get("pending").and_then(Value::as_str).map(str::to_string);
     if app.session.active().is_none() && pending.is_none() {

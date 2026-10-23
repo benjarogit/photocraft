@@ -744,7 +744,9 @@ pub fn is_route_marker(key: &str) -> bool {
 /// the engine (a disk-change save, Export As, Save for Web, Print), so automation is judged for
 /// that command rather than for the dialog's `__command`.
 fn file_command(fields: &Fields) -> Option<&'static str> {
-    if crate::disk_change_prompt::owns(fields) {
+    if crate::deviantart::owns(fields) {
+        Some("file.submitDeviantArt")
+    } else if crate::disk_change_prompt::owns(fields) {
         Some("file.save")
     } else if fields.contains_key("__export") {
         Some("file.export.exportAs")

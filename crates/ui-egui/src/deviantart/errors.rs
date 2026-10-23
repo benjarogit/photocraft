@@ -26,8 +26,7 @@ pub(super) fn remember_rotated_login(app: &mut PhotocraftApp) {
 }
 
 pub(super) fn login_was_rejected(error: &str) -> bool {
-    let lower = error.to_ascii_lowercase();
-    lower.contains("invalid_grant") || lower.contains("invalid_token") || lower.contains("refresh token") || lower.contains("refresh_token")
+    error.starts_with("refresh-grant-rejected: ") || error == "The DeviantArt login expired. Connect again."
 }
 
 pub(super) fn report_deviantart_error(app: &mut PhotocraftApp, error: &str, adopt_rotation: bool) {

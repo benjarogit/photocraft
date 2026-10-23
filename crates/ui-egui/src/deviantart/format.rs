@@ -42,7 +42,7 @@ pub fn item_id(body: &str) -> Option<i64> {
 }
 
 pub fn multipart(title: &str, comments: &str, tags: &[String], filename: &str, bytes: &[u8]) -> (String, Vec<u8>) {
-    let boundary = format!("PcDeviantArt{}", bytes.len());
+    let boundary = boundary_for(std::iter::once(bytes).chain([title.as_bytes(), comments.as_bytes()]).chain(tags.iter().map(|tag| tag.as_bytes())));
     let filename: String = filename.chars().map(|c| if matches!(c, '"' | '\r' | '\n' | '\\') { '_' } else { c }).collect();
     let mut body = Vec::new();
     part(&mut body, &boundary, "title", title);
@@ -61,4 +61,22 @@ pub fn multipart(title: &str, comments: &str, tags: &[String], filename: &str, b
 
 fn part(body: &mut Vec<u8>, boundary: &str, name: &str, value: &str) {
     body.extend_from_slice(format!("--{boundary}\r\nContent-Disposition: form-data; name=\"{name}\"\r\n\r\n{value}\r\n").as_bytes());
+}
+
+// Scan delimiter lines once, then choose the first unused numeric suffix. This also
+// handles crafted input without repeatedly rescanning a large upload for collisions.
+fn boundary_for<'a>(parts: impl Iterator<Item = &'a [u8]>) -> String {
+    let mut used = std::collections::BTreeSet::new();
+    for part in parts {
+        for line in part.split(|byte| *byte == b'\n') {
+            let Some(tail) = line.strip_prefix(b"--PcDeviantArt") else { continue };
+            let tail = tail.trim_ascii_end();
+            let tail = tail.strip_suffix(b"--").unwrap_or(tail);
+            if let Some(number) = std::str::from_utf8(tail).ok().and_then(|text| text.parse::<usize>().ok()) {
+                used.insert(number);
+            }
+        }
+    }
+    let suffix = (0..=used.len()).find(|number| !used.contains(number)).unwrap_or(used.len());
+    format!("PcDeviantArt{suffix}")
 }

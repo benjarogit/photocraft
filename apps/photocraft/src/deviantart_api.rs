@@ -210,7 +210,7 @@ fn bearer(client_id: &str, refresh_from_caller: &str) -> Result<String, String> 
                     let _ = crate::services::store_deviantart_token("");
                 }
                 login_changed().notify_all();
-                return Err(error);
+                return Err(if clear_stored_token { format!("refresh-grant-rejected: {error}") } else { error });
             }
         }
     }

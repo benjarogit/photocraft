@@ -359,9 +359,9 @@ fn finish_save(app: &mut PhotocraftApp, ctx: &egui::Context, save: SaveJob, labe
 
 /// Forget saves whose job ended and whose worker has returned; repeat a held window close once
 /// no save worker is left.
-fn close_after_saves(app: &mut PhotocraftApp, ctx: &egui::Context) {
+pub(crate) fn close_after_saves(app: &mut PhotocraftApp, ctx: &egui::Context) {
     app.jobs.saves.retain(|s| !(s.ended && s.state.finished()));
-    if !app.saving() && !app.printing() && std::mem::take(&mut app.jobs.close_after_saves) {
+    if !app.saving() && !app.printing() && !crate::deviantart::busy(app) && std::mem::take(&mut app.jobs.close_after_saves) {
         ctx.send_viewport_cmd(egui::ViewportCommand::Close);
     }
 }
