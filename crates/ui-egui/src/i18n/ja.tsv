@@ -15,6 +15,10 @@
 # Product and technology names (PhotoCraft, ArtCraft, OpenType, CMYK, Lab ...) stay in Latin
 # letters; the trailing "…" of dialog commands is kept.
 
+# Layer Mask Display Options (the layer mask rubylith's colour and opacity)
+	Mask Options…	マスクオプション…
+	Layer Mask Display Options…	レイヤーマスクの表示オプション…
+
 # Channel Options and New Spot Channel (#3761)
 	Channel Color	チャンネルカラー
 	Color Indicates:	着色表示:
@@ -1093,7 +1097,7 @@
 	Done	完了
 	Dots	ドット
 	Drag a rectangle around the object	オブジェクトを囲む矩形をドラッグ
-	Drag on the image to add a constraint; Shift for horizontal/vertical; right-click to delete.	画像上をドラッグして制約を追加。Shift で水平/垂直、右クリックで削除。
+	Drag on the image to add a constraint; Shift for horizontal/vertical; right-click a constraint to change or delete it.	画像上をドラッグして制約を追加。Shift で水平/垂直、制約を右クリックで変更・削除。
 	Drag to move the active shape's path or the Work Path	ドラッグして、アクティブなシェイプのパスまたは作業用パスを移動
 	Click: select anchor · Drag: move anchor, handle or segment · {shift}-click: add · {alt}-click: whole subpath	クリック: アンカーポイントを選択 · ドラッグ: ポイント、ハンドル、セグメントを移動 · {shift}+クリック: 追加 · {alt}+クリック: サブパス全体
 	Draw with the Pen tool (P) or make a work path from a selection.	ペンツール(P)で描くか、選択範囲から作業用パスを作成します。
@@ -1335,6 +1339,8 @@
 	Override Pressure	筆圧を上書き
 	Override Rotation	回転を上書き
 	Override Tilt	傾きを上書き
+	Override Tilt X	傾き X を上書き
+	Override Tilt Y	傾き Y を上書き
 	PRESET DETAILS	プリセットの詳細
 	PSD	PSD
 	Paint Overlay	ペイントオーバーレイ
@@ -1486,6 +1492,7 @@
 	Set shape fill type	シェイプの塗りの種類を設定
 	Set shape stroke type	シェイプの線の種類を設定
 	Set the text color	文字色を設定
+	Create warped text	ワープテキストを作成
 	Shadows	シャドウ
 	Shape:	シェイプ:
 	Sharpening	シャープ
@@ -1992,6 +1999,7 @@
 	Quick export format	クイック書き出しの形式
 	Quick export location	クイック書き出しの保存先
 	Recent file count	最近使ったファイルの数
+	LUT folder	LUT フォルダー
 	Recent files	最近使ったファイル
 	Recent fonts	最近使ったフォント
 	Recover on launch	起動時に復元
@@ -2234,6 +2242,8 @@
 	GPU acceleration could not continue. Your documents are unchanged.	GPU アクセラレーションを継続できませんでした。ドキュメントは変更されていません。
 	PhotoCraft is using the CPU image compositor. The window may still use your graphics adapter.	PhotoCraft は CPU で画像を合成しています。ウィンドウは引き続きグラフィックスアダプターを使用する場合があります。
 	Retry GPU requires a restart. Save your work first.	GPU の再試行には再起動が必要です。先に作業を保存してください。
+	Retry GPU tries the graphics processor again now.	GPU を再試行すると、すぐにグラフィックプロセッサーをもう一度試します。
+	GPU acceleration resumed.	GPU アクセラレーションを再開しました。
 	Keep Using CPU	CPU を使い続ける
 	Retry GPU	GPU を再試行
 	Advanced	詳細設定
@@ -2287,6 +2297,11 @@ cameraRaw	Color	カラー
 	Content-Aware Move Tool	コンテンツに応じた移動ツール
 	TIFF Options	TIFF オプション
 	Targa Options	Targa オプション
+	JPEG Options	JPEG オプション
+	Image Options	画像オプション
+	Format Options	形式オプション
+	Baseline ("Standard")	ベースライン（標準）
+	Baseline Optimized	ベースライン（最適化）
 	24 bits/pixel	24 ビット/ピクセル
 	32 bits/pixel	32 ビット/ピクセル
 	Including layers will increase file size.	レイヤーを含めるとファイルサイズが大きくなります。
@@ -2877,6 +2892,7 @@ fontWeight	Italic	斜体
 	Duplicate Layer Comp	レイヤーカンプを複製
 	Duplicate Layers	レイヤーを複製
 	Duplicate Path	パスを複製
+	Rename Path…	パス名を変更…
 	Dust & Scratches	ダスト&スクラッチ
 	EXIF	EXIF
 	Export As	書き出し形式を指定
@@ -3048,6 +3064,8 @@ fontWeight	Italic	斜体
 	Cooling80	寒色フィルター (80)
 	Cooling82	寒色フィルター (82)
 	Copyright Status	著作権の状態
+	Copyright Notice	著作権表示
+	Document Title	ドキュメントタイトル
 	Copyrighted	著作権あり
 	Corners	角
 	Correct C A	色収差を補正
@@ -3775,14 +3793,24 @@ curves	Smooth	スムーズ
 	Light Gray	ライトグレー
 	Object Finder	オブジェクトファインダー
 	No object found there — drag a rectangle around it	そこにオブジェクトが見つかりません — 周囲に矩形をドラッグしてください
+	The active layer has no pixels here — turn on Sample All Layers or select a layer with pixels	アクティブなレイヤーのここにはピクセルがありません — 「すべてのレイヤーをサンプル」をオンにするか、ピクセルのあるレイヤーを選択してください
 	Remove after each stroke	ストロークごとに削除
 	Apply the removal ({key})	削除を適用 ({key})
 	Strokes to remove: {n} (Enter applies, Esc cancels)	削除するストローク: {n}（Enter で適用、Esc で取り消し）
+	Load Contours…	カーブを読み込み…
+	Replace Contours…	カーブを置き換え…
+	Save Contours…	カーブを保存…
+	Delete Contour	カーブを削除
+	Loaded contours from {file}	{file} からカーブを読み込みました
+	Saved contours to {file}	カーブを {file} に保存しました
 	Show home recent files	ホーム画面に最近使ったファイルを表示
 
 # Actions panel: Load/Save Actions (.atn) and kept Photoshop steps
 	Load Actions…	アクションを読み込み…
 	Save Actions…	アクションを保存…
+	New Action…	新規アクション…
+	Start Recording	記録を開始
+	Stop Recording	記録を停止
 	{name} (Photoshop)	{name}（Photoshop）
 	{message} ({note})	{message}（{note}）
 @plural	Loaded {n} action from {file}|Loaded {n} actions from {file}	{file} からアクション {n} 個を読み込みました
@@ -3884,75 +3912,16 @@ curves	Smooth	スムーズ
 	Reset All Locked Settings	ロックされた設定をすべて初期化
 	Copy Texture to Other Tools	テクスチャを他のツールにコピー
 	ICO is limited to 256 × 256 pixels	ICO は 256 × 256 ピクセルまでです
-# File › Submit to DeviantArt
-	Could not prepare a file to send: {error}	送るファイルを用意できませんでした: {error}
-	There is no saved file to send. Choose PSD or PNG.	送れる保存済みのファイルがありません。PSD か PNG を選んでください。
-	Submitting needs an internet connection.	送信にはインターネット接続が必要です。
-	Open the DeviantArt developer page	DeviantArt の開発者ページを開く
-	DeviantArt app id	DeviantArt アプリ ID
-	The DeviantArt login stays in the system keychain, not in PhotoCraft's settings file.	DeviantArt のログインは PhotoCraft の設定ファイルではなく、システムのキーチェーンに保存されます。
-	Connect DeviantArt	DeviantArt に接続
-	Title	題名
-	Tags	タグ
-	Letters, numbers and underscores, separated by commas.	文字、数字、アンダースコア。カンマで区切ります。
-	Submit as	送信形式
-	Also submit when I Save	保存時にも送信
-	Also submit when I Save As	別名保存時にも送信
-	Also submit when I Save a Copy	コピー保存時にも送信
-	Also submit when I Export	書き出し時にも送信
-	DeviantArt is set up. Save or export a file, then submit it.	DeviantArt の準備ができました。ファイルを保存または書き出してから送信してください。
-	Connect DeviantArt first.	先に DeviantArt に接続してください。
-	The DeviantArt app id should be a number.	DeviantArt のアプリ ID は数字です。
-	DeviantArt submitting needs the desktop app.	DeviantArt への送信はデスクトップアプリだけです。
-	A DeviantArt submit is already running.	DeviantArt への送信がすでに実行中です。
-	Waiting for DeviantArt…	DeviantArt を待っています…
-	Submitting {name} to DeviantArt…	{name} を DeviantArt に送信しています…
-	Submitted {name} to Sta.sh. Item {id}.	{name} を Sta.sh に送信しました。項目 {id}。
-	That file is larger than DeviantArt accepts (30 MB).	ファイルが DeviantArt の上限（30 MB）を超えています。
-	DeviantArt is connected.	DeviantArt に接続しました。
-	Opened {name}.	{name} を開きました。
-	Connect again after this update so gallery, publish and the profile picture are allowed.	ギャラリー、公開、プロフィール画像を使うには、もう一度接続してください。
-	Sta.sh item id	Sta.sh 項目 ID
-	Publish this publicly	公開する
-	Not for all ages	全年齢向けではない
-	License	ライセンス
-	Creative Commons	クリエイティブ・コモンズ
-	Commercial use	商用利用
-	Publish	公開
-	Deviation id	作品 ID
-	Update title and tags	題名とタグを更新
-	My gallery	自分のギャラリー
-	Profile picture	プロフィール画像
-	Set as DeviantArt profile picture	DeviantArt のプロフィール画像にする
-	Confirm that this publish is public.	この公開が公開設定であることを確認してください。
-	Create a Public app on DeviantArt, without a client secret. Copy the address below into the redirect field, paste the client id here, then connect.	DeviantArt で公開アプリを作ります。client secret は不要です。下のアドレスをリダイレクトにコピーし、ここにクライアント ID を貼って接続します。
-	Copied the redirect address.	リダイレクトアドレスをコピーしました。
-	Connected	接続済み
-	PNG is what DeviantArt shows. A PSD is only stored as a file in Sta.sh.	DeviantArt が表示するのは PNG です。PSD は Sta.sh にファイルとして置かれるだけです。
-	OK uploads to Sta.sh. Nothing is public until you publish.	OK は Sta.sh に送ります。公開は公開操作のあとです。
-	More options	詳細オプション
-	Upload with OK first. Publish uses the Sta.sh item from that upload.	先に OK でアップロードします。公開はその Sta.sh 項目を使います。
-	Connect again	再接続
-	Disconnect DeviantArt	DeviantArt を切断
-	Submit to DeviantArt…	DeviantArt に送る…
-	Submitted {name} to Sta.sh. It stays private until you publish it.	{name} は Sta.sh にあります。公開するまで非公開です。
-	Open the Sta.sh page	Sta.sh のページを開く
-	DeviantArt was disconnected.	DeviantArt を切断しました。
-	The DeviantArt login expired. Connect again.	DeviantArt のログインの有効期限が切れました。もう一度接続してください。
-	Open the Telegram message	Telegram のメッセージを開く
-	The ten newest files sent to this bot. Click one to open it in PhotoCraft.	このボットに送られた新しい順10件。クリックすると PhotoCraft で開きます。
-	Your published works. Click one to open it in PhotoCraft. Sta.sh drafts are not in this list.	公開済みの作品です。クリックすると PhotoCraft で開きます。Sta.sh の下書きはこの一覧にありません。
-	Get files	ファイルを取得
-	Files sent from PhotoCraft, and the ten newest files sent to this bot. Click one to open it in PhotoCraft.	PhotoCraft から送ったファイルと、このボットに送られた新しい順10件。クリックすると PhotoCraft で開きます。
-	No files yet. Send one from here, or send the bot a file, then try again.	まだファイルがありません。ここから送るか、ボットにファイルを送ってからもう一度。
-	Sta.sh drafts from this account, then published works. Click one to open it in PhotoCraft.	このアカウントの Sta.sh 下書き、そのあと公開作品。クリックすると PhotoCraft で開きます。
-	No Sta.sh files yet.	Sta.sh にはまだ何もありません。
-	No published works in the gallery.	ギャラリーに公開作品はありません。
-	Telegram did not return a link for this chat.	Telegram はこのチャットのリンクを返しませんでした。
-	Sta.sh drafts open their page. Published works open in PhotoCraft.	Sta.sh の下書きはそのページを開きます。公開作品は PhotoCraft で開きます。
-	DeviantArt did not offer a download.	DeviantArt はダウンロードを用意しませんでした。
-	Saved file	保存済みのファイル
-
+# History panel › History Brush source (#2966)
+	Paints from the History panel's source state	ヒストリーパネルのソース状態からペイントします
+	Sets the source for the history brush	ヒストリーブラシのソースを設定します
+# Bevel & Emboss shading controls.
+	Highlight Mode	ハイライトモード
+	Highlight Color	ハイライトカラー
+	Highlight Opacity	ハイライト不透明度
+	Shadow Mode	シャドウモード
+	Shadow Color	シャドウカラー
+	Shadow Opacity	シャドウ不透明度
 # Embedded Profile Mismatch: profile names beside the choices, Remember this choice
 	Use the embedded profile ({profile})	埋め込みプロファイルを使用 ({profile})
 	Convert to the working space ({profile})	作業用スペースに変換 ({profile})
@@ -3968,6 +3937,7 @@ curves	Smooth	スムーズ
 	Chisel Hard	チゼルハード
 	Chisel Soft	チゼルソフト
 	Open color-less EXR as ACEScg	色空間のないEXRをACEScgとして開く
+	Do not append "copy" to filename when saving a copy	コピーを保存するときにファイル名に「copy」を付けない
 # View › Guides › right-click a guide
 	Edit Selected Guides	選択したガイドを編集
 	Clear Selected Guides	選択したガイドを消去
@@ -4021,22 +3991,34 @@ curves	Smooth	スムーズ
 	GPU Memory Full	GPU メモリ不足
 	The layers need {needed} of GPU memory and may hold {budget}, so edits that redraw the whole document do it on the CPU. Click to set GPU Memory.	レイヤーには {needed} の GPU メモリが必要ですが、使えるのは {budget} のため、ドキュメント全体を再描画する編集は CPU で行われます。クリックして GPU メモリを設定します。
 	GPU memory budget: {budget}	GPU メモリ予算: {budget}
+	Graphics memory: {size}	グラフィックメモリ: {size}
 	This document's layers: {needed} of {budget} for layers	このドキュメントのレイヤー: レイヤー用 {budget} のうち {needed}
 	This document's layers need {needed} but may hold {budget}: whole-document redraws use the CPU	このドキュメントのレイヤーには {needed} が必要ですが、使えるのは {budget} です: ドキュメント全体の再描画は CPU で行われます
 	GPU Memory (MB, 0 = Automatic)	GPU メモリ（MB、0 = 自動）
+	{path}: the path is not valid Unicode; save under another name.	{path}: パスが有効な Unicode ではありません。別の名前で保存してください。
 	Replace	置き換え
 	{name} was changed by another app after it was opened or saved here.	{name} は、ここで開くか保存した後に別のアプリで変更されました。
 	Replace it with this document, or cancel and use File › Save As to keep both.	この書類で置き換えるか、キャンセルしてファイル › 名前を付けて保存で両方を残してください。
-
-# File › Submit to DeviantArt: result messages
-	Published on DeviantArt.	DeviantArt に公開しました。
-	Updated the title and tags on DeviantArt.	DeviantArt のタイトルとタグを更新しました。
-	Set the DeviantArt profile picture.	DeviantArt のプロフィール画像を設定しました。
-
 	Decrease Brush Size	ブラシサイズを小さく
 	Increase Brush Size	ブラシサイズを大きく
 	Decrease Brush Hardness	ブラシの硬さを下げる
 	Increase Brush Hardness	ブラシの硬さを上げる
+	Demosaic	デモザイク
+	How the camera's colour filter mosaic is filled in. It is applied when the file opens; the preview shows the method it was opened with.	カメラのカラーフィルター配列をどのように補間するか。ファイルを開くときに適用されます。プレビューは開いたときの方式で表示されます。
+	AHD (adaptive homogeneity)	AHD（適応的均質性）
+	Malvar–He–Cutler	Malvar–He–Cutler
+	Hirakawa–Parks: the cleanest edges and the least colour fringing, the slowest.	Hirakawa–Parks：エッジが最もきれいで色にじみが最も少ないが、最も遅い。
+	Gradient-corrected interpolation: sharp and fast, with some colour fringing on fine detail.	勾配補正補間：シャープで高速だが、細部に多少の色にじみが出る。
+	The fastest and the softest, with colour fringing on fine detail.	最も高速で最も柔らかく、細部に色にじみが出る。
+	“{name}” already exists. Replace it?	「{name}」は既に存在します。置き換えますか？
+	The name in the save dialog was “{name}”.	保存ダイアログで指定した名前は「{name}」でした。
+	Move Up	上へ移動
+	Move Down	下へ移動
+	Previous Brush	前のブラシ
+	Next Brush	次のブラシ
+	First Brush	最初のブラシ
+	Last Brush	最後のブラシ
+	Preview size	Preview size
 	Memory Usage	メモリ使用量
 	Per-document RAM limit (MB)	ドキュメントあたりの RAM 上限 (MB)
 	Installed RAM: {ram} MB; this limit: {percent}%	搭載 RAM: {ram} MB、この上限: {percent}%
@@ -4058,3 +4040,93 @@ curves	Smooth	スムーズ
 
 # Graphics Adapter preference (#1885)
 	GPU adapter	GPU アダプター
+# Actions: a step dialog holds a suspended recording (#7365)
+	Confirm or cancel the open action step dialog first	先に開いているアクションのステップのダイアログを確定またはキャンセルしてください
+	Pro Medium Gray	プロ(中間グレー)
+	Solarized	Solarized
+	Breeze	Breeze
+	Pro Light Gray	プロ(ライトグレー)
+	Pro Light	プロ(ライト)
+	Resize Windows to Fit	ウィンドウサイズを合わせる
+
+	EXR	EXR
+
+# Paragraph direction (TYPE-218-2)
+	Automatic paragraph direction	段落の方向を自動判別
+	Left-to-right paragraph direction	左から右への段落方向
+	Right-to-left paragraph direction	右から左への段落方向
+	Not rendered: this adjustment ({key}) is kept as imported.	レンダリングされません: この調整（{key}）はインポートされたまま保持されます。
+
+# Print preview image (#8236)
+	Print preview image	Print preview image
+	Drag on the image to add a constraint; Shift for horizontal/vertical; right-click to delete.	画像上をドラッグして制約を追加。Shift で水平/垂直、右クリックで削除。
+	Could not prepare a file to send: {error}	送るファイルを用意できませんでした: {error}
+	There is no saved file to send. Choose PSD or PNG.	送れる保存済みのファイルがありません。PSD か PNG を選んでください。
+	Submitting needs an internet connection.	送信にはインターネット接続が必要です。
+	Open the DeviantArt developer page	DeviantArt の開発者ページを開く
+	DeviantArt app id	DeviantArt アプリ ID
+	The DeviantArt login stays in the system keychain, not in PhotoCraft's settings file.	DeviantArt のログインは PhotoCraft の設定ファイルではなく、システムのキーチェーンに保存されます。
+	Connect DeviantArt	DeviantArt に接続
+	Title	題名
+	Tags	タグ
+	Letters, numbers and underscores, separated by commas.	文字、数字、アンダースコア。カンマで区切ります。
+	Submit as	送信形式
+	Also submit when I Save	保存時にも送信
+	Also submit when I Save As	別名保存時にも送信
+	Also submit when I Save a Copy	コピー保存時にも送信
+	Also submit when I Export	書き出し時にも送信
+	DeviantArt is set up. Save or export a file, then submit it.	DeviantArt の準備ができました。ファイルを保存または書き出してから送信してください。
+	Connect DeviantArt first.	先に DeviantArt に接続してください。
+	The DeviantArt app id should be a number.	DeviantArt のアプリ ID は数字です。
+	DeviantArt submitting needs the desktop app.	DeviantArt への送信はデスクトップアプリだけです。
+	A DeviantArt submit is already running.	DeviantArt への送信がすでに実行中です。
+	Waiting for DeviantArt…	DeviantArt を待っています…
+	Submitting {name} to DeviantArt…	{name} を DeviantArt に送信しています…
+	That file is larger than DeviantArt accepts (30 MB).	ファイルが DeviantArt の上限（30 MB）を超えています。
+	DeviantArt is connected.	DeviantArt に接続しました。
+	Create a Public app on DeviantArt, without a client secret. Copy the address below into the redirect field, paste the client id here, then connect.	DeviantArt で公開アプリを作ります。client secret は不要です。下のアドレスをリダイレクトにコピーし、ここにクライアント ID を貼って接続します。
+	Copied the redirect address.	リダイレクトアドレスをコピーしました。
+	Connected	接続済み
+	PNG is what DeviantArt shows. A PSD is only stored as a file in Sta.sh.	DeviantArt が表示するのは PNG です。PSD は Sta.sh にファイルとして置かれるだけです。
+	OK uploads to Sta.sh. Nothing is public until you publish.	OK は Sta.sh に送ります。公開は公開操作のあとです。
+	Connect again	再接続
+	Disconnect DeviantArt	DeviantArt を切断
+	Submit to DeviantArt…	DeviantArt に送る…
+	Submitted {name} to Sta.sh. It stays private until you publish it.	{name} は Sta.sh にあります。公開するまで非公開です。
+	Open the Sta.sh page	Sta.sh のページを開く
+	DeviantArt was disconnected.	DeviantArt を切断しました。
+	The DeviantArt login expired. Connect again.	DeviantArt のログインの有効期限が切れました。もう一度接続してください。
+	Saved file	保存済みのファイル
+	Submitted {name} to Sta.sh. Item {id}.	{name} を Sta.sh に送信しました。項目 {id}。
+	Opened {name}.	{name} を開きました。
+	Connect again after this update so gallery, publish and the profile picture are allowed.	ギャラリー、公開、プロフィール画像を使うには、もう一度接続してください。
+	Sta.sh item id	Sta.sh 項目 ID
+	Publish this publicly	公開する
+	Not for all ages	全年齢向けではない
+	License	ライセンス
+	Creative Commons	クリエイティブ・コモンズ
+	Commercial use	商用利用
+	Publish	公開
+	Deviation id	作品 ID
+	Update title and tags	題名とタグを更新
+	My gallery	自分のギャラリー
+	Profile picture	プロフィール画像
+	Set as DeviantArt profile picture	DeviantArt のプロフィール画像にする
+	Confirm that this publish is public.	この公開が公開設定であることを確認してください。
+	More options	詳細オプション
+	Upload with OK first. Publish uses the Sta.sh item from that upload.	先に OK でアップロードします。公開はその Sta.sh 項目を使います。
+	Open the Telegram message	Telegram のメッセージを開く
+	The ten newest files sent to this bot. Click one to open it in PhotoCraft.	このボットに送られた新しい順10件。クリックすると PhotoCraft で開きます。
+	Your published works. Click one to open it in PhotoCraft. Sta.sh drafts are not in this list.	公開済みの作品です。クリックすると PhotoCraft で開きます。Sta.sh の下書きはこの一覧にありません。
+	Get files	ファイルを取得
+	Files sent from PhotoCraft, and the ten newest files sent to this bot. Click one to open it in PhotoCraft.	PhotoCraft から送ったファイルと、このボットに送られた新しい順10件。クリックすると PhotoCraft で開きます。
+	No files yet. Send one from here, or send the bot a file, then try again.	まだファイルがありません。ここから送るか、ボットにファイルを送ってからもう一度。
+	Sta.sh drafts from this account, then published works. Click one to open it in PhotoCraft.	このアカウントの Sta.sh 下書き、そのあと公開作品。クリックすると PhotoCraft で開きます。
+	No Sta.sh files yet.	Sta.sh にはまだ何もありません。
+	No published works in the gallery.	ギャラリーに公開作品はありません。
+	Telegram did not return a link for this chat.	Telegram はこのチャットのリンクを返しませんでした。
+	Sta.sh drafts open their page. Published works open in PhotoCraft.	Sta.sh の下書きはそのページを開きます。公開作品は PhotoCraft で開きます。
+	DeviantArt did not offer a download.	DeviantArt はダウンロードを用意しませんでした。
+	Published on DeviantArt.	DeviantArt に公開しました。
+	Updated the title and tags on DeviantArt.	DeviantArt のタイトルとタグを更新しました。
+	Set the DeviantArt profile picture.	DeviantArt のプロフィール画像を設定しました。

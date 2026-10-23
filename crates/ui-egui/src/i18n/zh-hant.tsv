@@ -19,6 +19,10 @@
 # kept. Full-width punctuation (，。：) inside sentences; half-width parentheses and the " · "
 # separators as in the English.
 
+# Layer Mask Display Options (the layer mask rubylith's colour and opacity)
+	Mask Options…	遮色片選項…
+	Layer Mask Display Options…	圖層遮色片顯示選項…
+
 # Channel Options and New Spot Channel (#3761)
 	Channel Color	色版顏色
 	Color Indicates:	色彩指示：
@@ -1003,6 +1007,9 @@
 	Copper	銅色
 	Copyright	版權
 	Copyright and Contact Info	版權與聯絡資訊
+	Copyright Info URL	版權資訊 URL
+	Copyright Notice	版權聲明
+	Document Title	文件標題
 	Corner Crop Marks	角落裁切標記
 	Corner radius	圓角半徑
 	Correction	校正
@@ -1102,7 +1109,7 @@
 	Done	完成
 	Dots	點
 	Drag a rectangle around the object	在物件周圍拖曳出矩形
-	Drag on the image to add a constraint; Shift for horizontal/vertical; right-click to delete.	在影像上拖曳以新增限制線；按住 Shift 可限制水平/垂直；按右鍵可刪除。
+	Drag on the image to add a constraint; Shift for horizontal/vertical; right-click a constraint to change or delete it.	在影像上拖曳以新增限制線；按住 Shift 可限制水平/垂直；在限制線上按右鍵可變更或刪除。
 	Drag to move the active shape's path or the Work Path	拖曳以移動作用中形狀的路徑或工作路徑
 	Click: select anchor · Drag: move anchor, handle or segment · {shift}-click: add · {alt}-click: whole subpath	按一下：選取錨點 · 拖曳：移動錨點、把手或線段 · {shift}-按一下：增加 · {alt}-按一下：整個子路徑
 	Draw with the Pen tool (P) or make a work path from a selection.	使用筆型工具 (P) 繪製，或從選取範圍建立工作路徑。
@@ -1345,6 +1352,8 @@
 	Override Pressure	覆寫壓力
 	Override Rotation	覆寫旋轉
 	Override Tilt	覆寫傾斜
+	Override Tilt X	覆寫傾斜 X
+	Override Tilt Y	覆寫傾斜 Y
 	PRESET DETAILS	預設集詳細資料
 	PSD	PSD
 	Paint Overlay	繪畫覆蓋
@@ -1430,6 +1439,7 @@
 	Rename	重新命名
 	Rename Group…	重新命名群組…
 	Rename Layer…	重新命名圖層…
+	Rename Path…	重新命名路徑…
 	Rename Tool Preset…	重新命名工具預設集…
 	Rename…	重新命名…
 	Resample	重新取樣
@@ -1497,6 +1507,7 @@
 	Set shape fill type	設定形狀填滿類型
 	Set shape stroke type	設定形狀筆畫類型
 	Set the text color	設定文字顏色
+	Create warped text	建立彎曲文字
 	Shadows	陰影
 	Shape:	形狀：
 	Sharpening	銳利化
@@ -2001,6 +2012,7 @@
 	Quick export format	快速匯出格式
 	Quick export location	快速匯出位置
 	Recent file count	最近檔案數量
+	LUT folder	LUT 資料夾
 	Recent files	最近檔案
 	Recent fonts	最近使用的字體
 	Recover on launch	啟動時復原
@@ -2242,6 +2254,8 @@
 	GPU acceleration could not continue. Your documents are unchanged.	GPU 加速無法繼續。您的文件未變更。
 	PhotoCraft is using the CPU image compositor. The window may still use your graphics adapter.	PhotoCraft 正使用 CPU 合成影像。視窗仍可能使用您的顯示卡。
 	Retry GPU requires a restart. Save your work first.	重試 GPU 需要重新啟動。請先儲存您的工作。
+	Retry GPU tries the graphics processor again now.	重試 GPU 會立即再次嘗試使用圖形處理器。
+	GPU acceleration resumed.	已恢復 GPU 加速。
 	Keep Using CPU	繼續使用 CPU
 	Retry GPU	重試 GPU
 	Advanced	進階
@@ -2297,6 +2311,11 @@ cameraRaw	Blending	混合
 	Content-Aware Move Tool	內容感知移動工具
 	TIFF Options	TIFF 選項
 	Targa Options	Targa 選項
+	JPEG Options	JPEG 選項
+	Image Options	影像選項
+	Format Options	格式選項
+	Baseline ("Standard")	基線（「標準」）
+	Baseline Optimized	基線已最佳化
 	24 bits/pixel	24 位元/像素
 	32 bits/pixel	32 位元/像素
 	Including layers will increase file size.	包含圖層會增加檔案大小。
@@ -2774,9 +2793,16 @@ curves	Smooth	平滑
 	Stop	停止
 	Object Finder	物件尋找器
 	No object found there — drag a rectangle around it	那裡找不到物件 — 請在其周圍拖曳矩形
+	The active layer has no pixels here — turn on Sample All Layers or select a layer with pixels	作用中圖層在此處沒有像素 — 請開啟「取樣全部圖層」或選取有像素的圖層
 	Remove after each stroke	每次描邊後移除
 	Apply the removal ({key})	套用移除 ({key})
 	Strokes to remove: {n} (Enter applies, Esc cancels)	待移除的描邊：{n}（Enter 套用，Esc 取消）
+	Load Contours…	載入等高線…
+	Replace Contours…	取代等高線…
+	Save Contours…	儲存等高線…
+	Delete Contour	刪除等高線
+	Loaded contours from {file}	已從 {file} 載入等高線
+	Saved contours to {file}	已將等高線儲存到 {file}
 	Show home recent files	在主畫面上顯示最近的檔案
 	Clear Brush Controls	清除筆刷控制項
 	Reset All Locked Settings	重設所有鎖定的設定
@@ -2785,6 +2811,9 @@ curves	Smooth	平滑
 # Actions panel: Load/Save Actions (.atn) and kept Photoshop steps
 	Load Actions…	載入動作…
 	Save Actions…	儲存動作…
+	New Action…	新增動作…
+	Start Recording	開始錄製
+	Stop Recording	停止錄製
 	{name} (Photoshop)	{name}（Photoshop）
 	{message} ({note})	{message}（{note}）
 @plural	Loaded {n} action from {file}|Loaded {n} actions from {file}	已從 {file} 載入 {n} 個動作
@@ -2817,75 +2846,16 @@ curves	Smooth	平滑
 	Sent to {printer}	已傳送至 {printer}
 	set in Print Settings…	在列印設定中設定…
 	ICO is limited to 256 × 256 pixels	ICO 最大為 256 × 256 像素
-# File › Submit to DeviantArt
-	Could not prepare a file to send: {error}	無法準備要傳送的檔案：{error}
-	There is no saved file to send. Choose PSD or PNG.	沒有可傳送的已儲存檔案。請選擇 PSD 或 PNG。
-	Submitting needs an internet connection.	提交需要網際網路連線。
-	Open the DeviantArt developer page	開啟 DeviantArt 開發者頁面
-	DeviantArt app id	DeviantArt 應用程式 ID
-	The DeviantArt login stays in the system keychain, not in PhotoCraft's settings file.	DeviantArt 登入保存在系統鑰匙圈中，不在 PhotoCraft 的設定檔裡。
-	Connect DeviantArt	連接 DeviantArt
-	Title	標題
-	Tags	標籤
-	Letters, numbers and underscores, separated by commas.	字母、數字和底線，以逗號分隔。
-	Submit as	提交為
-	Also submit when I Save	儲存時也提交
-	Also submit when I Save As	另存新檔時也提交
-	Also submit when I Save a Copy	儲存副本時也提交
-	Also submit when I Export	匯出時也提交
-	DeviantArt is set up. Save or export a file, then submit it.	DeviantArt 已設定。請先儲存或匯出檔案，再提交。
-	Connect DeviantArt first.	請先連接 DeviantArt。
-	The DeviantArt app id should be a number.	DeviantArt 應用程式 ID 應為數字。
-	DeviantArt submitting needs the desktop app.	提交到 DeviantArt 僅在桌面應用程式中可用。
-	A DeviantArt submit is already running.	已有一次 DeviantArt 提交在進行。
-	Waiting for DeviantArt…	正在等待 DeviantArt…
-	Submitting {name} to DeviantArt…	正在將 {name} 提交到 DeviantArt…
-	Submitted {name} to Sta.sh. Item {id}.	已將 {name} 提交到 Sta.sh。項目 {id}。
-	That file is larger than DeviantArt accepts (30 MB).	檔案大於 DeviantArt 接受的大小（30 MB）。
-	DeviantArt is connected.	已連接 DeviantArt。
-	Opened {name}.	已開啟 {name}。
-	Connect again after this update so gallery, publish and the profile picture are allowed.	請重新連線，以便允許畫廊、發佈和個人頭像。
-	Sta.sh item id	Sta.sh 項目 ID
-	Publish this publicly	公開發佈
-	Not for all ages	不適合所有年齡
-	License	授權
-	Creative Commons	創用 CC
-	Commercial use	商業使用
-	Publish	發佈
-	Deviation id	作品 ID
-	Update title and tags	更新標題和標籤
-	My gallery	我的畫廊
-	Profile picture	個人頭像
-	Set as DeviantArt profile picture	設為 DeviantArt 頭像
-	Confirm that this publish is public.	請確認這次發佈是公開的。
-	Create a Public app on DeviantArt, without a client secret. Copy the address below into the redirect field, paste the client id here, then connect.	在 DeviantArt 上建立一個公開應用程式，不要 client secret。把下面的地址複製到重新導向，把用戶端 ID 貼到這裡，然後連線。
-	Copied the redirect address.	已複製重新導向地址。
-	Connected	已連線
-	PNG is what DeviantArt shows. A PSD is only stored as a file in Sta.sh.	DeviantArt 顯示的是 PNG。PSD 在 Sta.sh 裡只是一個檔案。
-	OK uploads to Sta.sh. Nothing is public until you publish.	OK 會上傳到 Sta.sh。發佈之前不會公開。
-	More options	更多選項
-	Upload with OK first. Publish uses the Sta.sh item from that upload.	請先用 OK 上傳。發佈會使用這次上傳的 Sta.sh 項目。
-	Connect again	重新連線
-	Disconnect DeviantArt	中斷 DeviantArt 連線
-	Submit to DeviantArt…	傳送到 DeviantArt…
-	Submitted {name} to Sta.sh. It stays private until you publish it.	{name} 已在 Sta.sh。發佈之前不會公開。
-	Open the Sta.sh page	開啟 Sta.sh 頁面
-	DeviantArt was disconnected.	已中斷 DeviantArt。
-	The DeviantArt login expired. Connect again.	DeviantArt 登入已過期。請重新連線。
-	Open the Telegram message	開啟 Telegram 訊息
-	The ten newest files sent to this bot. Click one to open it in PhotoCraft.	傳給這個機器人的最新十個檔案。點一個即可在 PhotoCraft 中開啟。
-	Your published works. Click one to open it in PhotoCraft. Sta.sh drafts are not in this list.	你已發佈的作品。點一個即可在 PhotoCraft 中開啟。Sta.sh 草稿不在這個清單裡。
-	Get files	取回檔案
-	Files sent from PhotoCraft, and the ten newest files sent to this bot. Click one to open it in PhotoCraft.	PhotoCraft 發出的檔案，以及傳給這個機器人的最新十個檔案。點一個即可在 PhotoCraft 中開啟。
-	No files yet. Send one from here, or send the bot a file, then try again.	還沒有檔案。從這裡傳送一個，或傳給機器人一個檔案，然後再試。
-	Sta.sh drafts from this account, then published works. Click one to open it in PhotoCraft.	這個帳號的 Sta.sh 草稿，然後是已發佈的作品。點一個即可在 PhotoCraft 中開啟。
-	No Sta.sh files yet.	Sta.sh 裡還沒有檔案。
-	No published works in the gallery.	畫廊裡沒有已發佈的作品。
-	Telegram did not return a link for this chat.	Telegram 沒有返回這個聊天的連結。
-	Sta.sh drafts open their page. Published works open in PhotoCraft.	Sta.sh 草稿會開啟它的頁面。已發佈的作品在 PhotoCraft 中開啟。
-	DeviantArt did not offer a download.	DeviantArt 沒有提供下載。
-	Saved file	已儲存的檔案
-
+# History panel › History Brush source (#2966)
+	Paints from the History panel's source state	從步驟記錄面板的來源狀態繪畫
+	Sets the source for the history brush	設定步驟記錄筆刷的來源
+# Bevel & Emboss shading controls.
+	Highlight Mode	亮部模式
+	Highlight Color	亮部顏色
+	Highlight Opacity	亮部不透明度
+	Shadow Mode	陰影模式
+	Shadow Color	陰影顏色
+	Shadow Opacity	陰影不透明度
 # Embedded Profile Mismatch: profile names beside the choices, Remember this choice
 	Use the embedded profile ({profile})	使用內嵌描述檔 ({profile})
 	Convert to the working space ({profile})	轉換為工作空間 ({profile})
@@ -2902,6 +2872,7 @@ curves	Smooth	平滑
 	Chisel Hard	雕刻清晰
 	Chisel Soft	雕刻柔和
 	Open color-less EXR as ACEScg	將無色彩空間資訊的 EXR 以 ACEScg 開啟
+	Do not append "copy" to filename when saving a copy	儲存副本時不在檔名後加上「copy」
 # Export As metadata and profile options
 	Color Profile	色彩描述檔
 	EXIF	EXIF
@@ -2909,6 +2880,7 @@ curves	Smooth	平滑
 # View › Guides › right-click a guide
 	Edit Selected Guides	編輯所選參考線
 	Clear Selected Guides	清除所選參考線
+	Make Selection	建立選取範圍
 	Bicubic Automatic	雙三次 (自動)
 	Bicubic Smoother	雙三次 (較平滑)
 	Bicubic Sharper	雙三次 (較銳利)
@@ -2954,6 +2926,7 @@ curves	Smooth	平滑
 	{shortcut} is reserved by the system and can't be assigned.	{shortcut} 由系統保留，無法指定。
 	Low-Latency Drawing (vsync off, applies at next launch)	低延遲繪圖（關閉垂直同步，下次啟動時生效）
 # Free Transform: a new layer while the box is open (#5859)
+	Reference point location	參考點位置
 	Free Transform is still being applied; try again when it has finished.	任意變形仍在套用中；請在完成後再試一次。
 	The transform couldn't be applied.	無法套用變形。
 # Preferences › Performance › GPU Memory; the status bar and slow-redraw notice
@@ -2962,22 +2935,34 @@ curves	Smooth	平滑
 	GPU Memory Full	GPU 記憶體已滿
 	The layers need {needed} of GPU memory and may hold {budget}, so edits that redraw the whole document do it on the CPU. Click to set GPU Memory.	圖層需要 {needed} GPU 記憶體，但只能佔用 {budget}，因此重繪整份文件的編輯會在 CPU 上進行。按一下以設定 GPU 記憶體。
 	GPU memory budget: {budget}	GPU 記憶體預算：{budget}
+	Graphics memory: {size}	顯示記憶體：{size}
 	This document's layers: {needed} of {budget} for layers	此文件的圖層：圖層可用 {budget} 中的 {needed}
 	This document's layers need {needed} but may hold {budget}: whole-document redraws use the CPU	此文件的圖層需要 {needed}，但只能佔用 {budget}：整份文件的重繪使用 CPU
 	GPU Memory (MB, 0 = Automatic)	GPU 記憶體（MB，0 = 自動）
+	{path}: the path is not valid Unicode; save under another name.	{path}：路徑不是有效的 Unicode；請以其他名稱儲存。
 	Replace	取代
 	{name} was changed by another app after it was opened or saved here.	{name} 在此處開啟或儲存後已被其他 App 更改。
 	Replace it with this document, or cancel and use File › Save As to keep both.	以此文件取代它，或取消並使用「檔案 › 另存新檔」以保留兩者。
-
-# File › Submit to DeviantArt: result messages
-	Published on DeviantArt.	已在 DeviantArt 上發佈。
-	Updated the title and tags on DeviantArt.	已更新 DeviantArt 上的標題和標籤。
-	Set the DeviantArt profile picture.	已設定 DeviantArt 大頭貼。
-
 	Decrease Brush Size	縮小筆刷大小
 	Increase Brush Size	放大筆刷大小
 	Decrease Brush Hardness	降低筆刷硬度
 	Increase Brush Hardness	提高筆刷硬度
+	Demosaic	去馬賽克
+	How the camera's colour filter mosaic is filled in. It is applied when the file opens; the preview shows the method it was opened with.	如何填補相機彩色濾鏡陣列的馬賽克。在開啟檔案時套用；預覽顯示開啟時所用的方法。
+	AHD (adaptive homogeneity)	AHD（自適應同質性）
+	Malvar–He–Cutler	Malvar–He–Cutler
+	Hirakawa–Parks: the cleanest edges and the least colour fringing, the slowest.	Hirakawa–Parks：邊緣最乾淨、色邊最少，速度最慢。
+	Gradient-corrected interpolation: sharp and fast, with some colour fringing on fine detail.	梯度校正插值：銳利且快速，細節處有些許色邊。
+	The fastest and the softest, with colour fringing on fine detail.	最快也最柔和，細節處有色邊。
+	“{name}” already exists. Replace it?	「{name}」已存在。要取代它嗎？
+	The name in the save dialog was “{name}”.	儲存對話框中的名稱是「{name}」。
+	Move Up	上移
+	Move Down	下移
+	Previous Brush	上一個筆刷
+	Next Brush	下一個筆刷
+	First Brush	第一個筆刷
+	Last Brush	最後一個筆刷
+	Preview size	Preview size
 	Memory Usage	記憶體使用量
 	Per-document RAM limit (MB)	每個文件的 RAM 上限 (MB)
 	Installed RAM: {ram} MB; this limit: {percent}%	已安裝 RAM：{ram} MB；此上限：{percent}%
@@ -3000,3 +2985,93 @@ curves	Smooth	平滑
 
 # Graphics Adapter preference (#1885)
 	GPU adapter	GPU 介面卡
+# Actions: a step dialog holds a suspended recording (#7365)
+	Confirm or cancel the open action step dialog first	請先確認或取消開啟中的動作步驟對話框
+	Pro Medium Gray	專業中灰
+	Solarized	Solarized
+	Breeze	Breeze
+	Pro Light Gray	專業淺灰
+	Pro Light	專業淺色
+	Resize Windows to Fit	調整視窗大小以符合
+
+	EXR	EXR
+
+# Paragraph direction (TYPE-218-2)
+	Automatic paragraph direction	自動段落方向
+	Left-to-right paragraph direction	由左至右的段落方向
+	Right-to-left paragraph direction	由右至左的段落方向
+	Not rendered: this adjustment ({key}) is kept as imported.	未算繪：此調整（{key}）依匯入時的原樣保留。
+
+# Print preview image (#8236)
+	Print preview image	Print preview image
+	Drag on the image to add a constraint; Shift for horizontal/vertical; right-click to delete.	在影像上拖曳以新增限制線；按住 Shift 可限制水平/垂直；按右鍵可刪除。
+	Could not prepare a file to send: {error}	無法準備要傳送的檔案：{error}
+	There is no saved file to send. Choose PSD or PNG.	沒有可傳送的已儲存檔案。請選擇 PSD 或 PNG。
+	Submitting needs an internet connection.	提交需要網際網路連線。
+	Open the DeviantArt developer page	開啟 DeviantArt 開發者頁面
+	DeviantArt app id	DeviantArt 應用程式 ID
+	The DeviantArt login stays in the system keychain, not in PhotoCraft's settings file.	DeviantArt 登入保存在系統鑰匙圈中，不在 PhotoCraft 的設定檔裡。
+	Connect DeviantArt	連接 DeviantArt
+	Title	標題
+	Tags	標籤
+	Letters, numbers and underscores, separated by commas.	字母、數字和底線，以逗號分隔。
+	Submit as	提交為
+	Also submit when I Save	儲存時也提交
+	Also submit when I Save As	另存新檔時也提交
+	Also submit when I Save a Copy	儲存副本時也提交
+	Also submit when I Export	匯出時也提交
+	DeviantArt is set up. Save or export a file, then submit it.	DeviantArt 已設定。請先儲存或匯出檔案，再提交。
+	Connect DeviantArt first.	請先連接 DeviantArt。
+	The DeviantArt app id should be a number.	DeviantArt 應用程式 ID 應為數字。
+	DeviantArt submitting needs the desktop app.	提交到 DeviantArt 僅在桌面應用程式中可用。
+	A DeviantArt submit is already running.	已有一次 DeviantArt 提交在進行。
+	Waiting for DeviantArt…	正在等待 DeviantArt…
+	Submitting {name} to DeviantArt…	正在將 {name} 提交到 DeviantArt…
+	That file is larger than DeviantArt accepts (30 MB).	檔案大於 DeviantArt 接受的大小（30 MB）。
+	DeviantArt is connected.	已連接 DeviantArt。
+	Create a Public app on DeviantArt, without a client secret. Copy the address below into the redirect field, paste the client id here, then connect.	在 DeviantArt 上建立一個公開應用程式，不要 client secret。把下面的地址複製到重新導向，把用戶端 ID 貼到這裡，然後連線。
+	Copied the redirect address.	已複製重新導向地址。
+	Connected	已連線
+	PNG is what DeviantArt shows. A PSD is only stored as a file in Sta.sh.	DeviantArt 顯示的是 PNG。PSD 在 Sta.sh 裡只是一個檔案。
+	OK uploads to Sta.sh. Nothing is public until you publish.	OK 會上傳到 Sta.sh。發佈之前不會公開。
+	Connect again	重新連線
+	Disconnect DeviantArt	中斷 DeviantArt 連線
+	Submit to DeviantArt…	傳送到 DeviantArt…
+	Submitted {name} to Sta.sh. It stays private until you publish it.	{name} 已在 Sta.sh。發佈之前不會公開。
+	Open the Sta.sh page	開啟 Sta.sh 頁面
+	DeviantArt was disconnected.	已中斷 DeviantArt。
+	The DeviantArt login expired. Connect again.	DeviantArt 登入已過期。請重新連線。
+	Saved file	已儲存的檔案
+	Submitted {name} to Sta.sh. Item {id}.	已將 {name} 提交到 Sta.sh。項目 {id}。
+	Opened {name}.	已開啟 {name}。
+	Connect again after this update so gallery, publish and the profile picture are allowed.	請重新連線，以便允許畫廊、發佈和個人頭像。
+	Sta.sh item id	Sta.sh 項目 ID
+	Publish this publicly	公開發佈
+	Not for all ages	不適合所有年齡
+	License	授權
+	Creative Commons	創用 CC
+	Commercial use	商業使用
+	Publish	發佈
+	Deviation id	作品 ID
+	Update title and tags	更新標題和標籤
+	My gallery	我的畫廊
+	Profile picture	個人頭像
+	Set as DeviantArt profile picture	設為 DeviantArt 頭像
+	Confirm that this publish is public.	請確認這次發佈是公開的。
+	More options	更多選項
+	Upload with OK first. Publish uses the Sta.sh item from that upload.	請先用 OK 上傳。發佈會使用這次上傳的 Sta.sh 項目。
+	Open the Telegram message	開啟 Telegram 訊息
+	The ten newest files sent to this bot. Click one to open it in PhotoCraft.	傳給這個機器人的最新十個檔案。點一個即可在 PhotoCraft 中開啟。
+	Your published works. Click one to open it in PhotoCraft. Sta.sh drafts are not in this list.	你已發佈的作品。點一個即可在 PhotoCraft 中開啟。Sta.sh 草稿不在這個清單裡。
+	Get files	取回檔案
+	Files sent from PhotoCraft, and the ten newest files sent to this bot. Click one to open it in PhotoCraft.	PhotoCraft 發出的檔案，以及傳給這個機器人的最新十個檔案。點一個即可在 PhotoCraft 中開啟。
+	No files yet. Send one from here, or send the bot a file, then try again.	還沒有檔案。從這裡傳送一個，或傳給機器人一個檔案，然後再試。
+	Sta.sh drafts from this account, then published works. Click one to open it in PhotoCraft.	這個帳號的 Sta.sh 草稿，然後是已發佈的作品。點一個即可在 PhotoCraft 中開啟。
+	No Sta.sh files yet.	Sta.sh 裡還沒有檔案。
+	No published works in the gallery.	畫廊裡沒有已發佈的作品。
+	Telegram did not return a link for this chat.	Telegram 沒有返回這個聊天的連結。
+	Sta.sh drafts open their page. Published works open in PhotoCraft.	Sta.sh 草稿會開啟它的頁面。已發佈的作品在 PhotoCraft 中開啟。
+	DeviantArt did not offer a download.	DeviantArt 沒有提供下載。
+	Published on DeviantArt.	已在 DeviantArt 上發佈。
+	Updated the title and tags on DeviantArt.	已更新 DeviantArt 上的標題和標籤。
+	Set the DeviantArt profile picture.	已設定 DeviantArt 大頭貼。
