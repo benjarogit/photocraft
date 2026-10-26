@@ -6,6 +6,70 @@ fn token() -> String {
 }
 
 #[test]
+fn successful_send_result_shows_the_message_and_link() {
+    assert_result_dialog_visible("Sent sketch.psd.", Some("https://t.me/example/4"), false);
+}
+
+#[test]
+fn failed_send_result_shows_the_error_without_a_link() {
+    assert_result_dialog_visible("The file could not be sent.", None, true);
+}
+
+#[test]
+fn successful_send_result_without_a_link_still_shows_the_status() {
+    assert_result_dialog_visible("Sent sketch.psd. Telegram did not return a link for this chat.", None, false);
+}
+
+#[test]
+fn automation_can_dismiss_a_send_result_without_dispatching_a_command() {
+    let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), crate::Services::default());
+    show_result(&mut app, "Sent sketch.psd.".into(), None);
+    let id = app.ui.dialogs.last().unwrap().id;
+    assert_eq!(crate::dialogs::confirm(&mut app, id).unwrap(), Value::Null);
+    assert!(app.ui.dialogs.is_empty());
+}
+
+fn assert_result_dialog_visible(message: &str, url: Option<&str>, error: bool) {
+    use egui_kittest::kittest::Queryable;
+    let size = egui::vec2(900.0, 520.0);
+    let app = PhotocraftApp::new(photocraft_engine::Session::new(), crate::Services::default());
+    let mut h = egui_kittest::Harness::builder().with_size(size).build_ui_state(|ui, app| crate::dialogs::show(app, ui.ctx()), app);
+    PhotocraftApp::setup_context(&h.ctx, crate::theme::ThemeKind::ALL[0]);
+    h.state_mut().ui.status = message.into();
+    h.state_mut().ui.status_error = error;
+    show_result(h.state_mut(), message.into(), url.map(str::to_string));
+    h.run_steps(4);
+    for label in [message, "OK"] {
+        let rect = h.get_by_label(label).rect();
+        assert!(rect.top() >= 0.0 && rect.bottom() <= size.y, "{label} is outside the window: {rect:?}");
+    }
+    if let Some(url) = url {
+        h.get_by_label(url);
+        h.get_by_label("Open the Telegram message");
+    } else {
+        assert!(h.query_by_label("Open the Telegram message").is_none());
+    }
+    assert!(h.query_by_label("Cancel").is_none());
+    if let Some(directory) = std::env::var_os("PHOTOCRAFT_TELEGRAM_RESULT_SCREENSHOTS") {
+        let directory = std::path::PathBuf::from(directory);
+        std::fs::create_dir_all(&directory).unwrap();
+        let name = if error {
+            "error"
+        } else if url.is_some() {
+            "success-link"
+        } else {
+            "success-no-link"
+        };
+        h.render().unwrap().save(directory.join(format!("telegram-result-{name}.png"))).unwrap();
+    }
+    h.get_by_label("OK").click();
+    h.run_steps(3);
+    assert!(h.state().ui.dialogs.is_empty());
+    assert_eq!(h.state().ui.status, message);
+    assert_eq!(h.state().ui.status_error, error);
+}
+
+#[test]
 fn broken_settings_file_is_not_set_up() {
     let s = settings_from_json("not json");
     assert!(!s.ready());

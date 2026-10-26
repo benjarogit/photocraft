@@ -440,6 +440,12 @@ pub fn show(app: &mut PhotocraftApp, ctx: &egui::Context) {
                         crate::telegram::body(app, ui, &mut fields);
                     });
                 }
+                DialogKind::Command if crate::telegram::result_owns(&fields) => {
+                    let room = (ctx.content_rect().bottom() - ui.cursor().top() - DIALOG_CHROME).max(120.0);
+                    egui::ScrollArea::vertical().id_salt(id.with("body")).max_height(room).show(ui, |ui| {
+                        crate::telegram::result_body(app, ui, &fields);
+                    });
+                }
                 DialogKind::Command if crate::open_prompt::owns_damage(&fields) => crate::open_prompt::damage_body(ui, &fields),
                 DialogKind::Command if crate::guide_layout_ui::owns(&fields) => outcome = crate::guide_layout_ui::body(app, ui, &mut fields, interactive),
                 DialogKind::Command if crate::brush_preset_dialog::owns(&fields) => {
@@ -536,7 +542,7 @@ pub fn show(app: &mut PhotocraftApp, ctx: &egui::Context) {
                 // (larger) size, so a dialog whose body gets shorter would never shrink back.
                 ui.with_layout(egui::Layout::right_to_left(egui::Align::Min), |ui| {
                     ui.spacing_mut().item_spacing.x = 10.0;
-                    if matches!(d.kind, DialogKind::About | DialogKind::Error) {
+                    if matches!(d.kind, DialogKind::About | DialogKind::Error) || crate::telegram::result_owns(&fields) {
                         // ↩ is OK too, as on every other dialog (#4872), from the frame after the
                         // alert appeared: the ↩ that raised it (committing a locked layer's Free
                         // Transform, say) must not close it again at once.
@@ -874,6 +880,7 @@ pub fn confirm(app: &mut PhotocraftApp, id: u64) -> Result<Value, String> {
         DialogKind::Command if crate::variables_ui::owns(&d.fields) => crate::variables_ui::confirm(app, &d.fields),
         DialogKind::Command if crate::file_ui::owns(&d.fields) => crate::file_ui::confirm(app, &d.fields),
         DialogKind::Command if crate::telegram::owns(&d.fields) => crate::telegram::confirm(app, &d.fields),
+        DialogKind::Command if crate::telegram::result_owns(&d.fields) => Ok(Value::Null),
         DialogKind::Command if crate::new_guide_ui::owns(&d.fields) => crate::new_guide_ui::confirm(app, &d.fields),
         DialogKind::Command if crate::color_picker_ui::owns(&d.fields) => crate::color_picker_ui::confirm(app, &d.fields),
         DialogKind::Command if crate::color_range_ui::owns(&d.fields) => crate::color_range_ui::confirm(app, &d.fields),
