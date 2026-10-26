@@ -292,7 +292,7 @@ pub(crate) fn invoke_unguarded(app: &mut PhotocraftApp, ctx: &egui::Context, id:
                 Err(tl!(message).to_string())
             }
         }
-        "file.submitDeviantArt" if params.as_object().is_some_and(|object| object.is_empty()) => crate::deviantart::command(app),
+        "file.submitDeviantArt" if params.is_null() || params.as_object().is_some_and(|object| object.is_empty()) => crate::deviantart::command(app),
         "file.submitDeviantArt" => app.run(id, params),
         "file.saveAs" => {
             let choices = crate::FormatChoices::from_params(&params, id)?;

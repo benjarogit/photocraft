@@ -1,6 +1,66 @@
 use super::*;
 
 #[test]
+fn menu_submission_with_null_or_empty_params_only_opens_the_dialog() {
+    for params in [Value::Null, json!({})] {
+        let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), crate::Services::default());
+        let result = crate::menus::invoke(&mut app, &egui::Context::default(), photocraft_engine::deviantart_cmds::COMMAND, params).unwrap();
+        assert!(result.get("dialog").is_some());
+        assert_eq!(app.ui.dialogs.iter().filter(|d| owns(&d.fields)).count(), 1);
+        assert!(app.deviantart_job.is_none());
+    }
+}
+
+#[test]
+fn menu_submission_rejects_non_object_parameters_instead_of_opening_a_dialog() {
+    for params in [json!([]), json!(true), json!(42), json!("png")] {
+        let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), crate::Services::default());
+        assert!(crate::menus::invoke(&mut app, &egui::Context::default(), photocraft_engine::deviantart_cmds::COMMAND, params).is_err());
+        assert!(app.ui.dialogs.is_empty());
+    }
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+#[test]
+fn saved_file_dialog_submits_the_pending_or_active_disk_copy() {
+    use std::sync::{Arc, Mutex};
+    let dir = tempfile::tempdir().unwrap();
+    let active = dir.path().join("active.png");
+    let pending = dir.path().join("pending.png");
+    std::fs::write(&active, b"ACTIVE").unwrap();
+    std::fs::write(&pending, b"PENDING").unwrap();
+    for explicit in [false, true] {
+        let seen = Arc::new(Mutex::new(Vec::new()));
+        let copy = seen.clone();
+        let services = crate::Services {
+            deviantart_submit: Some(Arc::new(move |_, _, _, _, _, name, bytes| {
+                copy.lock().unwrap().push((name.to_string(), bytes.to_vec()));
+                Ok(r#"{"itemid":42}"#.into())
+            })),
+            save_deviantart: Some(Box::new(|_| Ok(()))),
+            ..Default::default()
+        };
+        let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), services);
+        app.run("file.new", json!({"width":2,"height":2})).unwrap();
+        app.session.active_mut().unwrap().path = Some(active.display().to_string());
+        app.deviantart.client_id = "99".into();
+        app.deviantart.refresh_token = "synthetic".into();
+        let id = open_dialog(&mut app, explicit.then(|| pending.display().to_string()));
+        assert_eq!(app.ui.dialog_mut(id).unwrap().fields.get("format"), Some(&json!("file")));
+        crate::dialogs::confirm(&mut app, id).unwrap();
+        let deadline = std::time::Instant::now() + std::time::Duration::from_secs(2);
+        while app.deviantart_job.is_some() && std::time::Instant::now() < deadline {
+            poll(&mut app, &egui::Context::default());
+            std::thread::sleep(std::time::Duration::from_millis(5));
+        }
+        assert!(app.deviantart_job.is_none());
+        assert!(!app.ui.status_error, "{}", app.ui.status);
+        let expected = if explicit { ("pending.png".to_string(), b"PENDING".to_vec()) } else { ("active.png".to_string(), b"ACTIVE".to_vec()) };
+        assert_eq!(*seen.lock().unwrap(), vec![expected]);
+    }
+}
+
+#[test]
 fn a_rejected_refresh_token_is_recognized() {
     assert!(!super::errors::login_was_rejected("The refresh token is invalid"));
     assert!(super::errors::login_was_rejected("refresh-grant-rejected: invalid_grant"));
