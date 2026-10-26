@@ -144,3 +144,26 @@ fn deviantart_named_pipe_is_rejected_without_waiting_for_a_writer() {
     });
     assert!(rx.recv_timeout(std::time::Duration::from_secs(2)).expect("FIFO open must not block"));
 }
+
+#[cfg(unix)]
+#[test]
+fn deviantart_open_rejects_a_file_replaced_by_a_fifo_without_blocking() {
+    use rustix::fs::{CWD, Mode, OFlags, mkfifoat, open};
+    let dir = tempfile::tempdir().unwrap();
+    let path = dir.path().join("saved.png");
+    std::fs::write(&path, b"PNG").unwrap();
+    assert!(std::fs::metadata(&path).unwrap().is_file());
+    // Simulate a replacement after prepare's first metadata check.
+    std::fs::remove_file(&path).unwrap();
+    mkfifoat(CWD, &path, Mode::RUSR | Mode::WUSR).unwrap();
+    let (tx, rx) = std::sync::mpsc::channel();
+    let raced = path.clone();
+    let worker = std::thread::spawn(move || {
+        let _ = tx.send(open_regular_file(&raced).is_err());
+    });
+    let result = rx.recv_timeout(std::time::Duration::from_secs(2));
+    // Release an old blocking implementation before failing the regression test.
+    let _release = open(&path, OFlags::WRONLY | OFlags::NONBLOCK, Mode::empty());
+    worker.join().unwrap();
+    assert!(result.expect("replacing a checked file with a FIFO must not block"));
+}

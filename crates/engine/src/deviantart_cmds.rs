@@ -90,11 +90,7 @@ fn prepare(session: &Session, format: &str, path: &str) -> Result<(String, Vec<u
         if !before.is_file() || before.len() > MAX_BYTES {
             return Err(bad("path must name a regular file no larger than 30 MiB"));
         }
-        let file = std::fs::File::open(path).map_err(|error| EngineError::Other(error.to_string()))?;
-        let meta = file.metadata().map_err(|error| EngineError::Other(error.to_string()))?;
-        if !meta.is_file() || meta.len() > MAX_BYTES {
-            return Err(bad("path must name a regular file no larger than 30 MiB"));
-        }
+        let file = open_regular_file(std::path::Path::new(path))?;
         let mut bytes = Vec::new();
         file.take(MAX_BYTES + 1).read_to_end(&mut bytes).map_err(|error| EngineError::Other(error.to_string()))?;
         let name = std::path::Path::new(path).file_name().and_then(|name| name.to_str()).unwrap_or("file").to_string();
@@ -112,6 +108,23 @@ fn prepare(session: &Session, format: &str, path: &str) -> Result<(String, Vec<u
     };
     let exported = photocraft_io::export(&state.doc, &name, &opts).map_err(|error| EngineError::Other(error.to_string()))?;
     Ok((name, exported.bytes, exported.warnings))
+}
+#[cfg(not(target_arch = "wasm32"))]
+fn open_regular_file(path: &std::path::Path) -> Result<std::fs::File> {
+    #[cfg(unix)]
+    let file = {
+        use rustix::fs::{Mode, OFlags, open};
+        // Metadata checked before open can race with replacement by a FIFO.
+        let fd = open(path, OFlags::RDONLY | OFlags::NONBLOCK | OFlags::CLOEXEC, Mode::empty()).map_err(|error| EngineError::Other(error.to_string()))?;
+        std::fs::File::from(fd)
+    };
+    #[cfg(not(unix))]
+    let file = std::fs::File::open(path).map_err(|error| EngineError::Other(error.to_string()))?;
+    let meta = file.metadata().map_err(|error| EngineError::Other(error.to_string()))?;
+    if !meta.is_file() || meta.len() > MAX_BYTES {
+        return Err(bad("path must name a regular file no larger than 30 MiB"));
+    }
+    Ok(file)
 }
 #[cfg(target_arch = "wasm32")]
 fn prepare(_: &Session, _: &str, _: &str) -> Result<(String, Vec<u8>, Vec<String>)> {

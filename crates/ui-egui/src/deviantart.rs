@@ -524,6 +524,8 @@ fn start_submit(app: &mut PhotocraftApp, path: String, temporary: bool) -> Resul
 }
 
 fn start_prepared_submit(app: &mut PhotocraftApp, format: &str, pending: Option<String>) -> Result<(), String> {
+    // The dialog's disk-copy choice is the engine's saved-path mode.
+    let format = if format == "file" { "saved" } else { format };
     authorize_action(app, "submit")?;
     if app.deviantart_job.is_some() {
         return Err(tl!("A DeviantArt submit is already running.").to_string());
