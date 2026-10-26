@@ -530,6 +530,10 @@ fn forget_unsent(temporary: bool, path: &str, preview: &Option<String>) {
 }
 
 fn start_send(app: &mut PhotocraftApp, path: String, temporary: bool, chats: Vec<String>, preview: Option<String>) -> Result<(), String> {
+    if let Err(error) = authorize_network(app, "send") {
+        forget_unsent(temporary, &path, &preview);
+        return Err(error);
+    }
     if app.telegram_job.is_some() {
         if temporary {
             remove_temp_path(&path);
@@ -673,7 +677,22 @@ fn inbox_rows(sent_files: &[Value], body: &str) -> Vec<Value> {
     rows
 }
 
+// Direct dialog buttons also run under synthetic input; confirmation is not their only entry.
+fn authorize_network(app: &PhotocraftApp, action: &str) -> Result<(), String> {
+    let params = json!({"action": action});
+    if (app.automation_input || app.session.authorize.is_some())
+        && let Some(authorize) = app.services.automation_command.as_ref()
+    {
+        authorize("file.sendTelegram", &params)?;
+    }
+    if let Some(authorize) = app.session.authorize {
+        authorize("file.sendTelegram", &params).map_err(|error| error.to_string())?;
+    }
+    Ok(())
+}
+
 fn start_download(app: &mut PhotocraftApp, token: &str, file_id: &str, name: &str) -> Result<(), String> {
+    authorize_network(app, "download")?;
     if app.telegram_job.is_some() {
         return Err("A Telegram send is already running.".to_string());
     }
@@ -717,6 +736,7 @@ fn start_download(app: &mut PhotocraftApp, token: &str, file_id: &str, name: &st
 }
 
 fn start_find_chats(app: &mut PhotocraftApp, token: &str) -> Result<(), String> {
+    authorize_network(app, "findChats")?;
     if app.telegram_job.is_some() {
         return Err("A Telegram send is already running.".to_string());
     }
@@ -752,6 +772,7 @@ fn start_find_chats(app: &mut PhotocraftApp, token: &str) -> Result<(), String> 
 }
 
 fn start_fetch_inbox(app: &mut PhotocraftApp, token: &str) -> Result<(), String> {
+    authorize_network(app, "getFiles")?;
     if app.telegram_job.is_some() {
         return Err("A Telegram send is already running.".to_string());
     }

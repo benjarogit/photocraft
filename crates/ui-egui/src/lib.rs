@@ -2195,7 +2195,19 @@ impl PhotocraftApp {
     /// (#2032, #4373), reports a failure in the status bar, and releases a close prompt waiting on
     /// the save.
     pub(crate) fn write_answered_save(&mut self, ctx: &egui::Context, doc: DocId, path: String, settings: &ExportSettings, copy: bool, step: (&str, Value)) {
-        let written = self.with_document(doc, |app| app.write_document(path, settings, copy));
+        let written = self.with_document(doc, |app| {
+            let written = app.write_document(path.clone(), settings, copy)?;
+            let kind = match step.0 {
+                "file.save" => Some(telegram::WriteKind::Save),
+                "file.saveAs" => Some(telegram::WriteKind::SaveAs),
+                "file.saveACopy" => Some(telegram::WriteKind::SaveCopy),
+                _ => None,
+            };
+            if let Some(kind) = kind {
+                telegram::arm_after_save(app, &path, kind, &serde_json::json!({"pending": written.is_none()}));
+            }
+            Ok(written)
+        });
         if written.is_ok() {
             self.session.journal.push((step.0.into(), step.1));
         }

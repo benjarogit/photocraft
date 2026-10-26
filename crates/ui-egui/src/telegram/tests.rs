@@ -285,8 +285,13 @@ fn telegram_copy_is_translated_in_every_complete_catalog() {
         "Sending needs an internet connection.",
         "Pin the message",
         "Pinning needs the bot to be an admin. If it is not, the file is still sent.",
-        "Get from Telegram",
-        "No files yet. Send your bot a file or a photo, then try again.",
+        "Telegram did not return a link for this chat.",
+        "Sent {name}. {url}",
+        "Could not pin the message. The file was still sent.",
+        "Open the Telegram message",
+        "Files sent from PhotoCraft, and the ten newest files sent to this bot. Click one to open it in PhotoCraft.",
+        "Get files",
+        "No files yet. Send one from here, or send the bot a file, then try again.",
         "*File:* `{name}`",
         "*Size:* {size}",
         "*Time:* {time}",
@@ -361,4 +366,95 @@ fn automation_cannot_confirm_a_denied_telegram_dialog() {
     app.automation_input = true;
     assert_eq!(crate::dialogs::confirm(&mut app, id), Err("network denied".into()));
     assert!(app.ui.dialog_mut(id).is_some());
+}
+
+#[test]
+fn telegram_direct_network_actions_honor_both_automation_gates() {
+    for session_gate in [false, true] {
+        let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), crate::Services::default());
+        if session_gate {
+            app.session.authorize = Some(|id, _| {
+                assert_eq!(id, "file.sendTelegram");
+                Err(photocraft_engine::EngineError::Other("network denied".into()))
+            });
+        } else {
+            app.automation_input = true;
+            app.services.automation_command = Some(Box::new(|id, _| {
+                assert_eq!(id, "file.sendTelegram");
+                Err("network denied".into())
+            }));
+        }
+        for result in [
+            start_find_chats(&mut app, &token()),
+            start_fetch_inbox(&mut app, &token()),
+            start_download(&mut app, &token(), "id", "file.png"),
+            start_send(&mut app, "missing.png".into(), false, vec!["42".into()], None),
+        ] {
+            assert!(result.unwrap_err().contains("network denied"));
+            assert!(app.telegram_job.is_none());
+        }
+    }
+}
+
+#[test]
+fn telegram_answered_save_arms_the_original_document_for_all_save_kinds() {
+    for (command, kind) in [("file.save", WriteKind::Save), ("file.saveAs", WriteKind::SaveAs), ("file.saveACopy", WriteKind::SaveCopy)] {
+        for background in [false, true] {
+            let mut app = PhotocraftApp::new(
+                photocraft_engine::Session::new(),
+                crate::Services {
+                    export: Some(Box::new(|_, _, _| Ok((vec![1], vec![])))),
+                    write: Some(Box::new(|_, _| Ok(()))),
+                    save_file: Some(Arc::new(|_, _, _, _| Ok(vec![]))),
+                    ..Default::default()
+                },
+            );
+            app.session.execute("file.new", json!({"width":2,"height":2,"name":"source"})).unwrap();
+            let source = app.active_doc_id().unwrap();
+            app.session.execute("file.new", json!({"width":2,"height":2,"name":"other"})).unwrap();
+            let other = app.active_doc_id().unwrap();
+            app.telegram.send_on_save = true;
+            app.telegram.send_on_save_as = true;
+            app.telegram.send_on_save_copy = true;
+            app.background_jobs = background;
+            app.write_answered_save(
+                &egui::Context::default(),
+                source,
+                "source.jpg".into(),
+                &crate::ExportSettings::default(),
+                command == "file.saveACopy",
+                (command, json!({})),
+            );
+            assert_eq!(app.active_doc_id().unwrap(), other);
+            if background {
+                assert_eq!(app.jobs.saves.last().unwrap().notify_telegram, Some(kind));
+                assert_eq!(app.jobs.saves.last().unwrap().doc, source);
+                assert!(!dialog_open(&app));
+            } else {
+                let dialog = app.ui.dialogs.iter().find(|d| owns(&d.fields)).unwrap();
+                assert_eq!(dialog.fields.get("pending"), Some(&json!("source.jpg")));
+                assert_eq!(dialog.fields.get("__document"), Some(&json!(source.0)));
+            }
+        }
+    }
+}
+
+#[test]
+fn telegram_tiff_prompt_arms_save_as_after_confirmation() {
+    let mut app = PhotocraftApp::new(
+        photocraft_engine::Session::new(),
+        crate::Services { export: Some(Box::new(|_, _, _| Ok((vec![1], vec![])))), write: Some(Box::new(|_, _| Ok(()))), ..Default::default() },
+    );
+    app.session.execute("file.new", json!({"width":2,"height":2})).unwrap();
+    app.telegram.send_on_save_as = true;
+    crate::tiff_options_ui::park(&mut app, "layers.tif".into()).unwrap();
+    let ctx = egui::Context::default();
+    let input = egui::RawInput {
+        events: vec![egui::Event::Key { key: egui::Key::Enter, physical_key: None, pressed: true, repeat: false, modifiers: egui::Modifiers::NONE }],
+        ..Default::default()
+    };
+    ctx.run_ui(input, |ui| crate::tiff_options_ui::show(&mut app, ui.ctx())).textures_delta.clear();
+    assert!(app.tiff_options.is_none());
+    assert!(dialog_open(&app));
+    assert_eq!(app.session.journal.last().unwrap().0, "file.saveAs");
 }

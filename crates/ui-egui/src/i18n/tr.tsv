@@ -4186,7 +4186,7 @@ cameraData	Lens	Lens
 	Sent {name} to Telegram.	{name} Telegram'a gönderildi.
 	That file is larger than Telegram accepts (50 MB).	Bu dosya Telegram'ın kabul ettiğinden büyük (50 MB).
 	Could not read {name}: {error}	{name} okunamadı: {error}
-	The bot token should look like 123456789:ABC…	Bot belirteci 123456789:ABC… gibi görünmelidir.
+	The bot token should look like 123456789:ABC…	Bot belirteci biçimi: 123456789:ABC…
 	Enter a chat id (a number) or a public @channelname.	Bir sohbet kimliği (bir sayı) veya herkese açık bir @channelname girin.
 	Telegram sending needs the desktop app.	Telegram'a gönderme yalnızca masaüstü uygulamada vardır.
 	Telegram is set up. Save or export a file, then send it.	Telegram ayarlandı. Bir dosyayı kaydedin veya dışa aktarın, sonra gönderin.

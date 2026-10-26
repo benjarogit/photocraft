@@ -3676,7 +3676,7 @@ curves	Smooth	매끄럽게
 	Sent {name} to Telegram.	{name}을(를) Telegram으로 보냈습니다.
 	That file is larger than Telegram accepts (50 MB).	이 파일은 Telegram이 받는 크기(50 MB)보다 큽니다.
 	Could not read {name}: {error}	{name}을(를) 읽을 수 없습니다: {error}
-	The bot token should look like 123456789:ABC…	봇 토큰은 123456789:ABC… 형태여야 합니다.
+	The bot token should look like 123456789:ABC…	봇 토큰 형식: 123456789:ABC…
 	Enter a chat id (a number) or a public @channelname.	채팅 ID(숫자) 또는 공개 @channelname 을 입력합니다.
 	Telegram sending needs the desktop app.	Telegram 보내기는 데스크톱 앱에서만 됩니다.
 	Telegram is set up. Save or export a file, then send it.	Telegram이 설정되었습니다. 파일을 저장하거나 내보낸 다음 보냅니다.

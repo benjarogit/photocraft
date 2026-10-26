@@ -4136,7 +4136,7 @@ curves	Smooth	スムーズ
 	Sent {name} to Telegram.	{name} を Telegram に送りました。
 	That file is larger than Telegram accepts (50 MB).	このファイルは Telegram が受け取れる大きさ（50 MB）を超えています。
 	Could not read {name}: {error}	{name} を読み取れませんでした: {error}
-	The bot token should look like 123456789:ABC…	ボットトークンは 123456789:ABC… のような形です。
+	The bot token should look like 123456789:ABC…	ボットトークンの形式: 123456789:ABC…
 	Enter a chat id (a number) or a public @channelname.	チャット ID（数字）か、公開の @channelname を入力します。
 	Telegram sending needs the desktop app.	Telegram への送信はデスクトップアプリだけで使えます。
 	Telegram is set up. Save or export a file, then send it.	Telegram の設定ができました。ファイルを保存または書き出してから送ります。
