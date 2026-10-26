@@ -1,5 +1,4 @@
 //! Submission dialog and optional gallery/profile controls.
-use super::extras::{avatar_file, gallery_section, start_call};
 use super::*;
 
 pub(super) fn body(app: &mut PhotocraftApp, ui: &mut egui::Ui, f: &mut serde_json::Map<String, Value>) {
@@ -83,8 +82,6 @@ pub(super) fn body(app: &mut PhotocraftApp, ui: &mut egui::Ui, f: &mut serde_jso
     ui.label(egui::RichText::new(tl!("PNG is what DeviantArt shows. A PSD is only stored as a file in Sta.sh.")).color(t.text_dim));
     ui.label(egui::RichText::new(tl!("OK uploads to Sta.sh. Nothing is public until you publish.")).color(t.text_dim));
     ui.add_space(8.0);
-    gallery_section(app, ui, f);
-    ui.add_space(8.0);
     let mut more = f.get("more").and_then(Value::as_bool).unwrap_or(false);
     if crate::widgets::checkbox(ui, &mut more, tl!("More options")).changed() {
         f.insert("more".into(), json!(more));
@@ -93,96 +90,19 @@ pub(super) fn body(app: &mut PhotocraftApp, ui: &mut egui::Ui, f: &mut serde_jso
         return;
     }
     ui.add_space(4.0);
-    ui.label(egui::RichText::new(tl!("Connect again after this update so gallery, publish and the profile picture are allowed.")).color(t.text_dim));
-    ui.label(tl!("Sta.sh item id"));
-    let mut item_id = f.get("itemId").and_then(Value::as_str).unwrap_or("").to_string();
-    if item_id.is_empty() {
-        item_id = app.deviantart.last_item_id.clone();
+    let mut publishing = f.get("publishingOptions").and_then(Value::as_bool).unwrap_or(false);
+    if crate::widgets::checkbox(ui, &mut publishing, tl!("Publishing options")).changed() {
+        f.insert("publishingOptions".into(), json!(publishing));
     }
-    if ui.add(egui::TextEdit::singleline(&mut item_id).desired_width(120.0)).changed() {
-        f.insert("itemId".into(), json!(item_id.clone()));
+    if publishing {
+        super::publish_ui::body(app, ui, f);
     }
-    let mut public_ok = f.get("publicOk").and_then(Value::as_bool).unwrap_or(false);
-    if crate::widgets::checkbox(ui, &mut public_ok, tl!("Publish this publicly")).changed() {
-        f.insert("publicOk".into(), json!(public_ok));
+    let mut management = f.get("managementOptions").and_then(Value::as_bool).unwrap_or(false);
+    if crate::widgets::checkbox(ui, &mut management, tl!("Gallery and profile")).changed() {
+        f.insert("managementOptions".into(), json!(management));
     }
-    let mut mature = f.get("mature").and_then(Value::as_bool).unwrap_or(false);
-    if crate::widgets::checkbox(ui, &mut mature, tl!("Not for all ages")).changed() {
-        f.insert("mature".into(), json!(mature));
-    }
-    ui.label(tl!("License"));
-    let mut creative_commons = f.get("creativeCommons").and_then(Value::as_bool).unwrap_or(false);
-    if crate::widgets::checkbox(ui, &mut creative_commons, tl!("Creative Commons")).changed() {
-        f.insert("creativeCommons".into(), json!(creative_commons));
-    }
-    let mut commercial = f.get("commercial").and_then(Value::as_bool).unwrap_or(false);
-    if crate::widgets::checkbox(ui, &mut commercial, tl!("Commercial use")).changed() {
-        f.insert("commercial".into(), json!(commercial));
-    }
-    if crate::widgets::secondary_button(ui, tl!("Publish"), 160.0).clicked() {
-        if !public_ok {
-            app.ui.status = tl!("Confirm that this publish is public.").to_string();
-            app.ui.status_error = true;
-        } else if item_id.trim().is_empty() || item_id == "0" {
-            app.ui.status = tl!("Upload with OK first. Publish uses the Sta.sh item from that upload.").to_string();
-            app.ui.status_error = true;
-        } else if !app.deviantart.scopes.split_whitespace().any(|scope| scope == "publish") {
-            app.ui.status = tl!("Reconnect to DeviantArt to grant permission to publish.").to_string();
-            if let Err(error) = start_connect(app, "publish") {
-                app.ui.status = error;
-                app.ui.status_error = true;
-            }
-        } else if let Err(error) = start_call(
-            app,
-            &json!({"op":"publish","itemId": item_id.parse::<i64>().unwrap_or(0), "mature": mature, "level": "moderate", "classes": [], "creativeCommons": creative_commons, "commercial": commercial, "modify": "no"}).to_string(),
-        ) {
-            app.ui.status = error;
-            app.ui.status_error = true;
-        }
-    }
-    ui.label(tl!("Deviation id"));
-    let mut deviation_id = f.get("deviationId").and_then(Value::as_str).unwrap_or("").to_string();
-    if ui.add(egui::TextEdit::singleline(&mut deviation_id).desired_width(ui.available_width())).changed() {
-        f.insert("deviationId".into(), json!(deviation_id.clone()));
-    }
-    if crate::widgets::secondary_button(ui, tl!("Update title and tags"), 220.0).clicked() {
-        let tags = clean_tags(f.get("tags").and_then(Value::as_str).unwrap_or(""));
-        let title = f.get("title").and_then(Value::as_str).unwrap_or("");
-        if let Err(error) = start_call(app, &json!({"op":"edit","deviationId": deviation_id, "title": title, "tags": tags}).to_string()) {
-            app.ui.status = error;
-            app.ui.status_error = true;
-        }
-    }
-    ui.label(tl!("Profile picture"));
-    let avatar = f.get("avatar").and_then(Value::as_str).unwrap_or("png").to_string();
-    ui.horizontal(|ui| {
-        for (id, label) in [("png", "PNG"), ("jpg", "JPEG")] {
-            if ui.selectable_label(avatar == id, label).clicked() {
-                f.insert("avatar".into(), json!(id));
-            }
-        }
-    });
-    if crate::widgets::secondary_button(ui, tl!("Set as DeviantArt profile picture"), 260.0).clicked() {
-        if !app.deviantart.scopes.split_whitespace().any(|scope| scope == "user.manage") {
-            app.ui.status = tl!("Reconnect to DeviantArt to grant permission to change your profile picture.").to_string();
-            if let Err(error) = start_connect(app, "user.manage") {
-                app.ui.status = error;
-                app.ui.status_error = true;
-            }
-            return;
-        }
-        match avatar_file(app, &avatar) {
-            Ok(path) => {
-                if let Err(error) = start_call(app, &json!({"op":"avatar","path": path}).to_string()) {
-                    app.ui.status = error;
-                    app.ui.status_error = true;
-                }
-            }
-            Err(error) => {
-                app.ui.status = error;
-                app.ui.status_error = true;
-            }
-        }
+    if management {
+        super::management_ui::body(app, ui, f);
     }
     ui.add_space(8.0);
     crate::widgets::section_label(ui, "Submit automatically");

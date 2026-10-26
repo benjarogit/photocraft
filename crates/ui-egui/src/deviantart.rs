@@ -11,7 +11,11 @@ mod dialog;
 mod errors;
 mod extras;
 mod format;
+mod management_ui;
 mod pending;
+mod publish_ui;
+#[cfg(test)]
+mod surface_tests;
 #[cfg(test)]
 mod tests;
 
@@ -19,7 +23,7 @@ pub use extras::gallery_rows;
 use extras::{remember_stash, stash_rows_from};
 pub use format::{clean_tags, item_id, multipart, stash_url};
 
-const BASE_SCOPES: &str = "stash gallery browse";
+const BASE_SCOPES: &str = "stash";
 
 /// Loopback the user must whitelist on their DeviantArt app. A fixed port so the redirect URI
 /// does not change between logins.
@@ -487,7 +491,7 @@ fn start_connect(app: &mut PhotocraftApp, additional_scopes: &str) -> Result<(),
 fn requested_scopes(granted: &str, needed: &str) -> String {
     let mut scopes = Vec::new();
     for scope in granted.split_whitespace().chain(needed.split_whitespace()) {
-        if matches!(scope, "stash" | "gallery" | "browse" | "publish" | "user.manage") && !scopes.contains(&scope) {
+        if matches!(scope, "stash" | "gallery" | "browse" | "user" | "publish" | "user.manage") && !scopes.contains(&scope) {
             scopes.push(scope);
         }
     }

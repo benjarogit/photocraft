@@ -16,6 +16,16 @@ pub fn gallery_rows(text: &str) -> Vec<Value> {
     out
 }
 
+pub(super) fn scopes_for_operation(operation: &str) -> &'static str {
+    match operation {
+        "gallery" => "browse user",
+        "download" => "browse",
+        "publish" | "edit" => "publish",
+        "avatar" => "browse user.manage",
+        _ => "",
+    }
+}
+
 pub(super) fn start_call(app: &mut PhotocraftApp, request: &str) -> Result<(), String> {
     let parsed: Value = serde_json::from_str(request).unwrap_or_else(|_| json!({}));
     let op = parsed.get("op").and_then(Value::as_str).unwrap_or("");
@@ -42,6 +52,11 @@ pub(super) fn start_call(app: &mut PhotocraftApp, request: &str) -> Result<(), S
     if app.deviantart_job.is_some() {
         discard_temp(&path);
         return Err(tl!("A DeviantArt submit is already running.").to_string());
+    }
+    let scopes = scopes_for_operation(op);
+    if !scopes.is_empty() && !scopes.split_whitespace().all(|scope| app.deviantart.scopes.split_whitespace().any(|granted| granted == scope)) {
+        discard_temp(&path);
+        return start_connect(app, scopes);
     }
     let Some(call) = app.services.deviantart_call.clone() else {
         discard_temp(&path);

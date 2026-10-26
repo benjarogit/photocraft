@@ -19,16 +19,23 @@ const AUTHORIZE: &str = "https://www.deviantart.com/oauth2/authorize";
 const TOKEN: &str = "https://www.deviantart.com/oauth2/token";
 const SUBMIT: &str = "https://www.deviantart.com/api/v1/oauth2/stash/submit";
 
+fn validated_scopes(scopes: &str) -> Result<String, String> {
+    if scopes.len() > 256 {
+        return Err("The requested DeviantArt permissions are invalid.".to_string());
+    }
+    let scopes: Vec<&str> = scopes.split_whitespace().collect();
+    if scopes.is_empty() || scopes.iter().any(|scope| !matches!(*scope, "stash" | "gallery" | "browse" | "user" | "publish" | "user.manage")) {
+        return Err("The requested DeviantArt permissions are invalid.".to_string());
+    }
+    Ok(scopes.join(" "))
+}
+
 /// Open the browser, wait for the loopback redirect, and return the refresh token.
 pub fn connect(client_id: &str, scopes: &str) -> Result<String, String> {
     if client_id.is_empty() || !client_id.chars().all(|c| c.is_ascii_digit()) {
         return Err("The DeviantArt app id should be a number.".to_string());
     }
-    let scopes: Vec<&str> = scopes.split_whitespace().collect();
-    if scopes.is_empty() || scopes.iter().any(|scope| !matches!(*scope, "stash" | "gallery" | "browse" | "publish" | "user.manage")) {
-        return Err("The requested DeviantArt permissions are invalid.".to_string());
-    }
-    let scope = scopes.join(" ");
+    let scope = validated_scopes(scopes)?;
     let verifier = verifier();
     let state = hex_token();
     let challenge = code_challenge(&verifier);
@@ -779,6 +786,17 @@ mod tests {
     fn oauth_error_keeps_the_code_and_the_description() {
         let text = r#"{"error":"invalid_request","error_description":"The refresh token is invalid."}"#;
         assert_eq!(oauth_error(400, text), "invalid_request: The refresh token is invalid.");
+    }
+
+    #[test]
+    fn operation_scopes_are_validated_without_starting_a_login() {
+        for scope in ["stash", "stash publish", "stash browse user", "stash browse", "stash browse user.manage"] {
+            assert_eq!(validated_scopes(scope).unwrap(), scope);
+        }
+        for scope in ["", "admin", "stash user.admin", "stash,publish"] {
+            assert!(validated_scopes(scope).is_err());
+        }
+        assert!(validated_scopes(&" ".repeat(257)).is_err());
     }
 
     #[test]
