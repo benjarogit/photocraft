@@ -155,7 +155,7 @@ pub fn arm_after_save(app: &mut PhotocraftApp, path: &str, kind: WriteKind, resu
 }
 
 pub(crate) fn busy(app: &PhotocraftApp) -> bool {
-    app.deviantart_job.is_some() || (app.deviantart.ready() && !app.deviantart_pending.is_empty())
+    app.deviantart_job.as_ref().is_some_and(|job| matches!(job.kind, JobKind::Submit)) || (app.deviantart.ready() && !app.deviantart_pending.is_empty())
 }
 
 pub fn poll(app: &mut PhotocraftApp, ctx: &egui::Context) {
@@ -406,7 +406,22 @@ pub(crate) struct Job {
     name: String,
 }
 
+// Screen-level synthetic input reaches dialog buttons without dialogs::confirm.
+fn authorize_action(app: &PhotocraftApp, action: &str) -> Result<(), String> {
+    let params = json!({"action": action});
+    if (app.automation_input || app.session.authorize.is_some())
+        && let Some(authorize) = app.services.automation_command.as_ref()
+    {
+        authorize(photocraft_engine::deviantart_cmds::COMMAND, &params)?;
+    }
+    if let Some(authorize) = app.session.authorize {
+        authorize(photocraft_engine::deviantart_cmds::COMMAND, &params).map_err(|error| error.to_string())?;
+    }
+    Ok(())
+}
+
 fn start_connect(app: &mut PhotocraftApp) -> Result<(), String> {
+    authorize_action(app, "connect")?;
     if app.deviantart_job.is_some() {
         return Err(tl!("A DeviantArt submit is already running.").to_string());
     }
@@ -470,6 +485,7 @@ fn start_submit(app: &mut PhotocraftApp, path: String, temporary: bool) -> Resul
 }
 
 fn start_prepared_submit(app: &mut PhotocraftApp, format: &str, pending: Option<String>) -> Result<(), String> {
+    authorize_action(app, "submit")?;
     if app.deviantart_job.is_some() {
         return Err(tl!("A DeviantArt submit is already running.").to_string());
     }

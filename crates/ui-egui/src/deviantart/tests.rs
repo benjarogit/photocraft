@@ -268,3 +268,46 @@ fn deviantart_tiff_prompt_arms_save_as_after_confirmation() {
     assert!(dialog_open(&app));
     assert_eq!(app.session.journal.last().unwrap().0, "file.saveAs");
 }
+
+#[test]
+fn deviantart_direct_actions_honor_both_automation_gates() {
+    for session_gate in [false, true] {
+        let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), crate::Services::default());
+        if session_gate {
+            app.session.authorize = Some(|id, _| {
+                assert_eq!(id, photocraft_engine::deviantart_cmds::COMMAND);
+                Err(photocraft_engine::EngineError::Other("network denied".into()))
+            });
+        } else {
+            app.automation_input = true;
+            app.services.automation_command = Some(Box::new(|id, _| {
+                assert_eq!(id, photocraft_engine::deviantart_cmds::COMMAND);
+                Err("network denied".into())
+            }));
+        }
+        for result in [start_connect(&mut app), start_prepared_submit(&mut app, "png", None)] {
+            assert!(result.unwrap_err().contains("network denied"));
+            assert!(app.deviantart_job.is_none());
+        }
+    }
+}
+
+#[test]
+fn deviantart_only_mutating_jobs_delay_close() {
+    let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), crate::Services::default());
+    {
+        let kind = JobKind::Connect;
+        let (_tx, rx) = std::sync::mpsc::channel();
+        app.deviantart_job = Some(Job { rx, kind, path: String::new(), temporary: false, name: String::new() });
+        assert!(!busy(&app));
+        app.jobs.close_after_saves = true;
+        crate::jobs_ui::close_after_saves(&mut app, &egui::Context::default());
+        assert!(!app.jobs.close_after_saves);
+    }
+    {
+        let kind = JobKind::Submit;
+        let (_tx, rx) = std::sync::mpsc::channel();
+        app.deviantart_job = Some(Job { rx, kind, path: String::new(), temporary: false, name: String::new() });
+        assert!(busy(&app));
+    }
+}

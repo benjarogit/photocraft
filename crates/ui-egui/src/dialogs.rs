@@ -503,7 +503,9 @@ pub fn show(app: &mut PhotocraftApp, ctx: &egui::Context) {
                 }
                 DialogKind::Command if crate::new_guide_ui::owns(&fields) => crate::new_guide_ui::body(ui, &mut fields),
                 DialogKind::Command if crate::deviantart::owns(&fields) => {
-                    let room = (ctx.content_rect().height() - DIALOG_CHROME).max(120.0);
+                    // The body can grow after More options is expanded while the dialog keeps
+                    // its position. Reserve the footer below that position, not below y = 0.
+                    let room = (ctx.content_rect().bottom() - ui.cursor().top() - DIALOG_CHROME).max(120.0);
                     egui::ScrollArea::vertical().id_salt(id.with("body")).max_height(room).show(ui, |ui| {
                         crate::deviantart::body(app, ui, &mut fields);
                     });
