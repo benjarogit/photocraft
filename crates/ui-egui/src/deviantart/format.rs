@@ -2,21 +2,7 @@
 
 use serde_json::Value;
 
-/// DeviantArt tags allow letters, digits and underscores.
-pub fn clean_tags(text: &str) -> Vec<String> {
-    let mut out = Vec::new();
-    for raw in text.split(|c: char| c == ',' || c.is_whitespace()) {
-        let tag: String = raw.chars().filter(|c| c.is_ascii_alphanumeric() || *c == '_').take(64).collect();
-        if tag.is_empty() || out.iter().any(|have: &String| have.eq_ignore_ascii_case(&tag)) {
-            continue;
-        }
-        out.push(tag);
-        if out.len() == 30 {
-            break;
-        }
-    }
-    out
-}
+pub use photocraft_engine::deviantart_cmds::clean_tags;
 
 /// Sta.sh shows one private item at `https://www.deviantart.com/stash/0` plus the id in base 36.
 pub fn stash_url(item_id: i64) -> Option<String> {

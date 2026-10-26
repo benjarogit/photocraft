@@ -83,7 +83,7 @@ fn automatic_submissions_wait_for_the_active_job_and_run_in_order() {
     after_written(&mut app, &second.to_string_lossy(), WriteKind::Export);
     assert_eq!(app.deviantart_pending.len(), 2);
     assert!(seen.lock().unwrap().is_empty());
-    tx.send(Ok("{}".into())).unwrap();
+    tx.send(Ok(json!({"body":"{\"itemid\":1}","warnings":[]}).to_string())).unwrap();
     let ctx = egui::Context::default();
     let deadline = std::time::Instant::now() + std::time::Duration::from_secs(5);
     while (app.deviantart_job.is_some() || !app.deviantart_pending.is_empty()) && std::time::Instant::now() < deadline {
@@ -158,4 +158,113 @@ fn automation_cannot_confirm_a_denied_deviantart_dialog() {
     app.automation_input = true;
     assert_eq!(crate::dialogs::confirm(&mut app, id), Err("network denied".into()));
     assert!(app.ui.dialog_mut(id).is_some());
+}
+
+#[test]
+fn automatic_deviantart_submissions_default_off() {
+    for settings in [Settings::default(), settings_from_json("{}"), settings_from_json("broken")] {
+        assert!(!settings.send_on_save && !settings.send_on_save_as && !settings.send_on_save_copy && !settings.send_on_export);
+    }
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+#[test]
+fn menu_submission_with_params_uses_the_engine_dispatcher() {
+    let file = tempfile::NamedTempFile::new().unwrap();
+    std::fs::write(file.path(), b"PNG").unwrap();
+    let services = crate::Services {
+        deviantart_submit: Some(std::sync::Arc::new(|_, _, _, _, _, _, bytes| {
+            assert_eq!(bytes, b"PNG");
+            Ok(r#"{"itemid":42}"#.into())
+        })),
+        ..crate::Services::default()
+    };
+    let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), services);
+    app.deviantart.client_id = "99".into();
+    app.deviantart.refresh_token = "private-token".into();
+    configure_engine(&mut app);
+    let result = crate::menus::invoke(&mut app, &egui::Context::default(), photocraft_engine::deviantart_cmds::COMMAND, json!({"path":file.path()})).unwrap();
+    assert_eq!(result["body"], r#"{"itemid":42}"#);
+    assert!(app.ui.dialogs.is_empty());
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+#[test]
+fn engine_binding_loads_with_credentials_and_clears_on_failed_disconnect_save() {
+    let services = crate::Services {
+        load_deviantart: Some(Box::new(|| Some(r#"{"clientId":"99","refreshToken":"private"}"#.into()))),
+        deviantart_submit: Some(std::sync::Arc::new(|_, _, _, _, _, _, _| Ok(r#"{"itemid":42}"#.into()))),
+        save_deviantart: Some(Box::new(|_| Err("disk full".into()))),
+        ..crate::Services::default()
+    };
+    let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), services);
+    let file = tempfile::NamedTempFile::new().unwrap();
+    std::fs::write(file.path(), b"PNG").unwrap();
+    let params = json!({"path":file.path()});
+    assert!(app.session.execute(photocraft_engine::deviantart_cmds::COMMAND, params.clone()).is_ok());
+    errors::disconnect(&mut app);
+    assert!(app.session.deviantart_submit.is_none());
+    assert!(app.session.execute(photocraft_engine::deviantart_cmds::COMMAND, params).is_err());
+}
+
+#[test]
+fn deviantart_answered_save_arms_the_original_document_for_all_save_kinds() {
+    for (command, kind) in [("file.save", WriteKind::Save), ("file.saveAs", WriteKind::SaveAs), ("file.saveACopy", WriteKind::SaveCopy)] {
+        for background in [false, true] {
+            let mut app = PhotocraftApp::new(
+                photocraft_engine::Session::new(),
+                crate::Services {
+                    export: Some(Box::new(|_, _, _| Ok((vec![1], vec![])))),
+                    write: Some(Box::new(|_, _| Ok(()))),
+                    save_file: Some(std::sync::Arc::new(|_, _, _, _| Ok(vec![]))),
+                    ..Default::default()
+                },
+            );
+            app.session.execute("file.new", json!({"width":2,"height":2,"name":"source"})).unwrap();
+            let source = app.active_doc_id().unwrap();
+            app.session.execute("file.new", json!({"width":2,"height":2,"name":"other"})).unwrap();
+            let other = app.active_doc_id().unwrap();
+            app.deviantart.send_on_save = true;
+            app.deviantart.send_on_save_as = true;
+            app.deviantart.send_on_save_copy = true;
+            app.background_jobs = background;
+            app.write_answered_save(
+                &egui::Context::default(),
+                source,
+                "source.jpg".into(),
+                &crate::ExportSettings::default(),
+                command == "file.saveACopy",
+                (command, json!({})),
+            );
+            assert_eq!(app.active_doc_id().unwrap(), other);
+            if background {
+                assert_eq!(app.jobs.saves.last().unwrap().notify_deviantart, Some(kind));
+                assert_eq!(app.jobs.saves.last().unwrap().doc, source);
+                assert!(!dialog_open(&app));
+            } else {
+                assert!(dialog_open(&app));
+                assert_eq!(app.deviantart_pending.back().map(String::as_str), Some("source.jpg"));
+            }
+        }
+    }
+}
+
+#[test]
+fn deviantart_tiff_prompt_arms_save_as_after_confirmation() {
+    let mut app = PhotocraftApp::new(
+        photocraft_engine::Session::new(),
+        crate::Services { export: Some(Box::new(|_, _, _| Ok((vec![1], vec![])))), write: Some(Box::new(|_, _| Ok(()))), ..Default::default() },
+    );
+    app.session.execute("file.new", json!({"width":2,"height":2})).unwrap();
+    app.deviantart.send_on_save_as = true;
+    crate::tiff_options_ui::park(&mut app, "layers.tif".into()).unwrap();
+    let ctx = egui::Context::default();
+    let input = egui::RawInput {
+        events: vec![egui::Event::Key { key: egui::Key::Enter, physical_key: None, pressed: true, repeat: false, modifiers: egui::Modifiers::NONE }],
+        ..Default::default()
+    };
+    ctx.run_ui(input, |ui| crate::tiff_options_ui::show(&mut app, ui.ctx())).textures_delta.clear();
+    assert!(app.tiff_options.is_none());
+    assert!(dialog_open(&app));
+    assert_eq!(app.session.journal.last().unwrap().0, "file.saveAs");
 }
