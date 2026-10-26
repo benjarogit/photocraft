@@ -45,7 +45,7 @@ pub fn show(app: &mut PhotocraftApp, ctx: &egui::Context) {
     let Some(p) = &mut app.tiff_options else { return };
     let (mut ok, mut cancel) = (false, false);
     let (mut discard, mut dont_ask) = (p.discard_layers, p.dont_ask_again);
-    let modal = egui::Modal::new(egui::Id::new("tiff-options")).show(ctx, |ui| {
+    let modal = egui::Modal::new(egui::Id::unique("tiff-options")).show(ctx, |ui| {
         ui.set_max_width(420.0);
         ui.label(egui::RichText::new(tl!("TIFF Options")).font(crate::theme::semibold(15.0)));
         ui.add_space(4.0);
@@ -73,20 +73,7 @@ pub fn show(app: &mut PhotocraftApp, ctx: &egui::Context) {
         }
         let settings = ExportSettings { tiff_layers: !p.discard_layers, ..app.save_settings() };
         let step = serde_json::json!({"path": p.path, "tiffLayers": !p.discard_layers});
-        let written = app.with_document(p.doc, |app| app.write_document(p.path, &settings, p.discard_layers));
-        if written.is_ok() {
-            // An action being recorded keeps the Save As with this answer (#2032).
-            app.session.journal.push(("file.saveAs".into(), step));
-        }
-        match written {
-            Err(e) => {
-                app.ui.status = crate::i18n::fmt(tl!("Save failed: {error}"), &[("error", &e)]);
-                app.ui.status_error = true;
-            }
-            Ok(Some(_)) if !p.discard_layers => crate::discard_ui::saved_document(app, ctx, p.doc),
-            // A background save releases the close prompt when it finishes (`jobs_ui`).
-            Ok(_) => {}
-        }
+        app.write_answered_save(ctx, p.doc, p.path, &settings, p.discard_layers, ("file.saveAs", step));
     } else if cancel {
         app.tiff_options = None;
         app.ui.status = tl!("Save cancelled").into();
