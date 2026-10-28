@@ -239,6 +239,21 @@ pub fn system_info_model(app: &PhotocraftApp) -> SystemInfoModel {
     if let Some(note) = crate::monitor_status::retained_note(app) {
         display_notes.push(note);
     }
+    let mut graphics_rows = vec![
+        SystemInfoRow { label: tl!("Adapter").to_string(), value: shown_token(&info.adapter, "unknown"), mono: false },
+        SystemInfoRow { label: tl!("Backend").to_string(), value: backend_value(info), mono: false },
+        SystemInfoRow { label: tl!("Driver").to_string(), value: shown_token(&info.driver, "unknown"), mono: true },
+        SystemInfoRow { label: tl!("GPU preference").to_string(), value: shown_choice(&info.preference), mono: false },
+        SystemInfoRow { label: tl!("At launch").to_string(), value: shown_choice(&info.selected), mono: false },
+        SystemInfoRow { label: tl!("Compositor").to_string(), value: images.to_string(), mono: false },
+    ];
+    if let Some(mb) = info.video_memory_mb {
+        graphics_rows.push(SystemInfoRow {
+            label: tl!("Graphics memory").to_string(),
+            value: crate::chrome_ui::fmt_bytes(mb.saturating_mul(1 << 20)),
+            mono: false,
+        });
+    }
     SystemInfoModel {
         headline,
         attention,
@@ -251,18 +266,7 @@ pub fn system_info_model(app: &PhotocraftApp) -> SystemInfoModel {
                 ],
                 notes: Vec::new(),
             },
-            SystemInfoSection {
-                title: tl!("Graphics").to_string(),
-                rows: vec![
-                    SystemInfoRow { label: tl!("Adapter").to_string(), value: shown_token(&info.adapter, "unknown"), mono: false },
-                    SystemInfoRow { label: tl!("Backend").to_string(), value: backend_value(info), mono: false },
-                    SystemInfoRow { label: tl!("Driver").to_string(), value: shown_token(&info.driver, "unknown"), mono: true },
-                    SystemInfoRow { label: tl!("GPU preference").to_string(), value: shown_choice(&info.preference), mono: false },
-                    SystemInfoRow { label: tl!("At launch").to_string(), value: shown_choice(&info.selected), mono: false },
-                    SystemInfoRow { label: tl!("Compositor").to_string(), value: images.to_string(), mono: false },
-                ],
-                notes: graphics_notes,
-            },
+            SystemInfoSection { title: tl!("Graphics").to_string(), rows: graphics_rows, notes: graphics_notes },
             SystemInfoSection {
                 title: tl!("Display").to_string(),
                 rows: profiles.into_iter().map(|(label, value)| SystemInfoRow { label, value, mono: false }).collect(),
@@ -673,6 +677,22 @@ mod tests {
             assert_eq!(system_info(&app), copied);
             assert!(copied.iter().any(|line| line == "Graphics adapter: NVIDIA GeForce RTX 2060"));
             assert!(copied.iter().any(|line| line.contains("this platform doesn't report display profiles")));
+        });
+    }
+
+    #[test]
+    fn grouped_graphics_memory_is_localized_and_optional() {
+        let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), crate::Services::default());
+        crate::i18n::with_language(crate::i18n::Lang::from_code("de").unwrap(), || {
+            assert!(!system_info_model(&app).sections[1].rows.iter().any(|row| row.label == "Grafikspeicher"));
+            app.perf.gpu_info.video_memory_mb = Some(8192);
+            let model = system_info_model(&app);
+            let memory = model.sections[1].rows.iter().find(|row| row.label == "Grafikspeicher").unwrap();
+            let value = crate::chrome_ui::fmt_bytes(8192_u64 << 20);
+            assert_eq!(memory.value, value);
+            assert!(system_info(&app).iter().any(|line| line == &format!("Graphics memory: {value}")));
+            app.perf.gpu_info.video_memory_mb = None;
+            assert!(!system_info_model(&app).sections[1].rows.iter().any(|row| row.label == "Grafikspeicher"));
         });
     }
 

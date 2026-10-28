@@ -507,7 +507,7 @@ fn default_max_width(d: &Dialog, compact: bool, curves: bool, about_tabs: bool, 
     } else if about_tabs {
         700.0
     } else if d.kind == DialogKind::About && d.fields.get("systemInfo").and_then(Value::as_bool) == Some(true) {
-        560.0
+        560.0_f32.min(available)
     } else if d.kind == DialogKind::LayerStyle || d.fields.contains_key("__export") || crate::color_picker_ui::owns(&d.fields) {
         600.0
     } else if compact {
@@ -588,7 +588,10 @@ pub fn show(app: &mut PhotocraftApp, ctx: &egui::Context) {
             let compact = d.fields.contains_key("__compact");
             // The curve editor's graph is as wide as the dialog lets it be (#5113, #8984).
             let curves = is_curves(&fields);
-            if !compact {
+            let system_info = d.kind == DialogKind::About && d.fields.get("systemInfo").and_then(Value::as_bool) == Some(true);
+            // Leave room for the popup frame and its hit guard as well as the content.
+            let available_width = if system_info { available.x.min((ctx.content_rect().width() - 48.0).max(0.0)) } else { available.x };
+            if !compact && !system_info {
                 ui.set_min_width(if curves { 300.0 } else { 380.0 });
             }
             // A resizable dialog's contents fill its resizable area (#7420), the others the window.
@@ -605,10 +608,10 @@ pub fn show(app: &mut PhotocraftApp, ctx: &egui::Context) {
             if about_tabs {
                 ui.set_min_width(700.0);
             }
-            if d.kind == DialogKind::About && d.fields.get("systemInfo").and_then(Value::as_bool) == Some(true) {
-                ui.set_min_width(560.0);
+            if system_info {
+                ui.set_min_width(560.0_f32.min(available_width));
             }
-            ui.set_max_width(wide.unwrap_or_else(|| default_max_width(&d, compact, curves, about_tabs, available.x)));
+            ui.set_max_width(wide.unwrap_or_else(|| default_max_width(&d, compact, curves, about_tabs, available_width)));
             if web {
                 ui.set_max_width(available.x);
                 ui.set_min_size(available);
