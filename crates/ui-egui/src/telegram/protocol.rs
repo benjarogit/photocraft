@@ -1,6 +1,8 @@
 //! Telegram API payloads, response parsing, and file helpers.
 
-use super::*;
+#[cfg(not(target_arch = "wasm32"))]
+use super::MAX_BYTES;
+use super::{PhotocraftApp, Value, export_temp_for, json, settings_json};
 
 /// Chats that have talked to the bot, newest last, one row per id.
 pub fn chats_from_updates(text: &str) -> Vec<Value> {
