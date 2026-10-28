@@ -1,6 +1,6 @@
 //! Automatic submissions wait for the active background job to finish.
 
-use super::*;
+use super::{PhotocraftApp, show_result, start_submit};
 
 pub(super) fn enqueue(app: &mut PhotocraftApp, path: &str) {
     // Bound memory even when automation produces saves faster than the network.

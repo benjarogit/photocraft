@@ -1,5 +1,5 @@
 //! Submission dialog and optional gallery/profile controls.
-use super::*;
+use super::{DEVELOPER_PAGE, PhotocraftApp, REDIRECT_URI, Value, errors, json, start_connect};
 
 pub(super) fn body(app: &mut PhotocraftApp, ui: &mut egui::Ui, f: &mut serde_json::Map<String, Value>) {
     let t = crate::theme::Tokens::get(ui.ctx());

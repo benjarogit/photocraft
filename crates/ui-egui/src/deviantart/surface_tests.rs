@@ -97,3 +97,130 @@ fn independent_surface_labels_are_translated() {
         }
     }
 }
+
+fn text_input_has_value(h: &egui_kittest::Harness<'_, PhotocraftApp>, value: &str) -> bool {
+    h.query_all_by_role(egui::accesskit::Role::TextInput).any(|node| node.value().as_deref() == Some(value))
+}
+
+fn dialog_fields(h: &mut egui_kittest::Harness<'_, PhotocraftApp>, values: Value) {
+    let dialog = h.state_mut().ui.dialogs.last_mut().unwrap();
+    dialog.fields.extend(values.as_object().unwrap().clone());
+}
+
+fn capture_call(h: &mut egui_kittest::Harness<'_, PhotocraftApp>) -> std::sync::mpsc::Receiver<String> {
+    let (tx, rx) = std::sync::mpsc::channel();
+    h.state_mut().services.deviantart_call = Some(std::sync::Arc::new(move |_, _, request| {
+        tx.send(request.to_string()).unwrap();
+        Ok("{}".into())
+    }));
+    h.state_mut().deviantart.scopes = "stash publish".into();
+    rx
+}
+
+#[test]
+fn a_cleared_stash_id_stays_empty_across_frames() {
+    let mut h = harness();
+    h.state_mut().deviantart.last_item_id = "4242".into();
+    h.get_by_label("Publishing options").click();
+    h.run_steps(4);
+    assert!(text_input_has_value(&h, "4242"));
+    dialog_fields(&mut h, json!({"itemId":""}));
+    h.run_steps(4);
+    assert!(!text_input_has_value(&h, "4242"), "a deliberately empty field must not recover the previous upload ID");
+    h.run_steps(4);
+    assert!(!text_input_has_value(&h, "4242"));
+}
+
+#[test]
+fn invalid_stash_ids_never_reach_the_publish_transport() {
+    for id in ["", "0", " 0 ", "abc", "-5", "1.5", "9223372036854775808"] {
+        let mut h = harness();
+        let rx = capture_call(&mut h);
+        dialog_fields(&mut h, json!({"itemId":id,"publicOk":true}));
+        h.get_by_label("Publishing options").click();
+        h.run_steps(4);
+        h.get_by_label("Publish").scroll_to_me();
+        h.run_steps(3);
+        h.get_by_label("Publish").click();
+        h.run_steps(3);
+        assert!(h.state().ui.status_error, "{id:?}");
+        assert_eq!(h.state().ui.status, "Upload with OK first. Publish uses the Sta.sh item from that upload.", "{id:?}");
+        assert!(h.state().deviantart_job.is_none(), "{id:?}");
+        assert!(rx.try_recv().is_err(), "{id:?}");
+    }
+}
+
+#[test]
+fn publishing_uses_the_validated_trimmed_positive_id() {
+    let mut h = harness();
+    let rx = capture_call(&mut h);
+    dialog_fields(&mut h, json!({"itemId":" 42 ","publicOk":true}));
+    h.get_by_label("Publishing options").click();
+    h.run_steps(4);
+    h.get_by_label("Publish").scroll_to_me();
+    h.run_steps(3);
+    h.get_by_label("Publish").click();
+    h.run_steps(3);
+    let request = rx.recv_timeout(std::time::Duration::from_secs(2)).unwrap();
+    let request: Value = serde_json::from_str(&request).unwrap();
+    assert_eq!(request["op"], "publish");
+    assert_eq!(request["itemId"], 42);
+}
+
+#[test]
+fn empty_deviation_ids_are_rejected_before_editing() {
+    for id in ["", " \t "] {
+        let mut h = harness();
+        let rx = capture_call(&mut h);
+        dialog_fields(&mut h, json!({"deviationId":id}));
+        h.get_by_label("Gallery and profile").click();
+        h.run_steps(4);
+        h.get_by_label("Update title and tags").scroll_to_me();
+        h.run_steps(3);
+        h.get_by_label("Update title and tags").click();
+        h.run_steps(3);
+        assert_eq!(h.state().ui.status, "Enter the deviation id first.");
+        assert!(h.state().ui.status_error);
+        assert!(h.state().deviantart_job.is_none());
+        assert!(rx.try_recv().is_err());
+    }
+}
+
+#[test]
+fn editing_trims_the_deviation_id_and_preserves_an_empty_title() {
+    let mut h = harness();
+    let rx = capture_call(&mut h);
+    let id = "12345678-1234-1234-1234-123456789abc";
+    dialog_fields(&mut h, json!({"deviationId":format!(" {id} "),"title":""}));
+    h.get_by_label("Gallery and profile").click();
+    h.run_steps(4);
+    h.get_by_label("Update title and tags").scroll_to_me();
+    h.run_steps(3);
+    h.get_by_label("Update title and tags").click();
+    h.run_steps(3);
+    let request = rx.recv_timeout(std::time::Duration::from_secs(2)).unwrap();
+    let request: Value = serde_json::from_str(&request).unwrap();
+    assert_eq!(request["op"], "edit");
+    assert_eq!(request["deviationId"], id);
+    assert_eq!(request["title"], "");
+}
+
+#[test]
+fn a_malformed_stash_field_does_not_reuse_the_previous_upload_id() {
+    for value in [Value::Null, json!(42), json!(true), json!([]), json!({})] {
+        let mut h = harness();
+        let rx = capture_call(&mut h);
+        h.state_mut().deviantart.last_item_id = "4242".into();
+        dialog_fields(&mut h, json!({"itemId":value,"publicOk":true}));
+        h.get_by_label("Publishing options").click();
+        h.run_steps(4);
+        assert!(!text_input_has_value(&h, "4242"));
+        h.get_by_label("Publish").scroll_to_me();
+        h.run_steps(3);
+        h.get_by_label("Publish").click();
+        h.run_steps(3);
+        assert_eq!(h.state().ui.status, "Upload with OK first. Publish uses the Sta.sh item from that upload.");
+        assert!(h.state().deviantart_job.is_none());
+        assert!(rx.try_recv().is_err());
+    }
+}

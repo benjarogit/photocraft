@@ -1,6 +1,6 @@
 //! Optional gallery/edit/profile controls. Private uploads and publishing do not depend on this surface.
 use super::extras::{avatar_file, gallery_section, start_call};
-use super::*;
+use super::{PhotocraftApp, Value, clean_tags, json, start_connect};
 
 pub(super) fn body(app: &mut PhotocraftApp, ui: &mut egui::Ui, f: &mut serde_json::Map<String, Value>) {
     gallery_section(app, ui, f);
@@ -13,7 +13,10 @@ pub(super) fn body(app: &mut PhotocraftApp, ui: &mut egui::Ui, f: &mut serde_jso
     if crate::widgets::secondary_button(ui, tl!("Update title and tags"), 220.0).clicked() {
         let tags = clean_tags(f.get("tags").and_then(Value::as_str).unwrap_or(""));
         let title = f.get("title").and_then(Value::as_str).unwrap_or("");
-        if let Err(error) = start_call(app, &json!({"op":"edit","deviationId": deviation_id, "title": title, "tags": tags}).to_string()) {
+        if deviation_id.trim().is_empty() {
+            app.ui.status = tl!("Enter the deviation id first.").to_string();
+            app.ui.status_error = true;
+        } else if let Err(error) = start_call(app, &json!({"op":"edit","deviationId": deviation_id.trim(), "title": title, "tags": tags}).to_string()) {
             app.ui.status = error;
             app.ui.status_error = true;
         }

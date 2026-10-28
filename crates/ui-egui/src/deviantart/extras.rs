@@ -1,5 +1,7 @@
 //! Gallery, download, publish/edit and avatar host plumbing. Submission uses the engine.
-use super::*;
+#[cfg(not(target_arch = "wasm32"))]
+use super::{Job, file_name, stem};
+use super::{JobKind, PhotocraftApp, RecentItem, Settings, Value, authorize_action, json, remove_temp_path, start_connect, stash_url};
 
 pub fn gallery_rows(text: &str) -> Vec<Value> {
     let mut out = Vec::new();

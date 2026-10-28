@@ -1,13 +1,14 @@
 //! Public publishing controls, independent of gallery and profile management.
 use super::extras::start_call;
-use super::*;
+use super::{PhotocraftApp, Value, json, start_connect};
 
 pub(super) fn body(app: &mut PhotocraftApp, ui: &mut egui::Ui, f: &mut serde_json::Map<String, Value>) {
     ui.label(tl!("Sta.sh item id"));
-    let mut item_id = f.get("itemId").and_then(Value::as_str).unwrap_or("").to_string();
-    if item_id.is_empty() {
-        item_id = app.deviantart.last_item_id.clone();
-    }
+    let mut item_id = match f.get("itemId") {
+        Some(Value::String(value)) => value.clone(),
+        Some(_) => String::new(),
+        None => app.deviantart.last_item_id.clone(),
+    };
     if ui.add(egui::TextEdit::singleline(&mut item_id).desired_width(120.0)).changed() {
         f.insert("itemId".into(), json!(item_id.clone()));
     }
@@ -32,10 +33,14 @@ pub(super) fn body(app: &mut PhotocraftApp, ui: &mut egui::Ui, f: &mut serde_jso
         if !public_ok {
             app.ui.status = tl!("Confirm that this publish is public.").to_string();
             app.ui.status_error = true;
-        } else if item_id.trim().is_empty() || item_id == "0" {
+            return;
+        }
+        let Some(item_id) = item_id.trim().parse::<i64>().ok().filter(|id| *id > 0) else {
             app.ui.status = tl!("Upload with OK first. Publish uses the Sta.sh item from that upload.").to_string();
             app.ui.status_error = true;
-        } else if !app.deviantart.scopes.split_whitespace().any(|scope| scope == "publish") {
+            return;
+        };
+        if !app.deviantart.scopes.split_whitespace().any(|scope| scope == "publish") {
             app.ui.status = tl!("Reconnect to DeviantArt to grant permission to publish.").to_string();
             if let Err(error) = start_connect(app, "publish") {
                 app.ui.status = error;
@@ -43,7 +48,7 @@ pub(super) fn body(app: &mut PhotocraftApp, ui: &mut egui::Ui, f: &mut serde_jso
             }
         } else if let Err(error) = start_call(
             app,
-            &json!({"op":"publish","itemId": item_id.parse::<i64>().unwrap_or(0), "mature": mature, "level": "moderate", "classes": [], "creativeCommons": creative_commons, "commercial": commercial, "modify": "no"}).to_string(),
+            &json!({"op":"publish","itemId": item_id, "mature": mature, "level": "moderate", "classes": [], "creativeCommons": creative_commons, "commercial": commercial, "modify": "no"}).to_string(),
         ) {
             app.ui.status = error;
             app.ui.status_error = true;
