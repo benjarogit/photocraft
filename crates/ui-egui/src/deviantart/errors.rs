@@ -1,6 +1,6 @@
 //! DeviantArt login and request error handling.
 
-use super::*;
+use super::{PhotocraftApp, save_settings, settings_from_json, show_result};
 
 /// DeviantArt rotates the refresh token on every use. The keychain has the new one; the
 /// dialog still holds the one it sent. Copy the keychain value before the next save.
